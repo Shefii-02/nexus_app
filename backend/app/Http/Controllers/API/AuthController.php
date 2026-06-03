@@ -215,7 +215,6 @@ class AuthController extends Controller
         try {
             // OTP check (dev logic)
             if ($request->code !== '1234') {
-                Log::info('1234 Invalid');
                 return response()->json([
                     'success' => false,
                     'message' => 'Invalid OTP',
@@ -252,6 +251,7 @@ class AuthController extends Controller
                 'status' => true,
                 'access_token' => $token,
                 'refresh_token' => $refreshToken,
+                'is_new_user' => false,
                 'token_type' => 'Bearer',
                 'expires_in' => config('jwt.ttl', 60) * 60,
                 'refresh_expires_in' => config('jwt.refresh_ttl', 43200),

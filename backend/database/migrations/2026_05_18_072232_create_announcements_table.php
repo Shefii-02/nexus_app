@@ -14,7 +14,7 @@ return new class extends Migration
                 $table->string('title');
                 $table->text('content');
                 $table->foreignId('created_by')->constrained('users')->nullOnDelete();
-                $table->enum('target_type', ['all_users', 'all_staffs','all_students', 'all_teachers', 'selected_users', 'roles', 'batches', 'specific'])->default('all');
+                $table->enum('target_type', ['all_users', 'all_staffs','all_students', 'all_teachers', 'selected_users', 'roles', 'batches', 'specific'])->default('all_users');
                 $table->dateTime('start_date')->nullable();
                 $table->dateTime('end_date')->nullable();
                 $table->enum('priority', ['low', 'medium', 'high'])->default('medium');

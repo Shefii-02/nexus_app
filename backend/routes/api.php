@@ -189,8 +189,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('/invoice/{type}/{id}', [PaymentController::class, 'invoice']);
     });
 
-    Route::prefix('transactions')
-        ->group(function () {
+    Route::prefix('transactions')->group(function () {
 
             Route::get(
                 '/',

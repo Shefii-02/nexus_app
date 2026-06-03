@@ -25,7 +25,7 @@ use App\Http\Controllers\Api\Admin\TransactionController;
 use App\Http\Controllers\API\Admin\UserController;
 use App\Http\Controllers\Api\Admin\StaffPaymentController;
 use App\Http\Controllers\Api\Admin\TeacherPaymentItemController;
-use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\Api\Admin\ReportController;
 
 
 

@@ -207,7 +207,7 @@ class AuthController extends Controller
         ]);
 
         // OTP check (dev logic)
-        if ($request->code !== '123456') {
+        if ($request->code !== '1234') {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid OTP',

@@ -215,6 +215,7 @@ class AuthController extends Controller
         try {
             // OTP check (dev logic)
             if ($request->code !== '1234') {
+                Log::info('1234 Invalid');
                 return response()->json([
                     'success' => false,
                     'message' => 'Invalid OTP',

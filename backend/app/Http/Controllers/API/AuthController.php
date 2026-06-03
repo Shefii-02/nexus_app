@@ -196,13 +196,17 @@ class AuthController extends Controller
 
     public function verifyOtp(Request $request)
     {
-        Log::info('Received OTP verification request', ['phone' => $request->phone, 'code' => $request->code]);
+        Log::info('Received OTP verification request', [
+            'phone' => $request->phone,
+            'code' => $request->code
+        ]);
+
         $request->validate([
             'phone' => 'required|string',
             'code' => 'required|string',
         ]);
 
-        // Accept any OTP or only 123456
+        // OTP check (dev logic)
         if ($request->code !== '123456') {
             return response()->json([
                 'success' => false,
@@ -210,18 +214,43 @@ class AuthController extends Controller
             ], 422);
         }
 
-        $user = [
-            'id' => 1,
-            'name' => 'Demo User',
-            'email' => 'demo@example.com',
-            'avatar' => '👨',
-            'parent_name' => 'Parent Demo',
-        ];
+        // 🔥 STEP 1: Get FIRST user (as you requested)
+        $user = \App\Models\User::first();
 
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No users found in system',
+            ], 404);
+        }
+
+        // 🔥 STEP 2: Generate JWT token using api guard
+        $token = auth('api')->login($user);
+
+        // 🔥 STEP 3: Refresh token logic (reuse your system)
+        $refreshToken = Str::random(64);
+
+        \App\Models\RefreshToken::create([
+            'user_id' => $user->id,
+            'token_hash' => Hash::make($refreshToken),
+            'expires_at' => now()->addDays(7),
+            'access_token_expires_at' => now()->addMinutes(config('jwt.ttl', 60)),
+        ]);
+
+        // 🔥 STEP 4: Return SAME response format as login()
         return response()->json([
-            'success' => true,
-            'token' => 'dummy_token_123456',
-            'user' => $user,
+            'status' => true,
+            'access_token' => $token,
+            'refresh_token' => $refreshToken,
+            'token_type' => 'Bearer',
+            'expires_in' => config('jwt.ttl', 60) * 60,
+            'refresh_expires_in' => config('jwt.refresh_ttl', 43200),
+
+            'user' => [
+                ...$user->toArray(),
+                'roles' => $user->getRoleNames(),
+                'permissions' => $user->getAllPermissions()->pluck('name'),
+            ],
         ]);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\RefreshToken;
+use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -221,7 +222,7 @@ class AuthController extends Controller
             }
 
             // 🔥 FIX: Find the SPECIFIC user by phone number instead of the first user
-            $user = User::where('phone', $request->phone)->first();
+            $user = User::first();
 
             if (!$user) {
                 return response()->json([

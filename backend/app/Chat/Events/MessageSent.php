@@ -39,7 +39,6 @@ class MessageSent implements ShouldBroadcast
                 'message'         => $this->message->message,
                 'type'            => $this->message->type,
                 'media_url'       => $this->message->media_url,
-                'media_meta'      => $this->message->media_meta,
                 'reply_to'        => $this->message->reply_to,
                 'reply_message'   => $this->message->replyTo,
                 'is_edited'       => $this->message->is_edited,

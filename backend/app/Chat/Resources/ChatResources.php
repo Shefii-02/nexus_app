@@ -21,7 +21,8 @@ class MessageResource extends JsonResource
             'message'         => $this->is_deleted ? null : $this->message,
             'type'            => $this->type,
             'media_url'       => $this->is_deleted ? null : $this->media_url,
-            'media_meta'      => $this->is_deleted ? null : $this->media_meta,
+            // 'media_meta'      => $this->is_deleted ? null : $this->media_meta,
+            'media_meta'      => null,
             'reply_to'        => $this->reply_to,
             'reply_message'   => $this->whenLoaded('replyTo', fn() =>
                 $this->replyTo ? [

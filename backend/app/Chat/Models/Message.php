@@ -10,12 +10,11 @@ class Message extends Model
 {
     protected $fillable = [
         'conversation_id', 'sender_id', 'message', 'type',
-        'media_url', 'media_meta', 'reply_to', 'is_deleted',
+        'media_url', 'reply_to', 'is_deleted',
         'is_edited', 'is_pinned', 'deleted_at'
     ];
 
     protected $casts = [
-        'media_meta'  => 'array',
         'is_deleted'  => 'boolean',
         'is_edited'   => 'boolean',
         'is_pinned'   => 'boolean',

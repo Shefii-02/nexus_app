@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\API\Admin\AdmissionController;
 use App\Http\Controllers\Api\Admin\AdmissionPaymentController;
-use App\Http\Controllers\Api\Admin\AdmissionRenewalController;
+// use App\Http\Controllers\Api\Admin\AdmissionRenewalController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
@@ -126,34 +126,33 @@ Route::middleware(['auth:api'])->group(function () {
             [AdmissionController::class, 'payments']
         );
 
-        Route::prefix('renewals')
-            ->group(function () {
+        // Route::prefix('renewals')->group(function () {
 
-                Route::get(
-                    '/',
-                    [AdmissionRenewalController::class, 'index']
-                );
+        //     Route::get(
+        //         '/',
+        //         [AdmissionRenewalController::class, 'index']
+        //     );
 
-                Route::get(
-                    '/due',
-                    [AdmissionRenewalController::class, 'due']
-                );
+        //     Route::get(
+        //         '/due',
+        //         [AdmissionRenewalController::class, 'due']
+        //     );
 
-                Route::post(
-                    '/',
-                    [AdmissionRenewalController::class, 'store']
-                );
+        //     Route::post(
+        //         '/',
+        //         [AdmissionRenewalController::class, 'store']
+        //     );
 
-                Route::get(
-                    '/{id}',
-                    [AdmissionRenewalController::class, 'show']
-                );
+        //     Route::get(
+        //         '/{id}',
+        //         [AdmissionRenewalController::class, 'show']
+        //     );
 
-                Route::post(
-                    '/{id}/mark-paid',
-                    [AdmissionRenewalController::class, 'markPaid']
-                );
-            });
+        //     Route::post(
+        //         '/{id}/mark-paid',
+        //         [AdmissionRenewalController::class, 'markPaid']
+        //     );
+        // });
 
 
         Route::prefix('admission-payments')
@@ -604,4 +603,4 @@ Route::middleware(['auth:api'])->group(function () {
 });
 
 
-require __DIR__.'/chat.php';
+require __DIR__ . '/chat.php';

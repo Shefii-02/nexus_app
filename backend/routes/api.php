@@ -1,8 +1,8 @@
 <?php
 
-// use App\Http\Controllers\API\Admin\AdmissionController;
-// use App\Http\Controllers\Api\Admin\AdmissionPaymentController;
-// use App\Http\Controllers\Api\Admin\AdmissionRenewalController;
+use App\Http\Controllers\API\Admin\AdmissionController;
+use App\Http\Controllers\Api\Admin\AdmissionPaymentController;
+use App\Http\Controllers\Api\Admin\AdmissionRenewalController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
@@ -116,62 +116,64 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::prefix('payments')->group(function () {
 
-        // Route::apiResource(
-        //     'admissions',
-        //     AdmissionController::class
-        // );
+        Route::apiResource(
+            'admissions',
+            AdmissionController::class
+        );
 
-        // Route::get(
-        //     'admissions/{id}/payments',
-        //     [AdmissionController::class, 'payments']
-        // );
+        Route::get(
+            'admissions/{id}/payments',
+            [AdmissionController::class, 'payments']
+        );
 
-        // Route::prefix('renewals')->group(function () {
+        Route::prefix('renewals')
+            ->group(function () {
 
-        //     Route::get(
-        //         '/',
-        //         [AdmissionRenewalController::class, 'index']
-        //     );
+                Route::get(
+                    '/',
+                    [AdmissionRenewalController::class, 'index']
+                );
 
-        //     Route::get(
-        //         '/due',
-        //         [AdmissionRenewalController::class, 'due']
-        //     );
+                Route::get(
+                    '/due',
+                    [AdmissionRenewalController::class, 'due']
+                );
 
-        //     Route::post(
-        //         '/',
-        //         [AdmissionRenewalController::class, 'store']
-        //     );
+                Route::post(
+                    '/',
+                    [AdmissionRenewalController::class, 'store']
+                );
 
-        //     Route::get(
-        //         '/{id}',
-        //         [AdmissionRenewalController::class, 'show']
-        //     );
+                Route::get(
+                    '/{id}',
+                    [AdmissionRenewalController::class, 'show']
+                );
 
-        //     Route::post(
-        //         '/{id}/mark-paid',
-        //         [AdmissionRenewalController::class, 'markPaid']
-        //     );
-        // });
+                Route::post(
+                    '/{id}/mark-paid',
+                    [AdmissionRenewalController::class, 'markPaid']
+                );
+            });
 
 
-        // Route::prefix('admission-payments')->group(function () {
+        Route::prefix('admission-payments')
+            ->group(function () {
 
-        //     Route::get(
-        //         '/',
-        //         [AdmissionPaymentController::class, 'index']
-        //     );
+                Route::get(
+                    '/',
+                    [AdmissionPaymentController::class, 'index']
+                );
 
-        //     Route::post(
-        //         '/',
-        //         [AdmissionPaymentController::class, 'store']
-        //     );
+                Route::post(
+                    '/',
+                    [AdmissionPaymentController::class, 'store']
+                );
 
-        //     Route::get(
-        //         '/{id}',
-        //         [AdmissionPaymentController::class, 'show']
-        //     );
-        // });
+                Route::get(
+                    '/{id}',
+                    [AdmissionPaymentController::class, 'show']
+                );
+            });
 
 
         // Admission
@@ -189,7 +191,8 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('/invoice/{type}/{id}', [PaymentController::class, 'invoice']);
     });
 
-    Route::prefix('transactions')->group(function () {
+    Route::prefix('transactions')
+        ->group(function () {
 
             Route::get(
                 '/',
@@ -601,4 +604,4 @@ Route::middleware(['auth:api'])->group(function () {
 });
 
 
-require __DIR__ . '/chat.php';
+require __DIR__.'/chat.php';

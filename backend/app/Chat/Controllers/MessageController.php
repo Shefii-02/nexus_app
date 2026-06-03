@@ -3,10 +3,10 @@
 namespace App\Chat\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Conversation;
+use App\Chat\Models\Conversation;
 use App\Models\ConversationParticipant;
 use App\Models\DeletedMessage;
-use App\Models\Message;
+use App\Chat\Models\Message;
 use App\Models\MessageReaction;
 use App\Models\MessageRead;
 use App\Events\MessageSent;

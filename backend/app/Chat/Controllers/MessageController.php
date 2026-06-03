@@ -2,6 +2,7 @@
 
 namespace App\Chat\Controllers;
 
+use App\Chat\Events\MessageReadEvent;
 use App\Http\Controllers\Controller;
 use App\Chat\Models\Conversation;
 use App\Models\ConversationParticipant;
@@ -12,7 +13,6 @@ use App\Models\MessageRead;
 use App\Events\MessageSent;
 use App\Events\MessageUpdated;
 use App\Events\MessageDeleted;
-use App\Events\MessageReadEvent;
 use App\Events\ReactionAdded;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;

@@ -233,7 +233,9 @@ class AuthController extends Controller
 
             // 🔥 FIX: Log the user in via the 'api' guard to get the JWT token
             $token = auth('api')->login($user);
-Log::info($token);
+
+            Log::info($token);
+
             // Generate refresh token logic
             $refreshToken = Str::random(64);
 
@@ -259,7 +261,7 @@ Log::info($token);
                 ],
             ]);
         } catch (Exception $e) {
-            Log::error('OTP Verification Error: ' . $e->getMessage());
+            Log::info('OTP Verification Error: ' . $e->getMessage());
 
             // 🔥 FIX: Corrected response syntax array nesting error
             return response()->json([

@@ -55,6 +55,8 @@ return new class extends Migration
                 $table->timestamps();
                 $table->softDeletes();
             });
+
+
         }
 
 
@@ -164,10 +166,42 @@ return new class extends Migration
 
             $table->softDeletes();
         });
+
+          Schema::create('coupon_usages', function (Blueprint $table) {
+
+                $table->id();
+
+                $table->foreignId('coupon_id')
+                    ->constrained()
+                    ->cascadeOnDelete();
+
+                $table->foreignId('user_id')
+                    ->constrained('users');
+
+                $table->foreignId('admission_id')
+                    ->nullable()
+                    ->constrained('admissions')
+                    ->nullOnDelete();
+
+                $table->foreignId('renewal_id')
+                    ->nullable()
+                    ->constrained('admission_renewals')
+                    ->nullOnDelete();
+
+                $table->decimal('original_amount', 12, 2);
+
+                $table->decimal('discount_amount', 12, 2);
+
+                $table->decimal('final_amount', 12, 2);
+
+                $table->timestamps();
+            });
     }
 
     public function down(): void
     {
+
+        Schema::dropIfExists('coupon_usages');
         Schema::dropIfExists('admissions');
         Schema::dropIfExists('admission_renewals');
         Schema::dropIfExists('admission_payments');

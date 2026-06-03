@@ -24,6 +24,7 @@ return new class extends Migration
                 'image',
                 'file',
                 'audio',
+                'voice',
                 'video',
                 'class_link',
                 'record_link'

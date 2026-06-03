@@ -200,12 +200,16 @@ class AuthController extends Controller
             'phone' => $request->phone,
             'code' => $request->code
         ]);
+        $phone = str_replace(' ', '', $request->phone);
+        $request->merge([
+            'phone' => $phone
+        ]);
 
         $request->validate([
             'phone' => 'required|string',
             'code' => 'required|string',
         ]);
-  Log::info('request  issue');
+        Log::info('request  issue');
         // OTP check (dev logic)
         if ($request->code !== '1234') {
             return response()->json([

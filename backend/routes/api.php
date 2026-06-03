@@ -1,8 +1,9 @@
 <?php
 
 use App\Http\Controllers\API\Admin\AdmissionController;
-use App\Http\Controllers\Api\Admin\AdmissionPaymentController;
-use App\Http\Controllers\Api\Admin\AdmissionRenewalController;
+use App\Http\Controllers\API\Admin\AdmissionPaymentController;
+use App\Http\Controllers\API\Admin\AdmissionRenewalController;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
@@ -16,16 +17,16 @@ use App\Http\Controllers\API\Admin\AnnouncementController;
 use App\Http\Controllers\API\Admin\ConversationController;
 use App\Http\Controllers\Api\Admin\CouponController;
 use App\Http\Controllers\API\Admin\CourseMaterialController;
-use App\Http\Controllers\Api\Admin\LeaveRequestController;
+use App\Http\Controllers\API\Admin\LeaveRequestController;
 use App\Http\Controllers\API\Admin\MessageController;
 use App\Http\Controllers\API\Admin\NotificationController;
 use App\Http\Controllers\API\Admin\RoleController;
-use App\Http\Controllers\Api\Admin\TeacherPaymentController;
-use App\Http\Controllers\Api\Admin\TransactionController;
+use App\Http\Controllers\API\Admin\TeacherPaymentController;
+use App\Http\Controllers\API\Admin\TransactionController;
 use App\Http\Controllers\API\Admin\UserController;
-use App\Http\Controllers\Api\Admin\StaffPaymentController;
-use App\Http\Controllers\Api\Admin\TeacherPaymentItemController;
-use App\Http\Controllers\Api\Admin\ReportController;
+use App\Http\Controllers\API\Admin\StaffPaymentController;
+use App\Http\Controllers\API\Admin\TeacherPaymentItemController;
+use App\Http\Controllers\API\Admin\ReportController;
 
 
 

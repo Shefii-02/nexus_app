@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\RefreshToken;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -209,7 +210,8 @@ class AuthController extends Controller
             'phone' => 'required|string',
             'code' => 'required|string',
         ]);
-        Log::info('request  issue');
+
+        try{
         // OTP check (dev logic)
         if ($request->code !== '1234') {
             return response()->json([
@@ -268,5 +270,9 @@ class AuthController extends Controller
                 'permissions' => $user->getAllPermissions()->pluck('name'),
             ],
         ]);
+        }
+        catch(Exception $e){
+               Log::info('Error :',$e->getMessage());
+        }
     }
 }

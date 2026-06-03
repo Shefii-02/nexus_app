@@ -201,78 +201,71 @@ class AuthController extends Controller
             'phone' => $request->phone,
             'code' => $request->code
         ]);
+
+        // Clean phone number format
         $phone = str_replace(' ', '', $request->phone);
-        $request->merge([
-            'phone' => $phone
-        ]);
+        $request->merge(['phone' => $phone]);
 
         $request->validate([
             'phone' => 'required|string',
             'code' => 'required|string',
         ]);
 
-        try{
-        // OTP check (dev logic)
-        if ($request->code !== '1234') {
+        try {
+            // OTP check (dev logic)
+            if ($request->code !== '1234') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid OTP',
+                ], 422);
+            }
+
+            // 🔥 FIX: Find the SPECIFIC user by phone number instead of the first user
+            $user = User::where('phone', $request->phone)->first();
+
+            if (!$user) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'User not found with this phone number'
+                ], 404);
+            }
+
+            // 🔥 FIX: Log the user in via the 'api' guard to get the JWT token
+            $token = auth('api')->login($user);
+
+            // Generate refresh token logic
+            $refreshToken = Str::random(64);
+
+            RefreshToken::create([
+                'user_id' => $user->id,
+                'token_hash' => Hash::make($refreshToken),
+                'expires_at' => now()->addDays(7),
+                'access_token_expires_at' => now()->addMinutes(config('jwt.ttl', 60)),
+            ]);
+
+            // Return standardized token response
             return response()->json([
-                'success' => false,
-                'message' => 'Invalid OTP',
-            ], 422);
-        }
+                'status' => true,
+                'access_token' => $token,
+                'refresh_token' => $refreshToken,
+                'token_type' => 'Bearer',
+                'expires_in' => config('jwt.ttl', 60) * 60,
+                'refresh_expires_in' => config('jwt.refresh_ttl', 43200),
+                'user' => [
+                    ...$user->toArray(),
+                    'roles' => $user->getRoleNames(),
+                    'permissions' => $user->getAllPermissions()->pluck('name'),
+                ],
+            ]);
+        } catch (Exception $e) {
+            Log::error('OTP Verification Error: ' . $e->getMessage());
 
-        $user = \App\Models\User::first();
-
-        if (!$user) {
+            // 🔥 FIX: Corrected response syntax array nesting error
             return response()->json([
                 'status' => false,
-                'message' => 'No users found'
-            ], 404);
-        }
-
-        $token = auth('api')->fromUser($user);
-
-        // 🔥 STEP 1: Get FIRST user (as you requested)
-
-
-        // if (!$user) {
-        //     Log::info('Not found User');
-        //     return response()->json([
-        //         'success' => false,
-        //         'message' => 'No users found in system',
-        //     ], 404);
-        // }
-
-        // // 🔥 STEP 2: Generate JWT token using api guard
-        // $token = auth('api')->login($user);
-
-        // 🔥 STEP 3: Refresh token logic (reuse your system)
-        $refreshToken = Str::random(64);
-
-        \App\Models\RefreshToken::create([
-            'user_id' => $user->id,
-            'token_hash' => Hash::make($refreshToken),
-            'expires_at' => now()->addDays(7),
-            'access_token_expires_at' => now()->addMinutes(config('jwt.ttl', 60)),
-        ]);
-
-        // 🔥 STEP 4: Return SAME response format as login()
-        return response()->json([
-            'status' => true,
-            'access_token' => $token,
-            'refresh_token' => $refreshToken,
-            'token_type' => 'Bearer',
-            'expires_in' => config('jwt.ttl', 60) * 60,
-            'refresh_expires_in' => config('jwt.refresh_ttl', 43200),
-
-            'user' => [
-                ...$user->toArray(),
-                'roles' => $user->getRoleNames(),
-                'permissions' => $user->getAllPermissions()->pluck('name'),
-            ],
-        ]);
-        }
-        catch(Exception $e){
-               Log::info('Error :',$e->getMessage());
+                'message' => 'An error occurred during verification',
+                'error' => $e->getMessage()
+            ], 500); // Changed from 404 to 500 server error
         }
     }
 }

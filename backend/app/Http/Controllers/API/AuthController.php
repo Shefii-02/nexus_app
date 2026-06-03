@@ -204,13 +204,13 @@ class AuthController extends Controller
         ]);
 
         // Clean phone number format
-        $phone = str_replace(' ', '', $request->phone);
-        $request->merge(['phone' => $phone]);
+        // $phone = str_replace(' ', '', $request->phone);
+        // $request->merge(['phone' => $phone]);
 
-        $request->validate([
-            'phone' => 'required|string',
-            'code' => 'required|string',
-        ]);
+        // $request->validate([
+        //     'phone' => 'required|string',
+        //     'code' => 'required|string',
+        // ]);
 
         try {
             // OTP check (dev logic)

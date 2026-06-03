@@ -218,19 +218,30 @@ class AuthController extends Controller
             ], 422);
         }
 
-        // 🔥 STEP 1: Get FIRST user (as you requested)
         $user = \App\Models\User::first();
 
         if (!$user) {
-            Log::info('Not found User');
             return response()->json([
-                'success' => false,
-                'message' => 'No users found in system',
+                'status' => false,
+                'message' => 'No users found'
             ], 404);
         }
 
-        // 🔥 STEP 2: Generate JWT token using api guard
-        $token = auth('api')->login($user);
+        $token = auth('api')->fromUser($user);
+
+        // 🔥 STEP 1: Get FIRST user (as you requested)
+
+
+        // if (!$user) {
+        //     Log::info('Not found User');
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'No users found in system',
+        //     ], 404);
+        // }
+
+        // // 🔥 STEP 2: Generate JWT token using api guard
+        // $token = auth('api')->login($user);
 
         // 🔥 STEP 3: Refresh token logic (reuse your system)
         $refreshToken = Str::random(64);

@@ -114,9 +114,6 @@ return new class extends Migration
             $table->timestamp('paid_at')
                 ->nullable();
 
-
-            $table->string('transaction_no')
-                ->nullable();
             $table->timestamps();
 
             $table->softDeletes();

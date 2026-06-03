@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\API\Admin\AdmissionController;
-use App\Http\Controllers\Api\Admin\AdmissionPaymentController;
+// use App\Http\Controllers\API\Admin\AdmissionController;
+// use App\Http\Controllers\Api\Admin\AdmissionPaymentController;
 // use App\Http\Controllers\Api\Admin\AdmissionRenewalController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -116,15 +116,15 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::prefix('payments')->group(function () {
 
-        Route::apiResource(
-            'admissions',
-            AdmissionController::class
-        );
+        // Route::apiResource(
+        //     'admissions',
+        //     AdmissionController::class
+        // );
 
-        Route::get(
-            'admissions/{id}/payments',
-            [AdmissionController::class, 'payments']
-        );
+        // Route::get(
+        //     'admissions/{id}/payments',
+        //     [AdmissionController::class, 'payments']
+        // );
 
         // Route::prefix('renewals')->group(function () {
 
@@ -155,24 +155,23 @@ Route::middleware(['auth:api'])->group(function () {
         // });
 
 
-        Route::prefix('admission-payments')
-            ->group(function () {
+        // Route::prefix('admission-payments')->group(function () {
 
-                Route::get(
-                    '/',
-                    [AdmissionPaymentController::class, 'index']
-                );
+        //     Route::get(
+        //         '/',
+        //         [AdmissionPaymentController::class, 'index']
+        //     );
 
-                Route::post(
-                    '/',
-                    [AdmissionPaymentController::class, 'store']
-                );
+        //     Route::post(
+        //         '/',
+        //         [AdmissionPaymentController::class, 'store']
+        //     );
 
-                Route::get(
-                    '/{id}',
-                    [AdmissionPaymentController::class, 'show']
-                );
-            });
+        //     Route::get(
+        //         '/{id}',
+        //         [AdmissionPaymentController::class, 'show']
+        //     );
+        // });
 
 
         // Admission

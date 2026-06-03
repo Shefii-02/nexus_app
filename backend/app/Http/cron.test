@@ -1,0 +1,45 @@
+Admission::query()
+    ->whereDate(
+        'expiry_date',
+        now()->addDays(7)
+    )
+    ->where('status', 'active')
+    ->chunk(100, function ($items) {
+
+        foreach ($items as $admission) {
+
+            AdmissionRenewal::firstOrCreate(
+                [
+                    'admission_id' => $admission->id,
+                    'status' => 'pending',
+                ],
+                [
+                    'student_id' => $admission->student_id,
+
+                    'course_id' => $admission->course_id,
+
+                    'current_expiry_date'
+                        => $admission->expiry_date,
+
+                    'renewal_from'
+                        => $admission->expiry_date
+                            ->copy()
+                            ->addDay(),
+
+                    'renewal_to'
+                        => $admission->expiry_date
+                            ->copy()
+                            ->addMonth(),
+
+                    'amount'
+                        => $admission->net_fee,
+
+                    'final_amount'
+                        => $admission->net_fee,
+
+                    'status'
+                        => 'pending',
+                ]
+            );
+        }
+    });

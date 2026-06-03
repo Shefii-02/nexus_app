@@ -21,7 +21,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withBroadcasting(
         __DIR__ . '/../routes/channels.php',
         [
-            'prefix'     => 'broadcasting',
+            // 'prefix'     => 'broadcasting',
+            ['prefix' => 'api/broadcasting', 'middleware' => ['auth:api']],
+
             'middleware' => ['auth:api'], // ← JWT guard
         ]
     )

@@ -29,6 +29,13 @@ use App\Http\Controllers\API\Admin\TeacherPaymentItemController;
 use App\Http\Controllers\API\Admin\ReportController;
 
 
+// routes/api.php
+use Illuminate\Support\Facades\Broadcast;
+
+Route::post('/broadcasting/auth', function () {
+    return Broadcast::auth(request());
+})->middleware('auth:api');
+
 
 Route::post('send-otp', [AuthController::class, 'sendOtp']);
 Route::post('verify-otp', [AuthController::class, 'verifyOtp']);

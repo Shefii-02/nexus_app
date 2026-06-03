@@ -205,7 +205,7 @@ class AuthController extends Controller
             'phone' => 'required|string',
             'code' => 'required|string',
         ]);
-
+  Log::info('request  issue');
         // OTP check (dev logic)
         if ($request->code !== '1234') {
             return response()->json([
@@ -218,6 +218,7 @@ class AuthController extends Controller
         $user = \App\Models\User::first();
 
         if (!$user) {
+            Log::info('Not found User');
             return response()->json([
                 'success' => false,
                 'message' => 'No users found in system',

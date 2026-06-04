@@ -4,7 +4,7 @@ namespace App\Chat\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Chat\Models\Conversation;
-use App\Chat\Models\ConversationParticipant;
+use App\Models\ConversationParticipant;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;

@@ -131,7 +131,7 @@ class MessageController extends Controller
         $message = Message::where('conversation_id', $conversationId)->findOrFail($messageId);
 
         if ($forAll && $message->sender_id === $userId) {
-            $message->update(['is_deleted' => true, 'message' => null, 'media_url' => null, 'deleted_at' => now()]);
+            $message->update(['is_deleted' => true, 'deleted_at' => now()]);
             broadcast(new MessageDeleted($messageId, $conversationId))->toOthers();
         } else {
             DeletedMessage::firstOrCreate([

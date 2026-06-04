@@ -8,8 +8,7 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-
-
+use Illuminate\Support\Facades\Log;
 
 // ─── MessageUpdated ───────────────────────────────────────────────────────────
 class MessageUpdated implements ShouldBroadcast
@@ -23,10 +22,20 @@ class MessageUpdated implements ShouldBroadcast
         return [new PrivateChannel("conversation.{$this->message->conversation_id}")];
     }
 
-    public function broadcastAs(): string { return 'message.updated'; }
+    public function broadcastAs(): string
+    {
+        return 'message.updated';
+    }
 
     public function broadcastWith(): array
     {
-        return ['message' => $this->message->fresh(['reactions'])];
+
+        $data = [
+            'message' => $this->message->fresh(['reactions'])
+        ];
+
+        Log::info('MessageUpdated Broadcast', $data);
+
+        return ['message' => $data];
     }
 }

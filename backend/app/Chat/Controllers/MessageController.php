@@ -16,6 +16,7 @@ use App\Chat\Events\MessageDeleted;
 use App\Chat\Events\ReactionAdded;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class MessageController extends Controller
@@ -131,15 +132,16 @@ class MessageController extends Controller
         $message = Message::where('conversation_id', $conversationId)->findOrFail($messageId);
 
         if ($forAll && $message->sender_id === $userId) {
+            Log::info('Deleting');
             $message->update(['is_deleted' => true, 'deleted_at' => now()]);
-            broadcast(new MessageDeleted($messageId, $conversationId))->toOthers();
+            // broadcast(new MessageDeleted($messageId, $conversationId))->toOthers();
         } else {
             DeletedMessage::firstOrCreate([
                 'message_id' => $messageId,
                 'user_id'    => $userId,
             ]);
         }
-
+        broadcast(new MessageDeleted($messageId, $conversationId))->toOthers();
         return response()->json(['message' => 'Deleted.']);
     }
 

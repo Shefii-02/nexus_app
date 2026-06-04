@@ -33,7 +33,12 @@ class TypingIndicator implements ShouldBroadcast
 
     public function broadcastWith(): array
     {
-        Log::info('message typing  Broadcast', $this->userId . ' -' . $this->isTyping);
+        $data = [
+            'userId' => $this->userId,
+            'isTyping' => $this->isTyping,
+        ];
+
+        Log::info('message typing  Broadcast', $data);
 
         return [
             'user_id'   => $this->userId,

@@ -31,7 +31,11 @@ class MessageSent implements ShouldBroadcast
 
     public function broadcastWith(): array
     {
-        Log::info('message sending  Broadcast',  $this->message->message);
+        $data = [
+            'message' => $this->message->message
+        ];
+
+        Log::info('message sending  Broadcast',  $data);
 
         $this->message->load(['sender:id,name,avatar', 'replyTo:id,message,sender_id', 'reactions']);
         return [

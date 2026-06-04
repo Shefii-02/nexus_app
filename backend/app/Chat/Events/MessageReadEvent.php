@@ -26,11 +26,17 @@ class MessageReadEvent implements ShouldBroadcast
         return [new PrivateChannel("conversation.{$this->conversationId}")];
     }
 
-    public function broadcastAs(): string { return 'message.read'; }
+    public function broadcastAs(): string
+    {
+        return 'message.read';
+    }
 
     public function broadcastWith(): array
     {
-               Log::info('conversation read Broadcast', $this->conversationId);
+        $data = [
+            'message' => $this->conversationId
+        ];
+        Log::info('MessageRead Broadcast', $data);
         return [
             'conversation_id' => $this->conversationId,
             'user_id'         => $this->userId,

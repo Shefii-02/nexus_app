@@ -33,7 +33,12 @@ class ReactionAdded implements ShouldBroadcast
 
     public function broadcastWith(): array
     {
-        Log::info('message reactinh  Broadcast',  $this->reaction);
+        $data = [
+            'message' => $this->reaction
+        ];
+
+
+        Log::info('message reactinh  Broadcast',  $data);
 
         return [
             'message_id' => $this->messageId,

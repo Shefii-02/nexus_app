@@ -32,7 +32,13 @@ class UserOnlineStatus implements ShouldBroadcast
 
     public function broadcastWith(): array
     {
-        Log::info('message user online status  Broadcast', $this->userId . ' -' . $this->lastSeen);
+
+        $data = [
+            'userId' => $this->userId,
+            'lastSeen' => $this->lastSeen,
+        ];
+
+        Log::info('message user online status  Broadcast', $data);
 
         return [
             'user_id'   => $this->userId,

@@ -8,6 +8,9 @@ class MessageReaction extends Model
 {
     //
 
+        protected $fillable = ['message_id', 'user_id',	'reaction'];
+
+
         public function message()
         {
             return $this->belongsTo(Message::class);

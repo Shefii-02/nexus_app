@@ -9,8 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ConversationParticipant extends Model
 {
-
-    protected $fillable = ['conversation_id', 'user_id', 'joined_at'];
+    protected $fillable = ['conversation_id', 'user_id', 'last_read_at','created_at','updated_at','is_muted','created_by','is_pinned','status','left_at','deleted_at'];
 
     public function conversation(): BelongsTo
     {

@@ -7,4 +7,5 @@ use Illuminate\Database\Eloquent\Model;
 class ConversationReport extends Model
 {
     //
+    protected $fillable = ['conversation_id', 'user_id', 'reason'];
 }

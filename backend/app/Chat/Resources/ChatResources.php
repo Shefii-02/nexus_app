@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Chat\Resources;
 
 use Illuminate\Http\Request;
@@ -22,14 +23,23 @@ class MessageResource extends JsonResource
             'type'            => $this->type,
             'media_url'       => $this->is_deleted ? null : $this->media_url,
             // 'media_meta'      => $this->is_deleted ? null : $this->media_meta,
-            'media_meta'      => null,
+            'media_meta' => $this->is_deleted
+                ? null
+                : $this->media_meta,
             'reply_to'        => $this->reply_to,
-            'reply_message'   => $this->whenLoaded('replyTo', fn() =>
+            'reply_to_message' => $this->whenLoaded(
+                'replyTo',
+                fn() =>
                 $this->replyTo ? [
-                    'id'      => $this->replyTo->id,
-                    'message' => $this->replyTo->message,
-                    'type'    => $this->replyTo->type,
-                    'sender'  => $this->replyTo->sender ? [
+                    'id'              => $this->replyTo->id,
+                    'conversation_id' => $this->replyTo->conversation_id,
+                    'sender_id'       => $this->replyTo->sender_id,
+                    'message'         => $this->replyTo->message,
+                    'type'            => $this->replyTo->type,
+                    'media_url'       => $this->replyTo->media_url,
+                    'is_deleted'      => $this->replyTo->is_deleted,
+                    'created_at'      => $this->replyTo->created_at?->toISOString(),
+                    'sender'          => $this->replyTo->sender ? [
                         'id'   => $this->replyTo->sender->id,
                         'name' => $this->replyTo->sender->name,
                     ] : null,
@@ -38,7 +48,9 @@ class MessageResource extends JsonResource
             'is_deleted'      => $this->is_deleted,
             'is_edited'       => $this->is_edited,
             'is_pinned'       => $this->is_pinned,
-            'reactions'       => $this->whenLoaded('reactions', fn() =>
+            'reactions'       => $this->whenLoaded(
+                'reactions',
+                fn() =>
                 $this->reactions->map(fn($r) => [
                     'id'        => $r->id,
                     'user_id'   => $r->user_id,
@@ -46,7 +58,9 @@ class MessageResource extends JsonResource
                     'user_name' => $r->user?->name,
                 ])
             ),
-            'reads'           => $this->whenLoaded('reads', fn() =>
+            'reads'           => $this->whenLoaded(
+                'reads',
+                fn() =>
                 $this->reads->map(fn($r) => [
                     'user_id' => $r->user_id,
                     'read_at' => $r->read_at,
@@ -95,14 +109,16 @@ class ConversationResource extends JsonResource
                 : null,
 
             // Participants (group)
-            'participants'  => $this->whenLoaded('participants', fn() =>
+            'participants'  => $this->whenLoaded(
+                'participants',
+                fn() =>
                 $this->participants->map(fn($p) => [
                     'id'          => $p->id,
                     'user_id'     => $p->user_id,
                     'status'      => $p->status,
                     'is_muted'    => $p->is_muted,
                     'is_pinned'   => $p->is_pinned,
-                    'last_read_at'=> $p->last_read_at?->toISOString(),
+                    'last_read_at' => $p->last_read_at?->toISOString(),
                     'user'        => $p->user ? [
                         'id'     => $p->user->id,
                         'name'   => $p->user->name,
@@ -113,7 +129,9 @@ class ConversationResource extends JsonResource
             ),
 
             // Last message
-            'last_message'  => $this->whenLoaded('messages', fn() =>
+            'last_message'  => $this->whenLoaded(
+                'messages',
+                fn() =>
                 $this->messages->first() ? new MessageResource($this->messages->first()) : null
             ),
         ];

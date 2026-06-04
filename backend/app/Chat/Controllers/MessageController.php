@@ -31,7 +31,8 @@ class MessageController extends Controller
         abort_unless(
             ConversationParticipant::where('conversation_id', $conversationId)
                 ->where('user_id', $userId)->where('status', 'active')->exists(),
-            403, 'Not a participant.'
+            403,
+            'Not a participant.'
         );
 
         $messages = Message::with(['sender:id,name,avatar', 'replyTo.sender:id,name', 'reactions.user:id,name', 'reads:message_id,user_id,read_at'])
@@ -216,14 +217,31 @@ class MessageController extends Controller
     /**
      * Pin/unpin a message (group admin or conversation creator).
      */
+    // public function togglePin(Request $request, int $conversationId, int $messageId): JsonResponse
+    // {
+    //     $message = Message::where('conversation_id', $conversationId)->findOrFail($messageId);
+    //     $message->update(['is_pinned' => !$message->is_pinned]);
+
+    //     broadcast(new MessageUpdated($message))->toOthers();
+
+    //     return response()->json(['is_pinned' => $message->is_pinned]);
+    // }
     public function togglePin(Request $request, int $conversationId, int $messageId): JsonResponse
     {
-        $message = Message::where('conversation_id', $conversationId)->findOrFail($messageId);
-        $message->update(['is_pinned' => !$message->is_pinned]);
+        Message::where('conversation_id', $conversationId)
+            ->update(['is_pinned' => false]);
+
+        $message = Message::where('conversation_id', $conversationId)
+            ->findOrFail($messageId);
+
+        $message->update(['is_pinned' => true]);
 
         broadcast(new MessageUpdated($message))->toOthers();
 
-        return response()->json(['is_pinned' => $message->is_pinned]);
+        return response()->json([
+            'success' => true,
+            'is_pinned' => true,
+        ]);
     }
 
     // ─── Private ─────────────────────────────────────────────────────────

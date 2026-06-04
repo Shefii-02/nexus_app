@@ -63,8 +63,8 @@ class AuthController extends Controller
             'access_token' => $token,
             'refresh_token' => $refreshToken,
             'token_type' => 'Bearer',
-            'expires_in' => config('jwt.ttl', 60) * 60, // Convert to seconds
-            'refresh_expires_in' => config('jwt.refresh_ttl', 43200), // 7 days in seconds
+            'access_token_expires_at' => config('jwt.ttl', 60) * 60, // Convert to seconds
+            'refresh_token_expires_at' => config('jwt.refresh_ttl', 43200), // 7 days in seconds
 
             'user' => [
                 ...$user->toArray(),
@@ -142,16 +142,17 @@ class AuthController extends Controller
         RefreshToken::create([
             'user_id' => $user->id,
             'token_hash' => Hash::make($newRefreshToken),
-            'expires_at' => now()->addMonth(),
+            'expires_at' => now()->addMonths(6),
             'access_token_expires_at' => $accessTokenExpiry,
         ]);
 
         return response()->json([
+            'status' => true,
             'access_token' => $newAccessToken,
             'refresh_token' => $newRefreshToken,
             'token_type' => 'Bearer',
-            'expires_in' => config('jwt.ttl', 60) * 60, // Convert to seconds
-            'refresh_expires_in' => config('jwt.refresh_ttl', 43200), // 7 days in seconds
+            'access_token_expires_at' => config('jwt.ttl', 43200) * 60,
+            'refresh_token_expires_at' => config('jwt.refresh_ttl', 259200) * 60,
             'user' => [
                 ...$user->toArray(),
                 'roles' => $user->getRoleNames(),
@@ -198,78 +199,138 @@ class AuthController extends Controller
 
     public function verifyOtp(Request $request)
     {
-        Log::info('Received OTP verification request', [
-            'phone' => $request->phone,
-            'code' => $request->code
-        ]);
-
-        // Clean phone number format
-        // $phone = str_replace(' ', '', $request->phone);
-        // $request->merge(['phone' => $phone]);
-
-        // $request->validate([
-        //     'phone' => 'required|string',
-        //     'code' => 'required|string',
-        // ]);
-
         try {
-            // OTP check (dev logic)
+
             if ($request->code !== '1234') {
                 return response()->json([
-                    'success' => false,
+                    'status' => false,
                     'message' => 'Invalid OTP',
                 ], 422);
             }
 
-            // 🔥 FIX: Find the SPECIFIC user by phone number instead of the first user
-            $user = User::first();
+            $user = User::where('phone', $request->phone)->first();
 
             if (!$user) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'User not found with this phone number'
+                    'message' => 'User not found'
                 ], 404);
             }
 
-            // 🔥 FIX: Log the user in via the 'api' guard to get the JWT token
-            $token = auth('api')->login($user);
+            $accessToken = auth('api')->login($user);
 
-            Log::info($token);
-
-            // Generate refresh token logic
-            $refreshToken = Str::random(64);
+            $refreshToken = Str::random(128);
 
             RefreshToken::create([
                 'user_id' => $user->id,
                 'token_hash' => Hash::make($refreshToken),
-                'expires_at' => now()->addDays(7),
-                'access_token_expires_at' => now()->addMinutes(config('jwt.ttl', 60)),
+                'expires_at' => now()->addMonths(6),
+                'access_token_expires_at' => now()->addDays(30),
             ]);
 
-            // Return standardized token response
             return response()->json([
                 'status' => true,
-                'access_token' => $token,
+
+                'access_token' => $accessToken,
                 'refresh_token' => $refreshToken,
-                'is_new_user' => false,
+
                 'token_type' => 'Bearer',
-                'expires_in' => config('jwt.ttl', 60) * 60,
-                'refresh_expires_in' => config('jwt.refresh_ttl', 43200),
+
+                'expires_in' => now()->addDays(30)->timestamp,
+
+                'refresh_expires_in' => now()->addMonths(6)->timestamp,
+
+                'is_new_user' => false,
+
                 'user' => [
                     ...$user->toArray(),
                     'roles' => $user->getRoleNames(),
                     'permissions' => $user->getAllPermissions()->pluck('name'),
-                ],
+                ]
             ]);
-        } catch (Exception $e) {
-            Log::info('OTP Verification Error: ' . $e->getMessage());
+        } catch (\Exception $e) {
 
-            // 🔥 FIX: Corrected response syntax array nesting error
             return response()->json([
                 'status' => false,
-                'message' => 'An error occurred during verification',
-                'error' => $e->getMessage()
-            ], 500); // Changed from 404 to 500 server error
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
+
+    // public function verifyOtp(Request $request)
+    // {
+    //     Log::info('Received OTP verification request', [
+    //         'phone' => $request->phone,
+    //         'code' => $request->code
+    //     ]);
+
+    //     // Clean phone number format
+    //     // $phone = str_replace(' ', '', $request->phone);
+    //     // $request->merge(['phone' => $phone]);
+
+    //     // $request->validate([
+    //     //     'phone' => 'required|string',
+    //     //     'code' => 'required|string',
+    //     // ]);
+
+    //     try {
+    //         // OTP check (dev logic)
+    //         if ($request->code !== '1234') {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Invalid OTP',
+    //             ], 422);
+    //         }
+
+    //         // 🔥 FIX: Find the SPECIFIC user by phone number instead of the first user
+    //         $user = User::first();
+
+    //         if (!$user) {
+    //             return response()->json([
+    //                 'status' => false,
+    //                 'message' => 'User not found with this phone number'
+    //             ], 404);
+    //         }
+
+    //         // 🔥 FIX: Log the user in via the 'api' guard to get the JWT token
+    //         $token = auth('api')->login($user);
+
+    //         Log::info($token);
+
+    //         // Generate refresh token logic
+    //         $refreshToken = Str::random(64);
+
+    //         RefreshToken::create([
+    //             'user_id' => $user->id,
+    //             'token_hash' => Hash::make($refreshToken),
+    //             'expires_at' => now()->addDays(7),
+    //             'access_token_expires_at' => now()->addMinutes(config('jwt.ttl', 60)),
+    //         ]);
+
+    //         // Return standardized token response
+    //         return response()->json([
+    //             'status' => true,
+    //             'access_token' => $token,
+    //             'refresh_token' => $refreshToken,
+    //             'is_new_user' => false,
+    //             'token_type' => 'Bearer',
+    //             'expires_in' => config('jwt.ttl', 60) * 60,
+    //             'refresh_expires_in' => config('jwt.refresh_ttl', 43200),
+    //             'user' => [
+    //                 ...$user->toArray(),
+    //                 'roles' => $user->getRoleNames(),
+    //                 'permissions' => $user->getAllPermissions()->pluck('name'),
+    //             ],
+    //         ]);
+    //     } catch (Exception $e) {
+    //         Log::info('OTP Verification Error: ' . $e->getMessage());
+
+    //         // 🔥 FIX: Corrected response syntax array nesting error
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'An error occurred during verification',
+    //             'error' => $e->getMessage()
+    //         ], 500); // Changed from 404 to 500 server error
+    //     }
+    // }
 }

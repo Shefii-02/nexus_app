@@ -7,6 +7,7 @@ use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 // ─── TypingIndicator ─────────────────────────────────────────────────────────
 class TypingIndicator implements ShouldBroadcast
@@ -25,10 +26,15 @@ class TypingIndicator implements ShouldBroadcast
         return [new PresenceChannel("conversation.{$this->conversationId}")];
     }
 
-    public function broadcastAs(): string { return 'typing'; }
+    public function broadcastAs(): string
+    {
+        return 'typing';
+    }
 
     public function broadcastWith(): array
     {
+        Log::info('message typing  Broadcast', $this->userId . ' -' . $this->isTyping);
+
         return [
             'user_id'   => $this->userId,
             'user_name' => $this->userName,

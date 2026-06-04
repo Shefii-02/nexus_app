@@ -7,7 +7,7 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-
+use Illuminate\Support\Facades\Log;
 
 // ─── MessageDeleted ───────────────────────────────────────────────────────────
 class MessageDeleted implements ShouldBroadcast
@@ -28,6 +28,7 @@ class MessageDeleted implements ShouldBroadcast
 
     public function broadcastWith(): array
     {
+            Log::info('MessageDelete Broadcast', $this->messageId);
         return ['message_id' => $this->messageId, 'conversation_id' => $this->conversationId];
     }
 }

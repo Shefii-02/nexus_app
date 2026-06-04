@@ -20,18 +20,18 @@ class ConversationController extends Controller
         $userId = $request->user()->id;
 
         $conversations = Conversation::with([
-                'participants.user:id,name,avatar',
-                'messages' => fn($q) => $q->latest()->limit(1),
-                'messages.sender:id,name',
-            ])
+            'participants.user:id,name,avatar',
+            'messages' => fn($q) => $q->latest()->limit(1),
+            'messages.sender:id,name',
+        ])
             ->forUser($userId)
             ->where('status', '!=', 'archived')
             ->orderByDesc(function ($query) {
                 $query->select('created_at')
-                      ->from('messages')
-                      ->whereColumn('conversation_id', 'conversations.id')
-                      ->latest()
-                      ->limit(1);
+                    ->from('messages')
+                    ->whereColumn('conversation_id', 'conversations.id')
+                    ->latest()
+                    ->limit(1);
             })
             ->paginate(30);
 
@@ -273,4 +273,149 @@ class ConversationController extends Controller
 
         return response()->json(['message' => 'Reported successfully.']);
     }
+
+
+    public function sharedMedia(Request $request, int $conversationId)
+    {
+        // ── Auth guard ────────────────────────────────────────────────────────
+        $user = $request->user();
+
+        // Make sure the authenticated user is actually a participant
+        $isMember = DB::table('conversation_participants')
+            ->where('conversation_id', $conversationId)
+            ->where('user_id', $user->id)
+            ->exists();
+
+        if (!$isMember) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        // ── Filter by type ────────────────────────────────────────────────────
+        // ?type=media  → image + video rows
+        // ?type=links  → link rows
+        // ?type=docs   → file rows
+        $type = $request->query('type', 'media');
+
+        $query = DB::table('messages')
+            ->where('conversation_id', $conversationId)
+            ->where('is_deleted', 0)          // exclude soft-deleted
+            ->whereNull('deleted_at')         // double-check hard deletes
+            ->orderBy('id', 'desc');
+
+        switch ($type) {
+            case 'media':
+                $query->whereIn('type', ['image', 'video', 'audio']);
+                break;
+
+            case 'links':
+                $query->where('type', 'link');
+                break;
+
+            case 'docs':
+                $query->where('type', 'file');
+                break;
+
+            default:
+                return response()->json(['message' => 'Invalid type'], 422);
+        }
+
+        $rows = $query->get([
+            'id',
+            'type',
+            'message',      // used as fallback text / link url
+            'media_url',
+            'created_at',
+        ]);
+
+        // ── Shape the response to match SharedMediaItem in Flutter ────────────
+        $data = $rows->map(function ($row) use ($type) {
+
+            $base = [
+                'id'       => $row->id,
+                'type'     => $row->type,
+                'sent_at'  => $row->created_at,
+            ];
+
+            if ($type === 'media') {
+                // media_url holds the image / video URL
+                // For video, thumb_url could be a separate column if you add one;
+                // for now we use media_url for both.
+                return array_merge($base, [
+                    'media_url' => $row->media_url,
+                    'thumb_url' => $row->media_url, // replace with thumb col if available
+                ]);
+            }
+
+            if ($type === 'links') {
+                // Your link messages store the URL in `message` or `media_url`.
+                // Adjust the fields below to match how you save links.
+                $url    = $row->media_url ?? $row->message;
+                $domain = null;
+
+                if ($url) {
+                    $parsed = parse_url($url);
+                    $domain = $parsed['host'] ?? null;
+                }
+
+                return array_merge($base, [
+                    'link_title'  => null,          // add a link_title column if needed
+                    'link_url'    => $url,
+                    'link_domain' => $domain,
+                ]);
+            }
+
+            if ($type === 'docs') {
+                // media_url holds the file download URL.
+                // Extract file name + extension from the URL path.
+                $url      = $row->media_url ?? '';
+                $fileName = basename(parse_url($url, PHP_URL_PATH) ?? '');
+                $fileExt  = strtolower(pathinfo($fileName, PATHINFO_EXTENSION)) ?: null;
+
+                // File size: add a `file_size` column to messages if you want it,
+                // otherwise leave null — Flutter handles null gracefully.
+                return array_merge($base, [
+                    'file_name' => $fileName ?: ($row->message ?: 'Document'),
+                    'file_ext'  => $fileExt,
+                    'file_size' => null,   // e.g. $row->file_size if column exists
+                    'media_url' => $url,
+                ]);
+            }
+
+            return $base;
+        });
+
+        return response()->json(['data' => $data]);
+    }
+
+
+    // public function sharedMedia(Conversation $conversation, Request $request)
+    // {
+    //     $type = $request->query('type', 'media'); // 'media' | 'links' | 'docs'
+
+    //     $query = $conversation->messages()->whereNull('deleted_at');
+
+    //     if ($type === 'media') {
+    //         $query->whereIn('type', ['image', 'video', 'audio']);
+    //     } elseif ($type === 'links') {
+    //         $query->where('type', 'link');
+    //     } elseif ($type === 'docs') {
+    //         $query->where('type', 'file');
+    //     }
+
+    //     $items = $query->latest()->get()->map(fn($m) => [
+    //         'id'          => $m->id,
+    //         'type'        => $m->type,
+    //         'media_url'   => $m->file_url,
+    //         'thumb_url'   => $m->thumb_url,
+    //         'link_title'  => $m->link_title,
+    //         'link_url'    => $m->link_url,
+    //         'link_domain' => $m->link_domain,
+    //         'file_name'   => $m->file_name,
+    //         'file_ext'    => $m->file_ext,
+    //         'file_size'   => $m->file_size,
+    //         'sent_at'     => $m->created_at?->toISOString(),
+    //     ]);
+
+    //     return response()->json(['data' => $items]);
+    // }
 }

@@ -25,7 +25,7 @@ Route::middleware(['auth:api'])->prefix('chat')->group(function () {
     Route::post('conversations/{id}/mute',       [ConversationController::class, 'toggleMute']);
     Route::post('conversations/{id}/pin',        [ConversationController::class, 'togglePin']);
     Route::post('conversations/{id}/report',     [ConversationController::class, 'report']);
-
+     Route::get('conversations/{conversation}/shared-media', [ConversationController::class, 'sharedMedia']);
     // ─── Messages ────────────────────────────────────────────────────────
     Route::get('conversations/{conversationId}/messages',             [MessageController::class, 'index']);
     Route::post('conversations/{conversationId}/messages',            [MessageController::class, 'store']);

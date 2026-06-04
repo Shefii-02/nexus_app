@@ -88,7 +88,7 @@ class MessageController extends Controller
             'message'         => $request->message,
             'type'            => $request->type,
             'media_url'       => $mediaUrl,
-            'reply_to'        => $request->reply_to,
+            'reply_to'        => $request->reply_to_id,
         ]);
 
         // Update conversation's updated_at for sorting

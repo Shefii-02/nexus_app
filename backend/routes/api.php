@@ -27,8 +27,7 @@ use App\Http\Controllers\API\Admin\UserController;
 use App\Http\Controllers\API\Admin\StaffPaymentController;
 use App\Http\Controllers\API\Admin\TeacherPaymentItemController;
 use App\Http\Controllers\API\Admin\ReportController;
-
-
+use App\Http\Controllers\API\AppPaymentController;
 // routes/api.php
 use Illuminate\Support\Facades\Broadcast;
 
@@ -123,6 +122,43 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/{id}/report', [MessageController::class, 'report']);
         Route::post('/{id}/pin', [MessageController::class, 'pin']);
         Route::delete('/{id}', [MessageController::class, 'destroy']);
+    });
+
+
+    Route::prefix('payments')->group(function () {
+
+        // ── Student ──────────────────────────────────────────────────────────────
+        // GET /api/payments/student?student_id=5
+        Route::get('student', [AppPaymentController::class, 'studentPayments'])
+            ->name('payments.student');
+
+        // ── Teacher ──────────────────────────────────────────────────────────────
+        // GET /api/payments/teacher?teacher_id=3
+        Route::get('teacher', [AppPaymentController::class, 'teacherPayments'])
+            ->name('payments.teacher');
+
+        // ── Admin / Staff (all 4 tabs) ────────────────────────────────────────────
+        // GET /api/payments/admin
+        Route::get('admin', [AppPaymentController::class, 'adminPayments'])
+            ->middleware('role:admin,staff')
+            ->name('payments.admin');
+
+        // ── Receipt generation ────────────────────────────────────────────────────
+        // GET /api/payments/receipt/{type}/{id}
+        // type: admission | renewal | teacher | staff
+        Route::get('receipt/{type}/{id}', [AppPaymentController::class, 'receipt'])
+            ->name('payments.receipt');
+
+        // ── Admin release actions ─────────────────────────────────────────────────
+        Route::middleware('role:admin,staff')->group(function () {
+            // POST /api/payments/teacher/{id}/release
+            Route::post('teacher/{id}/release', [AppPaymentController::class, 'releaseTeacherPayment'])
+                ->name('payments.teacher.release');
+
+            // POST /api/payments/staff/{id}/release
+            Route::post('staff/{id}/release', [AppPaymentController::class, 'releaseStaffPayment'])
+                ->name('payments.staff.release');
+        });
     });
 
 

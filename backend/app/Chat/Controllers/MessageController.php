@@ -36,7 +36,7 @@ class MessageController extends Controller
             'Not a participant.'
         );
 
-        $messages = Message::with(['sender:id,name,avatar', 'replyTo.sender:id,name', 'reactions.user:id,name', 'reads:message_id,user_id,read_at'])
+        $messages = Message::withTrashed()->with(['sender:id,name,avatar', 'replyTo.sender:id,name', 'reactions.user:id,name', 'reads:message_id,user_id,read_at'])
             ->where('conversation_id', $conversationId)
             ->visibleTo($userId)
             ->orderByDesc('created_at')

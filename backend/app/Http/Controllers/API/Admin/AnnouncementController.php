@@ -7,6 +7,8 @@ use App\Http\Controllers\API\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AnnouncementRequest;
 use App\Http\Resources\AnnouncementResource;
+use App\Models\Announcement;
+use App\Models\AnnouncementUser;
 use App\Services\Announcement\AnnouncementService;
 use App\Services\Media\MediaService;
 use Illuminate\Http\Request;
@@ -77,17 +79,154 @@ class AnnouncementController extends Controller
 
     public function destroy(int $id)
     {
-         if (!$this->service->exists($id)) {
-                return $this->errorResponse('Course not found', null, 404);
-            }
+        if (!$this->service->exists($id)) {
+            return $this->errorResponse('Course not found', null, 404);
+        }
 
-            $current = $this->service->find($id);
-            if ($current->thumbnail && is_int($current->thumbnail)) {
-                $this->mediaService->delete($current->thumbnail);
-            }
+        $current = $this->service->find($id);
+        if ($current->thumbnail && is_int($current->thumbnail)) {
+            $this->mediaService->delete($current->thumbnail);
+        }
 
         $this->service->delete($id);
 
         return response()->json(['message' => 'Deleted']);
+    }
+
+
+
+    /**
+     * GET /api/announcements
+     * Returns all active, non-expired announcements for the authenticated user,
+     * along with that user's read/click status from announcement_user pivot.
+     */
+    public function appIndex(Request $request)
+    {
+        $userId = $request->user()->id;
+        $now    = now();
+
+        $announcements = Announcement::query()
+            ->where('status', 'active')
+            ->where(function ($q) use ($now) {
+                $q->whereNull('start_date')->orWhere('start_date', '<=', $now);
+            })
+            ->where(function ($q) use ($now) {
+                $q->whereNull('end_date')->orWhere('end_date', '>=', $now);
+            })
+            ->where(function ($q) use ($userId) {
+                // target_type: 'all' means everyone; 'user' means only via pivot
+                $q->where('target_type', 'all')
+                    ->orWhereHas('users', fn($u) => $u->where('user_id', $userId));
+            })
+            ->orderByDesc('is_pinned')
+            ->orderByDesc('priority')
+            ->orderByDesc('created_at')
+            ->get();
+
+        // Fetch this user's pivot rows in one query
+        $pivotMap = AnnouncementUser::where('user_id', $userId)
+            ->whereIn('announcement_id', $announcements->pluck('id'))
+            ->get()
+            ->keyBy('announcement_id');
+
+        $data = $announcements->map(function (Announcement $a) use ($pivotMap, $userId) {
+            $pivot = $pivotMap->get($a->id);
+
+            return [
+                'id'         => $a->id,
+                'title'      => $a->title,
+                'content'    => $a->content,
+                'image'      => $a->image ? asset('storage/' . $a->image) : null,
+                'priority'   => $a->priority,
+                'is_pinned'  => (bool) $a->is_pinned,
+                'position'   => $a->position,
+                'start_date' => $a->start_date?->toDateString(),
+                'end_date'   => $a->end_date?->toDateString(),
+                'created_at' => $a->created_at->toIso8601String(),
+                // User-specific fields
+                'is_read'    => $pivot ? !is_null($pivot->read_at) : false,
+                'is_clicked' => $pivot ? !is_null($pivot->clicked_at) : false,
+                'read_at'    => $pivot?->read_at?->toIso8601String(),
+            ];
+        });
+
+        return response()->json(['data' => $data]);
+    }
+
+    /**
+     * GET /api/announcements/{id}
+     * Returns a single announcement and marks it as read.
+     */
+    public function AppShow(Request $request, int $id)
+    {
+        $userId = $request->user()->id;
+        $now    = now();
+
+        $announcement = Announcement::where('status', 'active')
+            ->where(function ($q) use ($now) {
+                $q->whereNull('start_date')->orWhere('start_date', '<=', $now);
+            })
+            ->where(function ($q) use ($now) {
+                $q->whereNull('end_date')->orWhere('end_date', '>=', $now);
+            })
+            ->where(function ($q) use ($userId) {
+                $q->where('target_type', 'all')
+                    ->orWhereHas('users', fn($u) => $u->where('user_id', $userId));
+            })
+            ->findOrFail($id);
+
+        // Upsert pivot: mark delivered + read
+        $pivot = AnnouncementUser::firstOrNew([
+            'announcement_id' => $announcement->id,
+            'user_id'         => $userId,
+        ]);
+
+        if (is_null($pivot->delivered_at)) {
+            $pivot->delivered_at = now();
+        }
+        if (is_null($pivot->read_at)) {
+            $pivot->read_at = now();
+            $pivot->status  = 'read';
+        }
+        $pivot->save();
+
+        return response()->json([
+            'data' => [
+                'id'         => $announcement->id,
+                'title'      => $announcement->title,
+                'content'    => $announcement->content,
+                'image'      => $announcement->image ? asset('storage/' . $announcement->image) : null,
+                'priority'   => $announcement->priority,
+                'is_pinned'  => (bool) $announcement->is_pinned,
+                'position'   => $announcement->position,
+                'start_date' => $announcement->start_date?->toDateString(),
+                'end_date'   => $announcement->end_date?->toDateString(),
+                'created_at' => $announcement->created_at->toIso8601String(),
+                'is_read'    => true,
+                'read_at'    => $pivot->read_at->toIso8601String(),
+            ],
+        ]);
+    }
+
+    /**
+     * POST /api/announcements/{id}/click
+     * Marks the announcement as clicked (e.g. user tapped Call or WhatsApp).
+     */
+    public function markClicked(Request $request, int $id)
+    {
+        $userId = $request->user()->id;
+
+        $pivot = AnnouncementUser::firstOrNew([
+            'announcement_id' => $id,
+            'user_id'         => $userId,
+        ]);
+
+        if (is_null($pivot->clicked_at)) {
+            $pivot->clicked_at = now();
+            $pivot->status     = 'clicked';
+        }
+        $pivot->save();
+
+        return response()->json(['success' => true]);
     }
 }

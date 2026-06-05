@@ -93,6 +93,10 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('announcements/{announcement}/publish', [AnnouncementController::class, 'publish']);
     Route::post('announcements/{announcement}/archive', [AnnouncementController::class, 'archive']);
 
+    Route::get('updates', [AnnouncementController::class, 'appIndex']);
+    Route::get('updates/{id}', [AnnouncementController::class, 'AppShow']);
+    Route::post('updates/{id}/click', [AnnouncementController::class, 'markClicked']);
+
 
     Route::get('permissions', [RoleController::class, 'permissions']);
 
@@ -612,4 +616,4 @@ Route::middleware(['auth:api'])->group(function () {
 });
 
 
-require __DIR__. '/chat.php';
+require __DIR__ . '/chat.php';

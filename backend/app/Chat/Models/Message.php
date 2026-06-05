@@ -12,9 +12,16 @@ class Message extends Model
     // use SoftDeletes;
 
     protected $fillable = [
-        'conversation_id', 'sender_id', 'message', 'type',
-        'media_url', 'reply_to', 'is_deleted',
-        'is_edited', 'is_pinned', 'deleted_at'
+        'conversation_id',
+        'sender_id',
+        'message',
+        'type',
+        'media_url',
+        'reply_to',
+        'is_deleted',
+        'is_edited',
+        'is_pinned',
+        'deleted_at'
     ];
 
     protected $casts = [
@@ -60,9 +67,17 @@ class Message extends Model
         return $this->hasMany(\App\Models\DeletedMessage::class);
     }
 
+    // public function scopeVisibleTo($query, int $userId)
+    // {
+    //     return $query->whereDoesntHave('deletedFor', fn($q) => $q->where('user_id', $userId))
+    //                  ->where('is_deleted', false);
+    // }
+
     public function scopeVisibleTo($query, int $userId)
     {
-        return $query->whereDoesntHave('deletedFor', fn($q) => $q->where('user_id', $userId))
-                     ->where('is_deleted', false);
+        return $query->whereDoesntHave(
+            'deletedFor',
+            fn($q) => $q->where('user_id', $userId)
+        );
     }
 }

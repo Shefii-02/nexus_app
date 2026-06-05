@@ -5,9 +5,12 @@ namespace App\Chat\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Message extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'conversation_id', 'sender_id', 'message', 'type',
         'media_url', 'reply_to', 'is_deleted',

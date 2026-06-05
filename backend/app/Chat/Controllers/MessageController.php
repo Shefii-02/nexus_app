@@ -29,25 +29,55 @@ class MessageController extends Controller
     {
         $userId = $request->user()->id;
 
-        // Ensure user is a participant
         abort_unless(
             ConversationParticipant::where('conversation_id', $conversationId)
-                ->where('user_id', $userId)->where('status', 'active')->exists(),
+                ->where('user_id', $userId)
+                ->where('status', 'active')
+                ->exists(),
             403,
             'Not a participant.'
         );
 
-        $messages = Message::with(['sender:id,name,avatar', 'replyTo.sender:id,name', 'reactions.user:id,name', 'reads:message_id,user_id,read_at'])
+        $messages = Message::with([
+            'sender:id,name,avatar',
+            'replyTo:id,conversation_id,sender_id,message,type,media_url,is_deleted,created_at',
+            'replyTo.sender:id,name',
+            'reactions.user:id,name',
+            'reads:message_id,user_id,read_at',
+        ])
             ->where('conversation_id', $conversationId)
             ->visibleTo($userId)
-            ->orderByDesc('created_at')
+            ->latest()
             ->cursorPaginate(40);
 
-        // Mark all as read
         $this->markAsRead($conversationId, $userId);
 
-        return response()->json(MessageResource::collect($messages));
+        return MessageResource::collection($messages)
+            ->response();
     }
+    // public function index(Request $request, int $conversationId): JsonResponse
+    // {
+    //     $userId = $request->user()->id;
+
+    //     // Ensure user is a participant
+    //     abort_unless(
+    //         ConversationParticipant::where('conversation_id', $conversationId)
+    //             ->where('user_id', $userId)->where('status', 'active')->exists(),
+    //         403,
+    //         'Not a participant.'
+    //     );
+
+    //     $messages = Message::with(['sender:id,name,avatar', 'replyTo.sender:id,name', 'reactions.user:id,name', 'reads:message_id,user_id,read_at'])
+    //         ->where('conversation_id', $conversationId)
+    //         ->visibleTo($userId)
+    //         ->orderByDesc('created_at')
+    //         ->cursorPaginate(40);
+
+    //     // Mark all as read
+    //     $this->markAsRead($conversationId, $userId);
+
+    //     return response()->json(MessageResource::collect($messages));
+    // }
 
     /**
      * Send a message (text or media).

@@ -107,9 +107,9 @@ class AnnouncementController extends Controller
 
         $announcements = Announcement::query()
             ->where('status', 'published')
-            ->where(function ($q) use ($now) {
-                $q->whereNull('start_date')->orWhere('start_date', '<=', $now);
-            })
+            // ->where(function ($q) use ($now) {
+            //     $q->whereNull('start_date')->orWhere('start_date', '<=', $now);
+            // })
             ->where(function ($q) use ($now) {
                 $q->whereNull('end_date')->orWhere('end_date', '>=', $now);
             })

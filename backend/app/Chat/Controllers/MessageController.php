@@ -14,6 +14,7 @@ use App\Chat\Events\MessageSent;
 use App\Chat\Events\MessageUpdated;
 use App\Chat\Events\MessageDeleted;
 use App\Chat\Events\ReactionAdded;
+use App\Chat\Resources\MessageResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
@@ -38,14 +39,14 @@ class MessageController extends Controller
 
         $messages = Message::with(['sender:id,name,avatar', 'replyTo.sender:id,name', 'reactions.user:id,name', 'reads:message_id,user_id,read_at'])
             ->where('conversation_id', $conversationId)
-            // ->visibleTo($userId)
+            ->visibleTo($userId)
             ->orderByDesc('created_at')
             ->cursorPaginate(40);
 
         // Mark all as read
         $this->markAsRead($conversationId, $userId);
 
-        return response()->json($messages);
+        return response()->json(MessageResource::collect($messages));
     }
 
     /**

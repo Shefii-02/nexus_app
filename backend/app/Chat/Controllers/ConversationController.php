@@ -165,7 +165,6 @@ class ConversationController extends Controller
                 ->firstWhere('user_id', '!=', $userId);
             $conversation->other_user = $other?->user;
         }
-Log::info($conversation);
         return response()->json(['conversation' => $conversation]);
     }
 

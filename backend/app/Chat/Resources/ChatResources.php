@@ -20,7 +20,9 @@ class MessageResource extends JsonResource
                 'avatar' => $this->sender->avatar,
             ]),
             'message'         => $this->is_deleted ? null : $this->message,
-            'type'            => $this->type,
+            // 'type'            => $this->type,
+            'type' => $this->is_deleted ? 'deleted' : $this->type,
+
             'media_url'       => $this->is_deleted ? null : $this->media_url,
             // 'media_meta'      => $this->is_deleted ? null : $this->media_meta,
             'media_meta' => $this->is_deleted

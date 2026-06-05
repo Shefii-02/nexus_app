@@ -107,12 +107,12 @@ class AnnouncementController extends Controller
 
         $announcements = Announcement::query()
             ->where('status', 'published')
-            // ->where(function ($q) use ($now) {
-            //     $q->whereNull('start_date')->orWhere('start_date', '<=', $now);
-            // })
-            // ->where(function ($q) use ($now) {
-            //     $q->whereNull('end_date')->orWhere('end_date', '>=', $now);
-            // })
+            ->where(function ($q) use ($now) {
+                $q->whereNull('start_date')->orWhere('start_date', '<=', $now);
+            })
+            ->where(function ($q) use ($now) {
+                $q->whereNull('end_date')->orWhere('end_date', '>=', $now);
+            })
             // ->where(function ($q) use ($userId) {
             //     // target_type: 'all' means everyone; 'user' means only via pivot
             //     $q
@@ -163,7 +163,7 @@ class AnnouncementController extends Controller
         $userId = $request->user()->id;
         $now    = now();
 
-        $announcement = Announcement::where('status', 'active')
+        $announcement = Announcement::where('status', 'published')
             ->where(function ($q) use ($now) {
                 $q->whereNull('start_date')->orWhere('start_date', '<=', $now);
             })

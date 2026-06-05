@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\PaymentService;
 
 use App\Models\AdmissionPayment;
 use App\Models\AdmissionRenewal;

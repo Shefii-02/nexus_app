@@ -107,18 +107,18 @@ class AnnouncementController extends Controller
 
         $announcements = Announcement::query()
             ->where('status', 'published')
-            ->where(function ($q) use ($now) {
-                $q->whereNull('start_date')->orWhere('start_date', '<=', $now);
-            })
-            ->where(function ($q) use ($now) {
-                $q->whereNull('end_date')->orWhere('end_date', '>=', $now);
-            })
-            ->where(function ($q) use ($userId) {
-                // target_type: 'all' means everyone; 'user' means only via pivot
-                $q
-                // ->orWhere('target_type', 'all_users')
-                    ->WhereHas('users', fn($u) => $u->where('user_id', $userId));
-            })
+            // ->where(function ($q) use ($now) {
+            //     $q->whereNull('start_date')->orWhere('start_date', '<=', $now);
+            // })
+            // ->where(function ($q) use ($now) {
+            //     $q->whereNull('end_date')->orWhere('end_date', '>=', $now);
+            // })
+            // ->where(function ($q) use ($userId) {
+            //     // target_type: 'all' means everyone; 'user' means only via pivot
+            //     $q
+            //     // ->orWhere('target_type', 'all_users')
+            //         ->WhereHas('users', fn($u) => $u->where('user_id', $userId));
+            // })
             ->orderByDesc('is_pinned')
             ->orderByDesc('priority')
             ->orderByDesc('created_at')

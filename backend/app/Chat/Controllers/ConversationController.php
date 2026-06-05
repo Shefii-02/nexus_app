@@ -8,6 +8,7 @@ use App\Models\ConversationParticipant;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ConversationController extends Controller
 {
@@ -164,7 +165,7 @@ class ConversationController extends Controller
                 ->firstWhere('user_id', '!=', $userId);
             $conversation->other_user = $other?->user;
         }
-
+Log::info($conversation);
         return response()->json(['conversation' => $conversation]);
     }
 

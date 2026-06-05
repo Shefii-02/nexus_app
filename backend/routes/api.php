@@ -100,6 +100,8 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::get('permissions', [RoleController::class, 'permissions']);
 
+
+
     Route::delete('/conversations/{id}', [ConversationController::class, 'destroy']);
 
     Route::prefix('conversations')->group(function () {

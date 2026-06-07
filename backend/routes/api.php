@@ -478,7 +478,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('/student', function () {
 
 
-            $studentPayments = [
+            return response()->json([
                 'success' => true,
                 'data' => [
 
@@ -571,9 +571,7 @@ Route::middleware(['auth:api'])->group(function () {
                         ],
                     ],
                 ],
-            ];
-
-            return response()->json([$studentPayments]);
+            ]);
         });
 
         // ── Teacher ──────────────────────────────────────────────────────────────
@@ -581,7 +579,7 @@ Route::middleware(['auth:api'])->group(function () {
         // Route::get('teacher', [AppPaymentController::class, 'teacherPayments'])
         //     ->name('payments.teacher');
         Route::get('/teacher', function () {
-            $teacherPayments = [
+            return response()->json([
                 'success' => true,
                 'data' => [
 
@@ -713,14 +711,13 @@ Route::middleware(['auth:api'])->group(function () {
                         ],
                     ],
                 ],
-            ];
-            return response()->json([$teacherPayments]);
+            ]);
         });
 
         // ── Admin / Staff (all 4 tabs) ────────────────────────────────────────────
         // GET /api/payments/admin
         Route::get('/admin', function () {
-            $adminPayments = [
+            return response()->json([
                 'success' => true,
                 'data' => [
 
@@ -1005,10 +1002,6 @@ Route::middleware(['auth:api'])->group(function () {
                         ],
                     ],
                 ],
-            ];
-
-            return response()->json([
-                $adminPayments
             ]);
         });
         // Route::get('admin', [AppPaymentController::class, 'adminPayments'])

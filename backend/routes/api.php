@@ -473,8 +473,8 @@ Route::middleware(['auth:api'])->group(function () {
 
         // ── Student ──────────────────────────────────────────────────────────────
         // GET /api/payments/student?student_id=5
-        Route::get('student', [AppPaymentController::class, 'studentPayments'])
-            ->name('payments.student');
+        // Route::get('student', [AppPaymentController::class, 'studentPayments'])
+        //     ->name('payments.student');
         Route::get('/student', function () {
 
 

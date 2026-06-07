@@ -244,6 +244,7 @@ class AuthController extends Controller
 
                 'user' => [
                     ...$user->toArray(),
+                    'role'  => $user->acc_type,
                     'roles' => $user->getRoleNames(),
                     'permissions' => $user->getAllPermissions()->pluck('name'),
                 ]

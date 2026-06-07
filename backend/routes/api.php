@@ -103,67 +103,67 @@ Route::middleware(['auth:api'])->group(function () {
     Route::apiResource('courses/{courseId}/materials', CourseMaterialController::class);
 
 
+    // Route::get('/my_courses', function () {
+    //     $getCourses = [
+    //         'success' => true,
+    //         'data' => [
+    //             [
+    //                 'id'                => 1,
+    //                 'name'              => 'Flutter & Dart – Complete Bootcamp',
+    //                 'description'       => 'Build stunning cross-platform apps from scratch. Covers widgets, state management, APIs and deployment.',
+    //                 'teacher_name'      => 'Arjun Menon',
+    //                 'teacher_avatar'    => '👨‍🏫',
+    //                 'category'          => 'Mobile Development',
+    //                 'total_classes'     => 24,
+    //                 'completed_classes' => 14,
+    //                 'expires_at'        => '2025-08-10T00:00:00.000000Z',
+    //                 'status'            => 'active',
+    //             ],
+    //             [
+    //                 'id'                => 2,
+    //                 'name'              => 'Laravel REST API Masterclass',
+    //                 'description'       => 'Design and build production-grade REST APIs with Laravel, Sanctum, queues and real-time events.',
+    //                 'teacher_name'      => 'Priya Nair',
+    //                 'teacher_avatar'    => '👩‍💻',
+    //                 'category'          => 'Backend Development',
+    //                 'total_classes'     => 18,
+    //                 'completed_classes' => 18,
+    //                 'expires_at'        => '2025-02-20T00:00:00.000000Z',
+    //                 'status'            => 'expired',
+    //             ],
+    //             [
+    //                 'id'                => 3,
+    //                 'name'              => 'UI/UX Design Fundamentals',
+    //                 'description'       => 'Master Figma, design systems, typography and user research.',
+    //                 'teacher_name'      => 'Sneha Pillai',
+    //                 'teacher_avatar'    => '🎨',
+    //                 'category'          => 'Design',
+    //                 'total_classes'     => 12,
+    //                 'completed_classes' => 3,
+    //                 'expires_at'        => '2025-09-10T00:00:00.000000Z',
+    //                 'status'            => 'active',
+    //             ],
+    //             [
+    //                 'id'                => 4,
+    //                 'name'              => 'Python for Data Science',
+    //                 'description'       => 'Pandas, NumPy, Matplotlib and scikit-learn.',
+    //                 'teacher_name'      => 'Rahul Krishnan',
+    //                 'teacher_avatar'    => '🧑‍🔬',
+    //                 'category'          => 'Data Science',
+    //                 'total_classes'     => 20,
+    //                 'completed_classes' => 0,
+    //                 'expires_at'        => '2025-10-10T00:00:00.000000Z',
+    //                 'status'            => 'active',
+    //             ],
+    //         ],
+    //     ];
+
+    //     return response()->json([
+    //         'data' =>  $getCourses
+    //     ]);
+    // });
+
     Route::get('/my_courses', function () {
-        $getCourses = [
-            'success' => true,
-            'data' => [
-                [
-                    'id'                => 1,
-                    'name'              => 'Flutter & Dart – Complete Bootcamp',
-                    'description'       => 'Build stunning cross-platform apps from scratch. Covers widgets, state management, APIs and deployment.',
-                    'teacher_name'      => 'Arjun Menon',
-                    'teacher_avatar'    => '👨‍🏫',
-                    'category'          => 'Mobile Development',
-                    'total_classes'     => 24,
-                    'completed_classes' => 14,
-                    'expires_at'        => '2025-08-10T00:00:00.000000Z',
-                    'status'            => 'active',
-                ],
-                [
-                    'id'                => 2,
-                    'name'              => 'Laravel REST API Masterclass',
-                    'description'       => 'Design and build production-grade REST APIs with Laravel, Sanctum, queues and real-time events.',
-                    'teacher_name'      => 'Priya Nair',
-                    'teacher_avatar'    => '👩‍💻',
-                    'category'          => 'Backend Development',
-                    'total_classes'     => 18,
-                    'completed_classes' => 18,
-                    'expires_at'        => '2025-02-20T00:00:00.000000Z',
-                    'status'            => 'expired',
-                ],
-                [
-                    'id'                => 3,
-                    'name'              => 'UI/UX Design Fundamentals',
-                    'description'       => 'Master Figma, design systems, typography and user research.',
-                    'teacher_name'      => 'Sneha Pillai',
-                    'teacher_avatar'    => '🎨',
-                    'category'          => 'Design',
-                    'total_classes'     => 12,
-                    'completed_classes' => 3,
-                    'expires_at'        => '2025-09-10T00:00:00.000000Z',
-                    'status'            => 'active',
-                ],
-                [
-                    'id'                => 4,
-                    'name'              => 'Python for Data Science',
-                    'description'       => 'Pandas, NumPy, Matplotlib and scikit-learn.',
-                    'teacher_name'      => 'Rahul Krishnan',
-                    'teacher_avatar'    => '🧑‍🔬',
-                    'category'          => 'Data Science',
-                    'total_classes'     => 20,
-                    'completed_classes' => 0,
-                    'expires_at'        => '2025-10-10T00:00:00.000000Z',
-                    'status'            => 'active',
-                ],
-            ],
-        ];
-
-        return response()->json([
-            'data' =>  $getCourses
-        ]);
-    });
-
-    Route::get('/classes/today', function () {
         $getCourseDetail = [
             'success' => true,
             'data' => [

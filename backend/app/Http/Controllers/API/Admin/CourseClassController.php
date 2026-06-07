@@ -9,6 +9,7 @@ use App\Http\Requests\CourseClassRequest;
 use App\Http\Requests\StoreCourseClassRequest;
 use App\Http\Requests\UpdateCourseClassRequest;
 use App\Http\Resources\CourseClassResource;
+use App\Models\CourseClass;
 use App\Services\CourseClass\CourseClassService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -144,5 +145,48 @@ class CourseClassController extends Controller
         } catch (\Exception $e) {
             return $this->errorResponse('Failed to retrieve classes', ['error' => $e->getMessage()], 500);
         }
+    }
+
+    public function today(Request $request): JsonResponse
+    {
+        $today = now()->toDateString();
+
+        $classes = CourseClass::with('teacher:id,name,avatar')
+            ->whereDate('start_time', $today)
+            ->orderBy('start_time')
+            ->get()
+            ->map(function ($cls) {
+                $now    = now();
+                $status = $cls->status; // use DB status if you store it
+
+                // Derive status from time if not explicitly set
+                if ($status !== 'completed') {
+                    if ($now->between($cls->start_time, $cls->end_time)) {
+                        $status = 'live';
+                    } elseif ($now->lt($cls->start_time)) {
+                        $status = 'upcoming';
+                    } else {
+                        $status = 'completed';
+                    }
+                }
+
+                return [
+                    'id'          => $cls->id,
+                    'title'       => $cls->title,
+                    'description' => $cls->description,
+                    'start_time'  => $cls->start_time->toISOString(),
+                    'end_time'    => $cls->end_time->toISOString(),
+                    'status'      => $status,
+                    'class_link'  => $cls->class_link,
+                    'record_link' => $cls->record_link,
+                    'teacher'     => $cls->teacher ? [
+                        'id'     => $cls->teacher->id,
+                        'name'   => $cls->teacher->name,
+                        'avatar' => $cls->teacher->avatar,
+                    ] : null,
+                ];
+            });
+
+        return response()->json(['data' => $classes]);
     }
 }

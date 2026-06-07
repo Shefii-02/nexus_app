@@ -430,12 +430,6 @@ Route::middleware(['auth:api'])->group(function () {
 
 
 
-    // Payment Management
-    Route::apiResource('payments', PaymentController::class);
-    Route::post('payments/{payment}/verify', [PaymentController::class, 'verify']);
-    Route::post('payments/{payment}/reject', [PaymentController::class, 'reject']);
-    Route::get('payments/student/{student}', [PaymentController::class, 'studentPayments']);
-
     // Announcement Management
     Route::apiResource('announcements', AnnouncementController::class);
     Route::get('announcements/published', [AnnouncementController::class, 'published']);
@@ -1052,6 +1046,8 @@ Route::middleware(['auth:api'])->group(function () {
     });
 
 
+
+
     // routes/api.php
 
     Route::prefix('payments')->group(function () {
@@ -1130,6 +1126,14 @@ Route::middleware(['auth:api'])->group(function () {
         // Invoice
         Route::get('/invoice/{type}/{id}', [PaymentController::class, 'invoice']);
     });
+
+
+    // Payment Management
+    Route::apiResource('payments', PaymentController::class);
+    Route::post('payments/{payment}/verify', [PaymentController::class, 'verify']);
+    Route::post('payments/{payment}/reject', [PaymentController::class, 'reject']);
+    Route::get('payments/student/{student}', [PaymentController::class, 'studentPayments']);
+
 
     Route::prefix('transactions')
         ->group(function () {

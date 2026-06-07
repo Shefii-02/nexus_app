@@ -310,9 +310,7 @@ Route::middleware(['auth:api'])->group(function () {
                 ],
             ],
         ];
-        return response()->json([
-            'data' =>  $getCourseDetail
-        ]);
+        return response()->json($getCourseDetail);
     });
 
 

@@ -158,9 +158,8 @@ Route::middleware(['auth:api'])->group(function () {
             ],
         ];
 
-        return response()->json([
-            'data' =>  $getCourses
-        ]);
+        return response()->json($getCourses
+        );
     });
 
     Route::get('/my_courses/{id}', function () {

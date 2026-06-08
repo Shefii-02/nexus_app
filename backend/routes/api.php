@@ -1541,6 +1541,12 @@ Route::middleware(['auth:api'])->group(function () {
         //     Route::put('/{id}/reject');
         // });
     });
+
+
+    // routes/api.php
+    Route::post('/course/{id}/call',         [CourseCallController::class, 'sendCall']);
+    Route::post('/course/{id}/notification', [CourseCallController::class, 'sendNotification']);
+    Route::get('/course/{id}/students',      [CourseCallController::class, 'getStudents']);
 });
 
 

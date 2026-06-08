@@ -39,14 +39,12 @@ class UserController extends Controller
 
     public function RegisterDevice(Request $request)
     {
-        $company_id = 1;
         $user = $request->user();
 
 
         UserPlatform::updateOrCreate(
             ['device_id' => $request->device_id, 'user_id' => $user->id],
             [
-                'company_id' => $company_id,
                 'fcm_token' => $request->fcm_token,
                 'voip_token' => $request->voip_token,
                 'platform' => $request->platform,
@@ -61,8 +59,6 @@ class UserController extends Controller
                 'status' => 'active'
             ]
         );
-
-
 
         return response()->json([
             'status' => true,

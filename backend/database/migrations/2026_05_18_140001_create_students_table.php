@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('guardian_phone', 20)->nullable();
             $table->enum('status', ['active', 'inactive', 'graduated', 'suspended'])->default('active');
             $table->timestamps();
-
+            $table->softDeletes();
             $table->index(['user_id', 'status']);
             $table->index('roll_number');
         });

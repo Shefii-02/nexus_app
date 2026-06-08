@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('message_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->text('reason')->nullable();
+            $table->int('verified_by')->nullable();
+            $table->string('status','20')->default('pending')->nullable();
             $table->timestamps();
         });
     }

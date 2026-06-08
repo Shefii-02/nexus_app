@@ -64,16 +64,17 @@ class CourseCallController extends Controller
     }
 
     // ── POST /course/{id}/call ───────────────────────────────────────────
-    public function sendCall(Request $request, $id)
+    public function sendCall(Request $request, int $id)
     {
         $request->validate([
-            'conversation_id' => 'required|integer',
-            'module_id'       => 'required|integer',
+            // 'conversation_id' => 'required|integer',
+            // 'module_id'       => 'required|integer',
             'student_ids'     => 'required|array',
             'student_ids.*'   => 'integer|exists:users,id',
         ]);
 
         Log::info($request->all());
+        Log::alert($id);
 
         // $students = User::whereIn('id', $request->student_ids)
         //     ->whereNotNull('fcm_token')
@@ -99,18 +100,20 @@ class CourseCallController extends Controller
     }
 
     // ── POST /course/{id}/notification ──────────────────────────────────
-    public function sendNotification(Request $request, $id)
+    public function sendNotification(Request $request, int $id)
     {
         $request->validate([
-            'conversation_id' => 'required|integer',
-            'module_id'       => 'required|integer',
+            // 'conversation_id' => 'required|integer',
+            // 'module_id'       => 'required|integer',
             'student_ids'     => 'required|array',
             'student_ids.*'   => 'integer|exists:users,id',
             'title'           => 'nullable|string',
             'body'            => 'nullable|string',
         ]);
 
+
         Log::info($request->all());
+        Log::alert($id);
 
         $studentCount = count($request->student_ids);
 

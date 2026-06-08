@@ -56,6 +56,11 @@ Route::middleware('auth:api')->group(function () {
 // Admin Routes - CRUD Operations
 Route::middleware(['auth:api'])->group(function () {
 
+
+    Route::post('/device/register', [UserController::class, 'RegisterDevice']);
+    Route::post('/visitor/store', [UserController::class, 'visitorStore']);
+
+
     Route::post('/user/fcm-token', function (Request $request) {
         $request->validate(['fcm_token' => 'required|string', 'platform' => 'required|string']);
         Log::info('-------------------------------');
@@ -158,7 +163,8 @@ Route::middleware(['auth:api'])->group(function () {
             ],
         ];
 
-        return response()->json($getCourses
+        return response()->json(
+            $getCourses
         );
     });
 

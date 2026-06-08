@@ -16,6 +16,7 @@ use App\Http\Controllers\API\Admin\PaymentController;
 use App\Http\Controllers\API\Admin\AnnouncementController;
 use App\Http\Controllers\API\Admin\ConversationController;
 use App\Http\Controllers\API\Admin\CouponController;
+use App\Http\Controllers\API\Admin\CourseCallController;
 use App\Http\Controllers\API\Admin\CourseMaterialController;
 use App\Http\Controllers\API\Admin\LeaveRequestController;
 use App\Http\Controllers\API\Admin\MessageController;

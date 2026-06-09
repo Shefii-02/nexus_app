@@ -12,5 +12,7 @@ Route::get('/', function () {
 
 
   Route::get('/send-notification/{token}', [PushNotificationController::class, 'sendPush']);
+  Route::get('/send-class-notification/{token}', [PushNotificationController::class, 'sendClassAlertTest']);
+
   Route::get('/send-notification-to-user', [PushNotificationController::class, 'sendToUser']);
   Route::get('/send-notification-to-topic', [PushNotificationController::class, 'sendToTopic']);

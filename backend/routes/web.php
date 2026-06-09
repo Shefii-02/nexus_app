@@ -8,7 +8,7 @@ Route::get('/', function () {
 });
 
 
-  Route::get('/fcm-test/{token}/{platform}', [PushNotificationController::class, 'sendClassNotification']);
+  Route::get('/fcm-call/{token}/{platform}', [PushNotificationController::class, 'sendClassNotification']);
 
 
   Route::get('/send-notification/{token}', [PushNotificationController::class, 'sendPush']);

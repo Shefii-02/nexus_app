@@ -430,8 +430,9 @@ class PushNotificationController extends Controller
     }
     public function sendClassAlertTest(string $fcmToken)
     {
-        $this->sendClassAlert($fcmToken, [
+      $response =   $this->sendClassAlert($fcmToken, [
             'id'            => '101',
+            'course_id'     => 1,
             'subject'       => 'Mathematics',
             'teacher'       => 'Mr. Rahul',
             'class_name'    => 'Class 10-A',
@@ -439,6 +440,8 @@ class PushNotificationController extends Controller
             'message'       => 'Class is starting now. Join immediately!',
             'alarm_enabled' => 'true',
         ]);
+
+        return $response;
     }
 
 

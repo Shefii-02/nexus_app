@@ -8,6 +8,11 @@ Route::get('/', function () {
 });
 
 
+
+Route::get('/privacy', function () {
+    return view('privacy');
+});
+
   Route::get('/fcm-call/{token}/{platform}', [PushNotificationController::class, 'sendClassNotification']);
 
 

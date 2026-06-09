@@ -43,7 +43,10 @@ class UserController extends Controller
 
 
         UserPlatform::updateOrCreate(
-            ['device_id' => $request->device_id, 'user_id' => $user->id],
+            [
+                // 'device_id' => $request->device_id,
+                 'user_id' => $user->id
+            ],
             [
                 'fcm_token' => $request->fcm_token,
                 'voip_token' => $request->voip_token,
@@ -73,7 +76,7 @@ class UserController extends Controller
 
         UserPlatform::updateOrCreate(
             [
-                'device_id' => $request->device_id,
+                // 'device_id' => $request->device_id,
                 'user_id'   => $currentUser->id
             ],
             [

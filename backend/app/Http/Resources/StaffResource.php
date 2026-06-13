@@ -10,19 +10,19 @@ class StaffResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'department' => $this->department,
-            'designation' => $this->designation,
-            'phone' => $this->phone,
-            'address' => $this->address,
-            'status'  => $this->user?->status ?? $this->user,
+            'department' => $this->staff?->department,
+            'designation' => $this->staff?->designation,
+            'phone' => $this->staff?->phone,
+            'address' => $this->staff?->address,
+            'status'  => $this->status ?? $this->status,
 
 
             'user' => [
-                'id' => $this->user?->id,
-                'name' => $this->user?->name,
-                'email' => $this->user?->email,
-                'phone' => $this->user?->phone,
-                'status'  => $this->user,
+                'id' => $this->id,
+                'name' => $this->name,
+                'email' => $this->email,
+                'phone' => $this->phone,
+                'status'  => $this->status,
                 'created_at' => $this->created_at,
                 'last_active' => $this->last_active,
             ]

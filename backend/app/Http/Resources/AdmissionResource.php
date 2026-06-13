@@ -17,7 +17,7 @@ class AdmissionResource extends JsonResource
 
             'student' => $this->whenLoaded(
                 'student',
-                fn () => [
+                fn() => [
                     'id' => $this->student?->id,
                     'name' => $this->student?->name,
                     'email' => $this->student?->email,
@@ -25,13 +25,20 @@ class AdmissionResource extends JsonResource
                 ]
             ),
 
+            'student_name' => $this->student?->name,
+            'course_name' => $this->course?->name,
+
             'course_id' => $this->course_id,
 
             'course' => $this->whenLoaded(
                 'course',
-                fn () => [
+                fn() => [
                     'id' => $this->course?->id,
-                    'title' => $this->course?->title,
+                    'name' => $this->course?->name,
+                    'actual_price' => $this->course?->actual_price,
+                    'fee_type' => $this->course?->fee_type,
+                    'duration_days' => $this->course?->duration_days,
+                    'is_renewal' => $this->course?->is_renewal,
                 ]
             ),
 
@@ -39,7 +46,7 @@ class AdmissionResource extends JsonResource
 
             'teacher' => $this->whenLoaded(
                 'teacher',
-                fn () => [
+                fn() => [
                     'id' => $this->teacher?->id,
                     'name' => $this->teacher?->name,
                 ]
@@ -54,6 +61,27 @@ class AdmissionResource extends JsonResource
             'coupon_id' => $this->coupon_id,
 
             'net_fee' => $this->net_fee,
+
+            'total_paid' =>
+            $this->payments->sum('amount'),
+
+            'balance_amount' =>
+            $this->net_fee -
+                $this->payments->sum('amount'),
+
+            'payments' => $this->whenLoaded(
+                'payments',
+                fn() => $this->payments->map(
+                    fn($payment) => [
+                        'id' => $payment->id,
+                        'amount' => $payment->amount,
+                        'payment_method' => $payment->payment_method,
+                        'transaction_no' => $payment->transaction_no,
+                        'remarks' => $payment->remarks,
+                        'paid_at' => $payment->paid_at,
+                    ]
+                )
+            ),
 
             'admission_date' => $this->admission_date,
 

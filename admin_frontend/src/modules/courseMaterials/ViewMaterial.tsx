@@ -27,7 +27,7 @@ const ViewMaterial = () => {
       </div>
     )
 
-  const material = data?.data;
+  const material = data;
 
   const isPdf =
     material.material_type === 'pdf'

@@ -51,4 +51,125 @@ export const courseService = {
 
   remove: (id: number) =>
     apiClient.delete(`/courses/${id}`),
+
+  getConversation: (
+    courseId: number
+  ) =>
+    apiClient.get(
+      `/courses/${courseId}/conversation`
+    ),
+  saveConversation: (
+    courseId: number,
+    payload: FormData
+  ) =>
+    apiClient.post(
+      `/courses/${courseId}/conversation`,
+      payload,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    ),
+
+  getTeachers: (
+    courseId: number,
+    search?: string
+  ) =>
+    apiClient.get(
+      `/courses/${courseId}/addon-teachers`,
+      {
+        params: {
+          search,
+        },
+      }
+    ),
+
+
+  saveTeachers: (
+    courseId: number,
+    teacher_ids: number[]
+  ) =>
+    apiClient.post(
+      `/courses/${courseId}/addon-teachers`,
+      {
+        teacher_ids,
+      }
+    ),
+
+  getCourseStudents(courseId: number) {
+    return apiClient.get(
+      `/courses/${courseId}/students`
+    )
+  },
+
+  updateCourseStudent(
+    courseId: number,
+    admissionId: number,
+    payload: any
+  ) {
+    return apiClient.put(
+      `/courses/${courseId}/students/${admissionId}`,
+      payload
+    )
+  },
+
+  getConversationParticipants: (
+    courseId: number,
+    search?: string
+  ) =>
+    apiClient.get(
+      `/courses/${courseId}/conversation/participants`,
+      {
+        params: {
+          search,
+        },
+      }
+    ),
+
+  removeCourseStudent(
+    courseId: number,
+    admissionId: number
+  ) {
+    return apiClient.delete(
+      `/courses/${courseId}/students/${admissionId}`
+    )
+  },
+
+  bulkUpdateStudents(
+    courseId: number,
+    payload: any
+  ) {
+    return apiClient.post(
+      `/courses/${courseId}/students/bulk-update`,
+      payload
+    )
+  },
+
+  getConversationMembers: (
+    courseId: number
+  ) =>
+    apiClient.get(
+      `/courses/${courseId}/conversation/members`
+    ),
+
+  searchConversationUsers: (
+    courseId: number,
+    search?: string
+  ) =>
+    apiClient.get(
+      `/courses/${courseId}/conversation/users`,
+      {
+        params: { search }
+      }
+    ),
+
+  removeConversationMember: (
+    courseId: number,
+    userId: number
+  ) =>
+    apiClient.delete(
+      `/courses/${courseId}/conversation/members/${userId}`
+    ),
+
 }

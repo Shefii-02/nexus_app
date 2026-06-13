@@ -15,6 +15,7 @@ class TeacherService extends BaseService
     {
         parent::__construct($repository);
     }
+
     /**
      * Create a new teacher
      */
@@ -44,9 +45,10 @@ class TeacherService extends BaseService
     {
         return DB::transaction(function () use ($id, $dto) {
 
-            $teacher = $this->repository->find($id);
 
-            if (!$teacher) {
+            $user = $this->repository->find($id);
+
+            if (!$user) {
                 throw new \Exception('Teacher not found');
             }
 
@@ -60,7 +62,7 @@ class TeacherService extends BaseService
             ], fn($v) => $v !== null);
 
             if (!empty($userData)) {
-                $teacher->user->update($userData);
+                $user->update($userData);
             }
 
             // 🔹 2. Update TEACHER TABLE
@@ -74,10 +76,16 @@ class TeacherService extends BaseService
             ], fn($v) => $v !== null);
 
             if (!empty($teacherData)) {
-                $teacher->update($teacherData);
+                $user->teacher()->updateOrCreate(
+                    [
+                        'user_id' => $user->id,
+                    ],
+                    $teacherData
+                );
+                // $user->teacher->update($teacherData);
             }
 
-            return $teacher->fresh()->load('user');
+            return $user->fresh()->load('teacher');
         });
     }
 

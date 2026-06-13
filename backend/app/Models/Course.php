@@ -46,7 +46,17 @@ class Course extends Model
      */
     public function teacher(): BelongsTo
     {
-        return $this->belongsTo(Teacher::class,'teacher_id','user_id');
+        return $this->belongsTo(User::class, 'teacher_id', 'id');
+    }
+
+    public function teachers()
+    {
+        return $this->belongsToMany(
+            User::class,
+            'teachers_courses',
+            'course_id',
+            'teacher_id'
+        );
     }
 
     /**
@@ -75,13 +85,11 @@ class Course extends Model
 
     public function thumbnailMedia()
     {
-        return $this->belongsTo(MediaFile::class, 'thumbnail','id');
+        return $this->belongsTo(MediaFile::class, 'thumbnail', 'id');
     }
 
 
-    public function conversation(){
-
-    }
+    public function conversation() {}
 
     /**
      * Relationship: Course has many Payments

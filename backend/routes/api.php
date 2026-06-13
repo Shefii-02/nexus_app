@@ -94,8 +94,55 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::apiResource('roles', RoleController::class);
 
+    Route::get('/courses/{course}/addon-teachers', [CourseController::class, 'addonTeachers']);
+
+    Route::post('/courses/{course}/addon-teachers', [CourseController::class, 'addonTeachersStore']);
+
+    Route::get('/courses/{course}/teachers', [CourseController::class, 'courseTeachers']);
+    Route::get('/courses/{course}/students', [CourseController::class, 'students']);
+
+    Route::put('/courses/students/{admission}', [CourseController::class, 'updateStudent']);
+
+    Route::delete('/courses/students/{admission}', [CourseController::class, 'removeStudent']);
+
+    Route::post('/courses/students/bulk-update', [CourseController::class, 'bulkUpdateStudents']);
+
+
+
+    Route::get('/courses/{course}/conversation', [CourseController::class, 'conversation']);
+    Route::get('/courses/{course}/conversation-participants', [CourseController::class, 'participants']);
+
+    Route::post('/courses/{course}/conversation', [CourseController::class, 'saveConversation']);
+
+
     // Course Management
     Route::apiResource('courses', CourseController::class);
+
+
+    Route::get(
+        '/courses/{course}/conversation',
+        [CourseController::class, 'conversation']
+    );
+
+    Route::get(
+        '/courses/{course}/conversation/members',
+        [CourseController::class, 'conversationMembers']
+    );
+
+    Route::get(
+        '/courses/{course}/conversation/users',
+        [CourseController::class, 'conversationUsers']
+    );
+
+    Route::post(
+        '/courses/{course}/conversation',
+        [CourseController::class, 'saveConversation']
+    );
+
+    Route::delete(
+        '/courses/{course}/conversation/members/{user}',
+        [CourseController::class, 'removeConversationMember']
+    );
 
 
 

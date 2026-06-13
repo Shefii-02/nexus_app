@@ -40,9 +40,9 @@ class CourseResource extends JsonResource
 
             'teacher' => $this->whenLoaded('teacher', function () {
                 return [
-                    'id' => $this->teacher->user->id,
-                    'name' => $this->teacher->user->name ?? null,
-                    'email' => $this->teacher->user->email ?? null,
+                    'id' => $this->teacher->id,
+                    'name' => $this->teacher->name ?? null,
+                    'email' => $this->teacher->email ?? null,
                 ];
             }),
 

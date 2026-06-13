@@ -27,6 +27,7 @@ class StudentController extends Controller
           $filters = [
             'search' => request('search'),
             'status' => request('status'),
+            'acc_type' => 'student',
         ];
 
 
@@ -40,13 +41,13 @@ class StudentController extends Controller
 
     public function show(int $student): JsonResponse
     {
-        $studentData = $this->studentService->findWithRelations($student, ['user']);
+        $studentData = $this->studentService->findWithRelations($student, ['student']);
 
         if (!$studentData) {
             return $this->errorResponse('Student not found', null, 404);
         }
 
-        return $this->successResponse(StudentResource::make($studentData->load('user')), 'Student retrieved successfully');
+        return $this->successResponse(StudentResource::make($studentData->load('student')), 'Student retrieved successfully');
     }
 
     public function store(StoreStudentRequest $request): JsonResponse
@@ -56,7 +57,7 @@ class StudentController extends Controller
             $student = $this->studentService->create($dto);
 
             return $this->successResponse(
-                StudentResource::make($student->load('user')),
+                StudentResource::make($student->load('student')),
                 'Student created successfully',
                 201
             );
@@ -67,7 +68,6 @@ class StudentController extends Controller
 
     public function update(UpdateStudentRequest $request, int $student): JsonResponse
     {
-
         try {
 
             if (!$this->studentService->exists($student)) {
@@ -82,7 +82,7 @@ class StudentController extends Controller
             $updated = $this->studentService->update($student, $dto);
 
             return $this->successResponse(
-                StudentResource::make($updated->load('user')),
+                StudentResource::make($updated->load('student')),
                 'Student updated successfully'
             );
         } catch (\Exception $e) {

@@ -11,6 +11,7 @@ export interface UserProfile {
   email: string
   role: 'admin' | 'Staff' | string
   acc_type: 'admin' | 'Staff' | string
+  avatar : string
   
 }
 

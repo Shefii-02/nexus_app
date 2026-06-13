@@ -1,21 +1,25 @@
-// components/CourseViewToggle.tsx
-const CourseViewToggle = ({ view, setView }: any) => {
-  return (
-    <div className="flex gap-2">
-      <button
-        onClick={() => setView('grid')}
-        className={view === 'grid' ? 'font-bold' : ''}
-      >
-        Grid
-      </button>
+import Button from '../../../components/Button'
 
-      <button
-        onClick={() => setView('list')}
-        className={view === 'list' ? 'font-bold' : ''}
-      >
-        List
-      </button>
-    </div>
+interface Props {
+  view: 'grid' | 'list'
+  setView: (view: 'grid' | 'list') => void
+}
+
+const CourseViewToggle = ({ view, setView }: Props) => {
+  return (<div className="flex gap-2">
+    <Button
+      variant={view === 'grid' ? 'primary' : 'secondary'}
+      onClick={() => setView('grid')}
+    >
+      Grid </Button>
+
+    <Button
+      variant={view === 'list' ? 'primary' : 'secondary'}
+      onClick={() => setView('list')}
+    >
+      List
+    </Button>
+  </div>
   )
 }
 

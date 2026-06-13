@@ -15,7 +15,7 @@ const EditCoursePage = () => {
   /** =========================
    * FETCH DATA
    ========================= */
-  const { data, isLoading } = useCourse(courseId)
+  const { data, isLoading,refetch } = useCourse(courseId)
   const { data: teacherData } = useTeachers()
   const updateCourse = useUpdateCourse()
 

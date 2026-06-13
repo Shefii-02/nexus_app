@@ -2,12 +2,12 @@
 
 namespace App\Repositories\Student;
 
-use App\Models\Student;
+use App\Models\User;
 use App\Repositories\BaseRepository;
 
 class StudentRepository extends BaseRepository implements StudentRepositoryInterface
 {
-    public function __construct(Student $student)
+    public function __construct(User $student)
     {
         parent::__construct($student);
     }
@@ -25,17 +25,21 @@ class StudentRepository extends BaseRepository implements StudentRepositoryInter
     public function getByBatch(int $batchId)
     {
         return $this->model->where('batch_id', $batchId)
-            ->with(['user', 'batch'])
+            ->with(['student', 'batch'])
             ->paginate(15);
     }
 
     public function getActiveStudents()
     {
-        return $this->model->active()->with(['user', 'batch'])->paginate(15);
+        return $this->model->active()->with(['student', 'batch'])->paginate(15);
     }
 
     protected function applyFilters($query, array $filters)
     {
+
+        $query->with('student');
+        $query->where('acc_type', 'student');
+
         if (!empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
@@ -46,11 +50,10 @@ class StudentRepository extends BaseRepository implements StudentRepositoryInter
 
         if (!empty($filters['search'])) {
             $search = $filters['search'];
-            $query->where('roll_number', 'like', "%{$search}%")
-                  ->orWhereHas('user', function ($q) use ($search) {
-                      $q->where('name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%");
-                  });
+            $query->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%")
+                ->orWhereHas('student', function ($q) use ($search) {
+                    $q->where('roll_number', 'like', "%{$search}%");
+                });
         }
 
         return $query;

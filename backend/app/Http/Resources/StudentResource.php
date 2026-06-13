@@ -10,19 +10,19 @@ class StudentResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'roll_number' => $this->roll_number,
-            'phone' => $this->phone,
-            'address' => $this->address,
-            'guardian_name' => $this->guardian_name,
-            'guardian_phone' => $this->guardian_phone,
+            'roll_number' => $this->student?->roll_number,
+            'phone' => $this->student?->phone,
+            'address' => $this->student?->address,
+            'guardian_name' => $this->student?->guardian_name,
+            'guardian_phone' => $this->student?->guardian_phone,
             'status'  => $this->user?->status ?? $this->user,
 
             'user' => [
-                'id' => $this->user?->id,
-                'name' => $this->user?->name,
-                'email' => $this->user?->email,
-                'phone' => $this->user?->phone,
-                'status'  => $this->user,
+                'id' => $this->id,
+                'name' => $this->name,
+                'email' => $this->email,
+                'phone' => $this->phone,
+                'status'  => $this->status,
                 'created_at' => $this->created_at,
                 'last_active' => $this->last_active,
             ]

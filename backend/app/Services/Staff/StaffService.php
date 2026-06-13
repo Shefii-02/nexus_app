@@ -17,7 +17,7 @@ class StaffService extends BaseService
 
     public function create(StaffDTO $dto): object
     {
-         return DB::transaction(function () use ($dto) {
+        return DB::transaction(function () use ($dto) {
 
             // ✅ 1. Create User
             $user = User::create($dto->toUserArray());
@@ -26,7 +26,7 @@ class StaffService extends BaseService
             $user->assignRole('staff');
 
             // ✅ 3. Create Staff
-             $staff = $this->repository->create(
+            $staff = $this->repository->create(
                 $dto->toStaffArray($user->id)
             );
 
@@ -36,7 +36,7 @@ class StaffService extends BaseService
 
     public function update(int $id, StaffDTO $dto): object
     {
-         return DB::transaction(function () use ($id, $dto) {
+        return DB::transaction(function () use ($id, $dto) {
 
             $staff = $this->repository->find($id);
 
@@ -54,7 +54,7 @@ class StaffService extends BaseService
             ], fn($v) => $v !== null);
 
             if (!empty($userData)) {
-                $staff->user->update($userData);
+                $staff->update($userData);
             }
 
             // 🔹 2. Update STAFF TABLE
@@ -67,10 +67,15 @@ class StaffService extends BaseService
             ], fn($v) => $v !== null);
 
             if (!empty($staffData)) {
-                $staff->update($staffData);
+                $staff->staff()->updateOrCreate(
+                    [
+                        'user_id' => $staff->id,
+                    ],
+                    $staffData
+                );
             }
 
-            return $staff->fresh()->load('user');
+            return $staff->fresh()->load('staff');
         });
     }
 

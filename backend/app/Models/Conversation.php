@@ -25,9 +25,25 @@ class Conversation extends Model
     //         ->withTimestamps();
     // }
     public function participants()
-{
-    return $this->hasMany(ConversationParticipant::class);
-}
+    {
+        return $this->hasMany(ConversationParticipant::class);
+    }
+    public function mParticipants()
+    {
+        return $this->belongsToMany(
+            User::class,
+            'conversation_participants',
+            'conversation_id',
+            'user_id'
+        )
+            ->withPivot([
+                'status',
+                'is_muted',
+                'is_pinned',
+                'left_at',
+                'created_by'
+            ]);
+    }
 
     public function creator(): BelongsTo
     {
@@ -43,8 +59,8 @@ class Conversation extends Model
     {
         return $query->whereHas('participants', function ($q) use ($userId) {
             $q->where('user_id', $userId)
-              ->where('status', 'active')
-              ->whereNull('deleted_at');
+                ->where('status', 'active')
+                ->whereNull('deleted_at');
         });
     }
 
@@ -54,5 +70,16 @@ class Conversation extends Model
     public function scopeForModule(Builder $query, int $moduleId): Builder
     {
         return $query->where('module_id', $moduleId);
+    }
+
+
+    public function avatarMedia()
+    {
+        return $this->belongsTo(MediaFile::class, 'avatar');
+    }
+
+    public function getAvatarUrlAttribute()
+    {
+        return $this->avatarMedia  ? asset('storage/' . $this->avatarMedia->file_path) : 'https://ui-avatars.com/api/?name=' . urlencode($this->title);
     }
 }

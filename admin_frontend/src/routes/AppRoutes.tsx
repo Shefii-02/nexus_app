@@ -52,13 +52,15 @@ import CreateMaterial from '../modules/courseMaterials/CreateMaterial'
 import EditMaterial from '../modules/courseMaterials/EditMaterial'
 import ViewMaterial from '../modules/courseMaterials/ViewMaterial'
 import CourseViewPage from '../modules/courses/pages/CourseViewPage'
+import ConversationPage from '../modules/conversations/ConversationPage'
+import CreateAdmissionPage from '../modules/admissions/pages/CreateAdmissionPage'
 
 const AppRoutes = () => (
   <Routes>
     <Route path="/login" element={<LoginPage />} />
     <Route element={<ProtectedRoute />}>
       <Route element={<ProtectedLayout><Outlet /></ProtectedLayout>}>
-      {/* <Route element={<DashboardLayout><Outlet /></DashboardLayout>}> */}
+        {/* <Route element={<DashboardLayout><Outlet /></DashboardLayout>}> */}
         <Route path="/" element={<DashboardPage />} />
         <Route path="/teachers" element={<TeacherListPage />} />
         <Route path="/teachers/create" element={<CreateTeacherPage />} />
@@ -88,35 +90,38 @@ const AppRoutes = () => (
         <Route path="/courses/:courseId/materials/:materialId" element={<ViewMaterial />} />
         <Route path="/courses/:courseId/materials/:materialId/edit" element={<EditMaterial />} />
 
-        {/* <Route path="/courses/:courseId/groups/create" element={<CreateGroupPage />} />
-        <Route path="/courses/:courseId/groups/:id/edit" element={<EditGroupPage />} />
-        <Route path="/courses/:courseId/groups/:id" element={<EditGroupPage />} /> */}
 
+        <Route path="/chats" element={<ConversationPage />} />
+        <Route path="/chats/create" element={<CreateGroupPage />} />
+        <Route path="/chats/:id/edit" element={<EditGroupPage />} />
+        <Route path="/chats/:id" element={<EditGroupPage />} />
 
-        {/* <Route path="/conversations" element={<ChatListPage />} />
-        <Route path="/conversation/chats/create" element={<CreateGroupPage />} />
-        <Route path="/conversation/chats/:id/edit" element={<EditGroupPage />} />
-        <Route path="/conversation/chats/:id" element={<EditGroupPage />} />
-
+        {/*
         <Route path="/conversation/groups" element={<GroupListPage />} />
         <Route path="/conversation/groups/create" element={<CreateGroupPage />} />
         <Route path="/conversation/groups/:id/edit" element={<EditGroupPage />} />
         <Route path="/conversation/groups/:id" element={<EditGroupPage />} /> */}
 
+
+        <Route path="/admissions/create" element={<CreateAdmissionPage />} />
+        <Route path="/admissions" element={<AdmissionsListPage />} />
+        
+        <Route path="/renewals/due" element={<RenewalPaymentsPage />} />
+        <Route path="/renewals" element={<RenewalPaymentsPage />} />
+
+
         <Route path="/payments" element={<PaymentListPage />} />
         <Route path="/payments/create" element={<CreatePaymentPage />} />
         <Route path="/payments/:id/edit" element={<EditPaymentPage />} />
-        <Route path="/payments/admissions/enroll" element={<EnrollAdmissionPage />} />
-        <Route path="/payments/admissions" element={<AdmissionsListPage />} />
+
         <Route path="/payments/transactions" element={<TransactionListPage />} />
-        <Route path="/payments/renewals" element={<RenewalPaymentsPage />} />
         <Route path="/announcements" element={<AnnouncementListPage />} />
         <Route path="/announcements/create" element={<CreateAnnouncementPage />} />
         <Route path="/announcements/:id/edit" element={<EditAnnouncementPage />} />
 
         <Route path="/notifications" element={<NotificationListPage />} />
         <Route path="/notifications/create" element={<CreateNotificationPage />} />
-        <Route path="/notifications/:id" element={<ViewNotificationPage />}/>
+        <Route path="/notifications/:id" element={<ViewNotificationPage />} />
         <Route path="/notifications/:id/edit" element={<EditNotificationPage />} />
 
         <Route path="/roles" element={<RoleListPage />} />

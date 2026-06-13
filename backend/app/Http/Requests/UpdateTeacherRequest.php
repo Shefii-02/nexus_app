@@ -17,9 +17,9 @@ class UpdateTeacherRequest extends BaseRequest
     {
         $teacher = $this->route('teacher');
 
-        // Get user_id from teacher
-        $teacher = \App\Models\Teacher::find($teacher);
-        $userId = $teacher?->user_id;
+        // // Get user_id from teacher
+        // $teacher = \App\Models\User::find($teacher);
+        // $userId = $teacher?->user_id;
         return [
             // 🔹 USER fields
             'name' => 'required|string|max:255',
@@ -27,14 +27,14 @@ class UpdateTeacherRequest extends BaseRequest
             'email' => [
                 'required',
                 'email',
-                Rule::unique('users', 'email')->ignore($userId),
+                Rule::unique('users', 'email')->ignore($teacher),
             ],
 
             'phone' => [
                 'required',
                 'string',
                 'max:20',
-                Rule::unique('users', 'phone')->ignore($userId),
+                Rule::unique('users', 'phone')->ignore($teacher),
             ],
 
             'password' => 'sometimes|string|min:6',

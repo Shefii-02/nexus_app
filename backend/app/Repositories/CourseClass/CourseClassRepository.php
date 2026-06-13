@@ -45,6 +45,28 @@ class CourseClassRepository extends BaseRepository implements CourseClassReposit
 
     protected function applyFilters($query, array $filters)
     {
+
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where('title', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%");
+        }
+
+        if (!empty($filters['record_link'])) {
+            if ($filters['record_link'] == 'added') {
+                $query->whereNull('record_link');
+            } else if ($filters['record_link'] == 'not') {
+                $query->whereNotNull('record_link');
+            }
+        }
+
+
+        if (!empty($filters['class_no'])) {
+            $query->where('class_no', $filters['class_no']);
+        }
+
+
+
         if (!empty($filters['course_id'])) {
             $query->where('course_id', $filters['course_id']);
         }

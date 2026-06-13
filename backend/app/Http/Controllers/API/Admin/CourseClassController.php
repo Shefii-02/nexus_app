@@ -25,7 +25,21 @@ class CourseClassController extends Controller
     {
         $page = request()->query('page', 1);
         $perPage = request()->query('per_page', 15);
-        $filters = request()->query('filters', []);
+        // $filters = request()->query('filters', []);
+
+
+        $filters = [
+            'search' => request('search'),
+            'record_link' => request('record_link'),
+            'status' => request('status'),
+            'source' => request('source'),
+            'class_no' => request('class_no'),
+            'teacher_id' => request('teacher_id'),
+            'start_date' => request('start_date'),
+            'end_date' => request('end_date'),
+        ];
+
+
         // 🔥 FORCE course filter
         $filters['course_id'] = $courseId;
 

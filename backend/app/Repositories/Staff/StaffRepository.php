@@ -2,12 +2,12 @@
 
 namespace App\Repositories\Staff;
 
-use App\Models\Staff;
+use App\Models\User;
 use App\Repositories\BaseRepository;
 
 class StaffRepository extends BaseRepository implements StaffRepositoryInterface
 {
-    public function __construct(Staff $staff)
+    public function __construct(User $staff)
     {
         parent::__construct($staff);
     }
@@ -31,6 +31,10 @@ class StaffRepository extends BaseRepository implements StaffRepositoryInterface
 
     protected function applyFilters($query, array $filters)
     {
+
+        $query->with('student');
+        $query->where('acc_type', 'staff');
+
         if (!empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
@@ -41,10 +45,9 @@ class StaffRepository extends BaseRepository implements StaffRepositoryInterface
 
         if (!empty($filters['search'])) {
             $search = $filters['search'];
-            $query->whereHas('user', function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
-            })->orWhere('designation', 'like', "%{$search}%");
+            $query->whereHas('staff', function ($q) use ($search) {
+                $q->where('designation', 'like', "%{$search}%");
+            })->orWhere('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%");
         }
 
         return $query;

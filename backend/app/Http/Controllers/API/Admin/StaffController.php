@@ -35,7 +35,7 @@ class StaffController extends Controller
 
     public function show(int $staff): JsonResponse
     {
-        $staffData = $this->staffService->findWithRelations($staff, ['user']);
+        $staffData = $this->staffService->findWithRelations($staff, ['staff']);
 
         if (!$staffData) {
             return $this->errorResponse('Staff member not found', null, 404);
@@ -51,7 +51,7 @@ class StaffController extends Controller
             $staff = $this->staffService->create($dto);
 
             return $this->successResponse(
-                StaffResource::make($staff->load('user')),
+                StaffResource::make($staff->load('staff')),
                 'Staff created successfully',
                 201
             );
@@ -74,7 +74,7 @@ class StaffController extends Controller
             ));
 
             $this->staffService->update($staff, $dto);
-            $updated = $this->staffService->findWithRelations($staff, ['user']);
+            $updated = $this->staffService->findWithRelations($staff, ['staff']);
 
             return $this->successResponse(StaffResource::make($updated), 'Staff updated successfully');
         } catch (\Exception $e) {

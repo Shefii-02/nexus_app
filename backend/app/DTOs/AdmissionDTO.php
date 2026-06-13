@@ -25,6 +25,8 @@ class AdmissionDTO
         public string $payment_method,
         public ?string $transaction_no,
         public ?string $remarks,
+        public ?string $notes
+
     ) {}
 
     public static function fromArray(
@@ -66,11 +68,15 @@ class AdmissionDTO
             status: $data['status']
                 ?? 'active',
 
-            paid_amount: '',
-            payment_method: '',
-            transaction_no: '',
-            remarks: '',
+            paid_amount: (float)($data['paid_amount'] ?? 0),
 
+            payment_method: $data['payment_method'] ?? '',
+
+            transaction_no: $data['transaction_no'] ?? null,
+
+            remarks: $data['remarks'] ?? null,
+
+            notes : $data['remarks'] ?? null,
         );
     }
 

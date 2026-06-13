@@ -18,9 +18,7 @@ class UpdateStaffRequest extends BaseRequest
     {
         $staff = $this->route('staff');
 
-        // Get user_id from staff
-        $staff = \App\Models\Staff::find($staff);
-        $userId = $staff?->user_id;
+
 
         return [
             'name' => 'required|string|max:255',
@@ -28,18 +26,18 @@ class UpdateStaffRequest extends BaseRequest
             'email' => [
                 'required',
                 'email',
-                Rule::unique('users', 'email')->ignore($userId),
+                Rule::unique('users', 'email')->ignore($staff),
             ],
 
             'phone' => [
                 'required',
                 'string',
                 'max:20',
-                Rule::unique('users', 'phone')->ignore($userId),
+                Rule::unique('users', 'phone')->ignore($staff),
             ],
             'department' => 'sometimes|string|max:255',
             'designation' => 'sometimes|string|max:255',
-            'phone' => 'sometimes|string|max:20|unique:staff,phone,' . $this->route('staff'),
+            'phone' => 'sometimes|string|max:20|unique:users,phone,' . $this->route('staff'),
             'address' => 'sometimes|string|max:500',
             'status' => 'sometimes|in:active,inactive,suspended',
         ];

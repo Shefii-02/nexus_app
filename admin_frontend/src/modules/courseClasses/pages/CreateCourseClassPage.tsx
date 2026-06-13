@@ -2,7 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import DynamicForm from '../../../components/DynamicForm'
 import PageHeader from '../../../components/PageHeader'
 import { handleMutationWithToast } from '../../../utils/handleMutationWithToast'
-import { useCreateCourseClass } from '../courseClassHooks'
+import { useCourseTeachers, useCreateCourseClass } from '../courseClassHooks'
 import { courseClassFormConfig } from '../courseClassFormConfig'
 import { useTeachers } from '../../teachers/teacherHooks'
 
@@ -22,7 +22,7 @@ const CreateCourseClassPage = () => {
   }
 
   // ✅ FETCH TEACHERS HERE (NOT in config file)
-  const { data: teacherData } = useTeachers()
+  const { data: teacherData } = useCourseTeachers()
 
   // ✅ INJECT options dynamically
   const config = courseClassFormConfig.map((field) =>

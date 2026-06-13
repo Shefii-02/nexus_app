@@ -1,4 +1,5 @@
 import apiClient from '../../services/apiClient'
+import type { TeacherListResponse } from '../teachers/teacherService'
 
 export interface CourseClass {
   id: number
@@ -48,6 +49,10 @@ export const courseClassService = {
 
     return apiClient.get<{ data: CourseClass }>(url) // ✅ MUST RETURN
   },
+
+   getCourseTeachers: (params?: Record<string, string | number | boolean>) =>
+    apiClient.get<TeacherListResponse>('/courses/${courseId}/teachers', { params }),
+   
   // getById: (id: number, courseId: number) =>{
   //     console.log('API URL:', `/courses/${courseId}/classes/${id}`) // ✅ print here
   //   apiClient.get<{ data: CourseClass }>(`/courses/${courseId}/classes/${id}`)

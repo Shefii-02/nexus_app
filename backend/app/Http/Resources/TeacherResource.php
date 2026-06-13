@@ -8,20 +8,21 @@ class TeacherResource extends JsonResource
 {
     public function toArray($request)
     {
+
         return [
             'id' => $this->id,
-            'subject' => $this->subject,
-            'qualification' => $this->qualification,
-            'experience_years' => $this->experience_years,
-            'address' => $this->address,
-            'status'  => $this->user?->status ?? $this->user,
+            'subject' => $this->teacher?->subject,
+            'qualification' => $this->teacher?->qualification,
+            'experience_years' => $this->teacher?->experience_years,
+            'address' => $this->teacher?->address,
+            'status'  => $this->status ?? $this->user,
 
             'user' => [
-                'id' => $this->user?->id,
-                'name' => $this->user?->name,
-                'email' => $this->user?->email,
-                'phone' => $this->user?->phone,
-                'status'  => $this->user,
+                'id' => $this->id,
+                'name' => $this->name,
+                'email' => $this->email,
+                'phone' => $this->phone,
+                'status'  => $this->status,
                 'created_at' => $this->created_at,
                 'last_active' => $this->last_active,
             ]

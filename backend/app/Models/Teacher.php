@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[Fillable(['user_id', 'qualification', 'subject', 'experience_years', 'phone', 'address', 'status'])]
 class Teacher extends Model
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'teachers';
 
@@ -27,9 +27,17 @@ class Teacher extends Model
     /**
      * Relationship: Teacher belongs to User
      */
+    // public function user(): BelongsTo
+    // {
+    //     return $this->belongsTo(User::class);
+    // }
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(
+            User::class,
+            'user_id',
+            'id'
+        );
     }
 
     /**

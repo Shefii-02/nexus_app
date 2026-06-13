@@ -25,10 +25,16 @@ class Student extends Model
     /**
      * Relationship: Student belongs to User
      */
+
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(
+            User::class,
+            'user_id',
+            'id'
+        );
     }
+
 
     /**
      * Relationship: Student belongs to many Batches (via pivot)

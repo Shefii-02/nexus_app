@@ -12,8 +12,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['name', 'email', 'password', 'agree_terms','phone', 'avatar', 'acc_type', 'status'])]
+#[Fillable(['name', 'email', 'password', 'agree_terms', 'phone', 'avatar', 'acc_type', 'status'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements JWTSubject
 {
@@ -45,9 +48,77 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
 
-
-    public function teacher()
+    public function teacher(): HasOne
     {
-        return $this->hasOne(Teacher::class);
+        return $this->hasOne(
+            Teacher::class,
+            'user_id',
+            'id'
+        );
+    }
+
+    public function student(): HasOne
+    {
+        return $this->hasOne(
+            Student::class,
+            'user_id',
+            'id'
+        );
+    }
+
+    public function staff(): HasOne
+    {
+        return $this->hasOne(
+            Staff::class,
+            'user_id',
+            'id'
+        );
+    }
+
+    /**
+     * Relationship: Teacher has many Courses
+     */
+    public function courses(): HasMany
+    {
+        return $this->hasMany(Course::class, 'teacher_id', 'id');
+    }
+
+    public function courseTeachers()
+    {
+        return $this->hasMany(
+            TeachersCourse::class,
+            'teacher_id',
+            'id'
+        );
+    }
+
+    public function assignedCourses()
+    {
+        return $this->belongsToMany(
+            Course::class,
+            'teachers_courses',
+            'teacher_id',
+            'course_id'
+        );
+    }
+
+    public function conversations()
+    {
+        return $this->belongsToMany(
+            Conversation::class,
+            'conversation_participants',
+            'user_id',
+            'conversation_id'
+        );
+    }
+
+    public function avatar()
+    {
+        return $this->hasOne(MediaFile::class, 'user_id')->where('file_type', 'avatar');
+    }
+
+    public function getAvatarUrlAttribute()
+    {
+        return $this->avatar  ? asset('storage/' . $this->avatar->file_path) : 'https://ui-avatars.com/api/?name=' . urlencode($this->name);
     }
 }

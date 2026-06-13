@@ -51,7 +51,7 @@ class StudentService extends BaseService
             ], fn($v) => $v !== null);
 
             if (!empty($userData)) {
-                $student->user->update($userData);
+                $student->update($userData);
             }
 
             // 🔹 2. Update STUDENT TABLE
@@ -65,10 +65,15 @@ class StudentService extends BaseService
             ], fn($v) => $v !== null);
 
             if (!empty($studentData)) {
-                $student->update($studentData);
+                $student->student()->updateOrCreate(
+                    [
+                        'user_id' => $student->id,
+                    ],
+                    $studentData
+                );
             }
 
-            return $student->fresh()->load('user');
+            return $student->fresh()->load('student');
         });
     }
 

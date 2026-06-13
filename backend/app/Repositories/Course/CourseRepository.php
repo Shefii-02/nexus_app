@@ -44,6 +44,10 @@ class CourseRepository extends BaseRepository implements CourseRepositoryInterfa
             $query->where('status', $filters['status']);
         }
 
+         if (!empty($filters['class_type'])) {
+            $query->where('class_type', $filters['class_type']);
+        }
+
         if (!empty($filters['teacher_id'])) {
             $query->where('teacher_id', $filters['teacher_id']);
         }

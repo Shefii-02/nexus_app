@@ -30,11 +30,28 @@ class AdmissionService extends BaseService
                 |--------------------------------------------------------------------------
                 */
 
+                $data = $dto->toArray();
+
+                if (empty($dto->expiry_date)) {
+
+                    $course = \App\Models\Course::findOrFail(
+                        $dto->course_id
+                    );
+
+                    $data['expiry_date'] =
+                        \Carbon\Carbon::parse(
+                            $dto->admission_date
+                        )->addDays(
+                            $course->duration_days ?? 30
+                        )->toDateString();
+                }
+
+
                 $admission =
                     $this->repository
-                        ->create(
-                            $dto->toArray()
-                        );
+                    ->create(
+                        $data
+                    );
 
                 /*
                 |--------------------------------------------------------------------------
@@ -47,32 +64,32 @@ class AdmissionService extends BaseService
                         $dto,
                         'paid_amount'
                     ) &&
-                    $dto->paid_amount > 0
+                    $dto->paid_amount >= 0
                 ) {
 
                     $payment =
                         AdmissionPayment::create([
 
                             'admission_id' =>
-                                $admission->id,
+                            $admission->id,
 
                             'amount' =>
-                                $dto->paid_amount,
+                            $dto->paid_amount,
 
                             'payment_method' =>
-                                $dto->payment_method,
+                            $dto->payment_method,
 
                             'transaction_no' =>
-                                $dto->transaction_no,
+                            $dto->transaction_no,
 
                             'remarks' =>
-                                $dto->remarks,
+                            $dto->remarks,
 
                             'paid_at' =>
-                                now(),
+                            now(),
 
                             'created_by' =>
-                                auth()->id(),
+                            auth()->id(),
                         ]);
 
                     /*
@@ -86,32 +103,33 @@ class AdmissionService extends BaseService
                         'type' => 'income',
 
                         'category' =>
-                            'admission_fee',
+                        'admission_fee',
 
                         'reference_type' =>
-                            'admission_payment',
+                        'admission_payment',
 
                         'reference_id' =>
-                            $payment->id,
+                        $payment->id,
 
                         'amount' =>
-                            $dto->paid_amount,
+                        $dto->paid_amount,
 
                         'description' =>
-                            'Admission payment collected',
+                        'Admission payment collected',
 
                         'transaction_date' =>
-                            now(),
+                        now(),
 
                         'created_by' =>
-                            auth()->id(),
+                        auth()->id(),
                     ]);
                 }
 
                 return $admission->load([
                     'student',
                     'course',
-                    'teacher'
+                    'teacher',
+                    'payments'
                 ]);
             }
         );
@@ -128,10 +146,26 @@ class AdmissionService extends BaseService
                 $dto
             ) {
 
+                $data = $dto->toArray();
+
+                if (empty($dto->expiry_date)) {
+
+                    $course = \App\Models\Course::findOrFail(
+                        $dto->course_id
+                    );
+
+                    $data['expiry_date'] =
+                        \Carbon\Carbon::parse(
+                            $dto->admission_date
+                        )->addDays(
+                            $course->duration_days ?? 30
+                        )->toDateString();
+                }
+
                 return $this->repository
                     ->update(
                         $id,
-                        $dto->toArray()
+                        $data
                     );
             }
         );
@@ -151,9 +185,8 @@ class AdmissionService extends BaseService
         );
     }
 
-    public function all(
-        array $filters = []
-    ) {
+    public function all(array $filters = [])
+    {
         return $this->repository
             ->all($filters);
     }

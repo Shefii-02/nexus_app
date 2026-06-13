@@ -19,8 +19,8 @@ class UpdateStudentRequest extends BaseRequest
         $student = $this->route('student');
 
         // Get user_id from student
-        $student = \App\Models\Student::find($student);
-        $userId = $student?->user_id;
+        $user = \App\Models\User::find($student);
+
         return [
             // 🔹 USER fields
             'name' => 'required|string|max:255',
@@ -28,14 +28,14 @@ class UpdateStudentRequest extends BaseRequest
             'email' => [
                 'required',
                 'email',
-                Rule::unique('users', 'email')->ignore($userId),
+                Rule::unique('users', 'email')->ignore($student),
             ],
 
             'phone' => [
                 'required',
                 'string',
                 'max:20',
-                Rule::unique('users', 'phone')->ignore($userId),
+                Rule::unique('users', 'phone')->ignore($student),
             ],
 
             'password' => 'sometimes|string|min:6',
@@ -47,7 +47,7 @@ class UpdateStudentRequest extends BaseRequest
                 'required',
                 'string',
                 'max:50',
-                Rule::unique('students', 'roll_number')->ignore($student->id),
+                Rule::unique('students', 'roll_number')->ignore($user->student?->id),
             ],
         ];
     }

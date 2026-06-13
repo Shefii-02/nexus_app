@@ -32,11 +32,11 @@ const CourseClassListPage = () => {
   const deleteClass = useDeleteCourseClass()
 
   const handleView = (id: number) => {
-    navigate(`/courses/${courseId}/classes/${id}`)
+    navigate(`/courses/${courseId}/classes/${id}/show`)
   }
 
   const handleEdit = (id: number) => {
-    navigate(`/courses/${courseId}/classes/${id}/edit`)
+    navigate(`/courses/${courseId}/classes/${id}`)
   }
 
   const handleDelete = (id: number) => {

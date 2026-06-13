@@ -10,6 +10,7 @@ use App\Http\Requests\UpdateTeacherRequest;
 use App\Http\Resources\TeacherResource;
 use App\Services\Teacher\TeacherService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 class TeacherController extends Controller
 {
@@ -25,16 +26,20 @@ class TeacherController extends Controller
         $page = request()->query('page', 1);
         $perPage = request()->query('per_page', 15);
 
+
         $filters = [
             'search' => request('search'),
             'status' => request('status'),
+            'acc_type' => 'teacher',
         ];
+
 
         $teachers = $this->teacherService->list(
             $page,
             $perPage,
             $filters
         );
+
 
         return $this->paginatedResponse(
             TeacherResource::collection($teachers),
@@ -45,9 +50,9 @@ class TeacherController extends Controller
     /**
      * Get single teacher
      */
-    public function show(int $teacher): JsonResponse
+    public function show(int $user): JsonResponse
     {
-        $teacherData = $this->teacherService->findWithRelations($teacher, ['user', 'courses']);
+        $teacherData = $this->teacherService->findWithRelations($user, ['teacher', 'courses']);
 
         if (!$teacherData) {
             return $this->errorResponse('Teacher not found', null, 404);
@@ -95,10 +100,11 @@ class TeacherController extends Controller
             $updated = $this->teacherService->update($teacher, $dto);
 
             return $this->successResponse(
-                TeacherResource::make($updated->load('user')),
+                TeacherResource::make($updated->load('teacher')),
                 'Teacher updated successfully'
             );
         } catch (\Exception $e) {
+            Log::info($e->getMessage());
             return $this->errorResponse(
                 'Failed to update teacher',
                 ['error' => $e->getMessage()],

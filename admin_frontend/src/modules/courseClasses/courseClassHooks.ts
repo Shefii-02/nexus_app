@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { courseClassService, type CourseClass, type CourseClassListResponse } from './courseClassService'
+import type { TeacherListResponse } from '../teachers/teacherService'
 
 export const useCourseClasses = (
   courseId: number,
@@ -15,6 +16,12 @@ export const useCourseClasses = (
 
     enabled: !!courseId,
   })
+
+  export const useCourseTeachers = (params?: Record<string, string | number | boolean>) =>
+    useQuery<TeacherListResponse, Error>({
+      queryKey: ['teachers', params],
+      queryFn: () => courseClassService.getCourseTeachers(params).then((res) => res.data),
+    })
 
 
 export const useCourseClass = (id: number, courseId: number) => {

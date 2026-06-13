@@ -52,7 +52,7 @@ export const navSections: NavSection[] = [
       },
        {
         label: 'Chat',
-        path: '/',
+        path: '/chats',
       },
 
       {
@@ -77,27 +77,27 @@ export const navSections: NavSection[] = [
         ],
       },
 
-      {
-        label: 'Attendance',
-        children: [
-          {
-            label: 'Student Attendance',
-            path: '/attendance/students',
-          },
-          {
-            label: 'Teacher Attendance',
-            path: '/attendance/teachers',
-          },
-          {
-            label: 'Staff Attendance',
-            path: '/attendance/staff',
-          },
-          {
-            label: 'Leave Requests',
-            path: '/leave-requests',
-          },
-        ],
-      },
+      // {
+      //   label: 'Attendance',
+      //   children: [
+      //     {
+      //       label: 'Student Attendance',
+      //       path: '/attendance/students',
+      //     },
+      //     {
+      //       label: 'Teacher Attendance',
+      //       path: '/attendance/teachers',
+      //     },
+      //     {
+      //       label: 'Staff Attendance',
+      //       path: '/attendance/staff',
+      //     },
+      //     {
+      //       label: 'Leave Requests',
+      //       path: '/leave-requests',
+      //     },
+      //   ],
+      // },
     ],
 
 
@@ -179,23 +179,23 @@ export const navSections: NavSection[] = [
         ],
       },
 
-      {
-        label: 'Coupons',
-        children: [
-          {
-            label: 'All Coupons',
-            path: '/coupons',
-          },
-          {
-            label: 'Create Coupon',
-            path: '/coupons/create',
-          },
-          {
-            label: 'Usage History',
-            path: '/coupons/history',
-          },
-        ],
-      },
+      // {
+      //   label: 'Coupons',
+      //   children: [
+      //     {
+      //       label: 'All Coupons',
+      //       path: '/coupons',
+      //     },
+      //     {
+      //       label: 'Create Coupon',
+      //       path: '/coupons/create',
+      //     },
+      //     {
+      //       label: 'Usage History',
+      //       path: '/coupons/history',
+      //     },
+      //   ],
+      // },
     ],
 
 
@@ -215,14 +215,14 @@ export const navSections: NavSection[] = [
             path: '/announcements/create',
           },
 
-          {
-            label: 'Delivery Logs',
-            path: '/notifications/create',
-          },
-          {
-            label: 'Failed Deliveried',
-            path: '/notifications/create',
-          },
+          // {
+          //   label: 'Delivery Logs',
+          //   path: '/notifications/create',
+          // },
+          // {
+          //   label: 'Failed Deliveried',
+          //   path: '/notifications/create',
+          // },
         ],
       },
       {
@@ -237,14 +237,14 @@ export const navSections: NavSection[] = [
             path: '/notifications/create',
           },
 
-          {
-            label: 'Delivery Logs',
-            path: '/notifications/create',
-          },
-          {
-            label: 'Failed Notifications',
-            path: '/notifications/create',
-          },
+          // {
+          //   label: 'Delivery Logs',
+          //   path: '/notifications/create',
+          // },
+          // {
+          //   label: 'Failed Notifications',
+          //   path: '/notifications/create',
+          // },
 
         ],
       },
@@ -254,26 +254,24 @@ export const navSections: NavSection[] = [
   {
     title: 'Masters',
     items: [
-      {
-        label: 'System',
-        children: [
-          {
-            label: 'Activity Logs',
-            path: '/announcements',
-          },
-          {
-            label: 'Login Logs',
-            path: '/announcements/create',
-          },
-          {
-            label: 'Audit Logs',
-            path: '/announcements/create',
-          },
+      // {
+        // label: 'System',
+        // children: [
+          // {
+          //   label: 'Activity Logs',
+          //   path: '/announcements',
+          // },
+          // {
+          //   label: 'Login Logs',
+          //   path: '/announcements/create',
+          // },
+          // {
+          //   label: 'Audit Logs',
+          //   path: '/announcements/create',
+          // },
 
-
-
-        ],
-      },
+      //   ],
+      // },
       {
         label: 'Settings',
         children: [
@@ -285,92 +283,92 @@ export const navSections: NavSection[] = [
             label: 'Roles',
             path: '/roles',
           },
-          {
-            label: 'Notification Settings',
-            path: '/notifications/create',
-          },
-          {
-            label: 'Attendance Settings',
-            path: '/notifications/create',
-          },
+          // {
+          //   label: 'Notification Settings',
+          //   path: '/notifications/create',
+          // },
+          // {
+          //   label: 'Attendance Settings',
+          //   path: '/notifications/create',
+          // },
 
-          {
-            label: 'Coupon Settings',
-            path: '/notifications/create',
+          // {
+          //   label: 'Coupon Settings',
+          //   path: '/notifications/create',
 
-          },
+          // },
 
-          {
-            label: 'Report Settings',
-            path: '/notifications/create',
+          // {
+          //   label: 'Report Settings',
+          //   path: '/notifications/create',
 
-          },
+          // },
 
-          {
-            label: 'Coupon Types',
-            path: '/notifications/create',
+          // {
+          //   label: 'Coupon Types',
+          //   path: '/notifications/create',
 
-          },
+          // },
 
-          {
-            label: 'Leave Types',
-            path: '/notifications/create',
+          // {
+          //   label: 'Leave Types',
+          //   path: '/notifications/create',
 
-          },
+          // },
 
-          {
-            label: 'Payment Types',
-            path: '/notifications/create',
+          // {
+          //   label: 'Payment Types',
+          //   path: '/notifications/create',
 
-          },
+          // },
 
-          {
-            label: 'Categories / Sub Categroies',
-            path: '/notifications/create',
+          // {
+          //   label: 'Categories / Sub Categroies',
+          //   path: '/notifications/create',
 
-          },
+          // },
 
 
         ],
       },
-      {
-        label: 'Reports',
-        children: [
+      // {
+      //   label: 'Reports',
+      //   children: [
 
-          {
-            label: 'Revenue Reports',
-            path: '/reports/revenue',
-          },
-          {
-            label: 'Profit Reports',
-            path: '/reports/profit',
-          },
-          {
-            label: 'Teacher Earnings',
-            path: '/reports/teacher-earnings',
-          },
-          {
-            label: 'Staff Salary',
-            path: '/reports/staff-salary',
-          },
-          {
-            label: 'Attendance Reports',
-            path: '/reports/attendance',
-          },
-          {
-            label: 'Admission Reports',
-            path: '/reports/admissions',
-          },
-          {
-            label: 'Renewal Reports',
-            path: '/reports/renewals',
-          },
-          {
-            label: 'Coupon Reports',
-            path: '/reports/coupons',
-          },
-        ]
-      }
+      //     {
+      //       label: 'Revenue Reports',
+      //       path: '/reports/revenue',
+      //     },
+      //     {
+      //       label: 'Profit Reports',
+      //       path: '/reports/profit',
+      //     },
+      //     {
+      //       label: 'Teacher Earnings',
+      //       path: '/reports/teacher-earnings',
+      //     },
+      //     {
+      //       label: 'Staff Salary',
+      //       path: '/reports/staff-salary',
+      //     },
+      //     {
+      //       label: 'Attendance Reports',
+      //       path: '/reports/attendance',
+      //     },
+      //     {
+      //       label: 'Admission Reports',
+      //       path: '/reports/admissions',
+      //     },
+      //     {
+      //       label: 'Renewal Reports',
+      //       path: '/reports/renewals',
+      //     },
+      //     {
+      //       label: 'Coupon Reports',
+      //       path: '/reports/coupons',
+      //     },
+      //   ]
+      // }
     ],
   },
 

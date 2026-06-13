@@ -12,7 +12,8 @@ class AdmissionRepository implements AdmissionRepositoryInterface
             ->with([
                 'student',
                 'course',
-                'teacher'
+                'teacher',
+                'payments'
             ])
             ->when(
                 !empty($filters['search']),
@@ -22,7 +23,7 @@ class AdmissionRepository implements AdmissionRepositoryInterface
 
                     $q->whereHas(
                         'student',
-                        fn ($s) =>
+                        fn($s) =>
                         $s->where(
                             'name',
                             'like',
@@ -42,7 +43,8 @@ class AdmissionRepository implements AdmissionRepositoryInterface
         return Admission::with([
             'student',
             'course',
-            'teacher'
+            'teacher',
+            'payments'
         ])->find($id);
     }
 

@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Repositories\Admission\AdmissionRepository;
+use App\Repositories\Admission\AdmissionRepositoryInterface;
 use Illuminate\Support\ServiceProvider;
 
 use App\Repositories\Teacher\TeacherRepositoryInterface as TeacherRepositoryInterfaceContract;
@@ -34,6 +36,7 @@ use App\Services\Announcement\AnnouncementService;
 
 use App\Repositories\Notification\NotificationRepositoryInterface as NotificationRepositoryInterfaceContract;
 use App\Repositories\Notification\NotificationRepository as NotificationRepositoryImplementation;
+use App\Services\Auth\OtpService;
 use App\Services\Notification\NotificationService;
 
 class AppServiceProvider extends ServiceProvider
@@ -90,6 +93,14 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(NotificationService::class, function ($app) {
             return new NotificationService($app->make(NotificationRepositoryInterfaceContract::class));
         });
+
+        $this->app->singleton(OtpService::class);
+
+        //Admission bindings
+        $this->app->bind(
+        AdmissionRepositoryInterface::class,
+        AdmissionRepository::class
+    );
     }
 
     /**

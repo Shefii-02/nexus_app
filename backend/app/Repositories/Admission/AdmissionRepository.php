@@ -6,46 +6,34 @@ use App\Models\Admission;
 
 class AdmissionRepository implements AdmissionRepositoryInterface
 {
+    protected array $defaultRelations = [
+        'student',
+        'course',
+        'teacher',
+        'payments',
+    ];
+
     public function all(array $filters = [])
     {
         return Admission::query()
-            ->with([
-                'student',
-                'course',
-                'teacher',
-                'payments'
-            ])
-            ->when(
-                !empty($filters['search']),
-                function ($q) use ($filters) {
-
-                    $search = $filters['search'];
-
-                    $q->whereHas(
-                        'student',
-                        fn($s) =>
-                        $s->where(
-                            'name',
-                            'like',
-                            "%{$search}%"
-                        )
-                    );
-                }
-            )
+            ->with($this->defaultRelations)
+            ->when(!empty($filters['search']), function ($q) use ($filters) {
+                $q->whereHas('student', fn($s) =>
+                    $s->where('name', 'like', "%{$filters['search']}%")
+                );
+            })
             ->latest()
-            ->paginate(
-                $filters['per_page'] ?? 15
-            );
+            ->paginate($filters['per_page'] ?? 15);
     }
 
     public function find(int $id)
     {
-        return Admission::with([
-            'student',
-            'course',
-            'teacher',
-            'payments'
-        ])->find($id);
+        return Admission::with($this->defaultRelations)->find($id);
+    }
+
+    public function findWithRelations(int $id, array $relations = [])
+    {
+        return Admission::with($relations)->find($id);
     }
 
     public function create(array $data)
@@ -53,28 +41,26 @@ class AdmissionRepository implements AdmissionRepositoryInterface
         return Admission::create($data);
     }
 
-    public function update(
-        int $id,
-        array $data
-    ) {
-        $admission = Admission::findOrFail($id);
-
-        $admission->update($data);
-
-        return $admission->fresh();
-    }
-
-    public function delete(int $id)
+    public function update(int $id, array $data)
     {
-        return Admission::destroy($id);
+        $admission = Admission::findOrFail($id);
+        $admission->update($data);
+        return $admission->fresh($this->defaultRelations);
     }
 
-    public function exists(
-        int $id
-    ): bool {
-        return Admission::where(
-            'id',
-            $id
-        )->exists();
+    public function delete(int $id): bool
+    {
+        $admission = Admission::find($id);
+
+        if (!$admission) {
+            return false;
+        }
+
+        return $admission->delete();
+    }
+
+    public function exists(int $id): bool
+    {
+        return Admission::where('id', $id)->exists();
     }
 }

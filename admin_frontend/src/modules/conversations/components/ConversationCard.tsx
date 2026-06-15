@@ -15,11 +15,11 @@ interface Props {
 export function ConversationCard({ conversation: conv, isActive, currentUserId, onSelect, onMute, onPin }: Props) {
   const [showMenu, setShowMenu] = useState(false);
 
-  const displayName = conv.type === 'individual'
+  const displayName = conv.type === 'single'
     ? conv.other_user?.name ?? 'Unknown'
     : conv.title ?? 'Group';
 
-  const avatar = conv.type === 'individual' ? conv.other_user?.avatar : conv.avatar;
+  const avatar = conv.type === 'single' ? conv.other_user?.avatar : conv.avatar;
 
   const lastMsg = conv.last_message;
   const lastMsgText = lastMsg?.is_deleted
@@ -42,15 +42,15 @@ export function ConversationCard({ conversation: conv, isActive, currentUserId, 
         {avatar ? (
           <img src={avatar} alt={displayName} />
         ) : (
-          <span className="avatar-initials">{getInitials(displayName)}</span>
+          <span className="avatar-initials text-capitalize">{getInitials(displayName)}</span>
         )}
-        {conv.type === 'individual' && <span className="online-dot" />}
+        {conv.type === 'single' && <span className="online-dot" />}
       </div>
 
       {/* Content */}
       <div className="conv-content">
         <div className="conv-top">
-          <span className="conv-name">
+          <span className="conv-name capitalize">
          {!!conv.is_pinned && <span className="pin-icon">📌</span>}
             {displayName}
           </span>

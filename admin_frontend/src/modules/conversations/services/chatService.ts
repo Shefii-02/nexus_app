@@ -1,6 +1,7 @@
 // src/modules/conversations/services/chatService.ts
 
 import apiClient from "../../../services/apiClient";
+import type { Course } from "../../courses/courseService";
 
 export interface User {
   id: number;
@@ -62,7 +63,7 @@ export interface Participant {
 
 export interface Conversation {
   id: number;
-  type: 'individual' | 'group';
+  type: 'single' | 'group';
   title: string | null;
   created_by: number;
   avatar: string | null;
@@ -136,6 +137,15 @@ export const sendMessage = (
   }).then(r => r.data.message);
 };
 
+ 
+export const forwardMessage = (messageId: number, conversationIds: number[]) =>
+  apiClient
+    .post<{ messages: Message[] }>('/messages/forward', {
+      message_id: messageId,
+      conversation_ids: conversationIds,
+    })
+    .then(r => r.data.messages);
+
 export const editMessage = (conversationId: number, messageId: number, message: string) =>
   apiClient.put<{ message: Message }>(`${BASE}/conversations/${conversationId}/messages/${messageId}`, { message })
      .then(r => r.data.message);
@@ -165,5 +175,19 @@ export const togglePinMessage = (conversationId: number, messageId: number) =>
 
 export const reportMessage = (conversationId: number, messageId: number, reason: string) =>
   apiClient.post(`${BASE}/conversations/${conversationId}/messages/${messageId}/report`, { reason });
+
+
+// ─── User Search ──────────────────────────────────────────────────────────────
+ 
+export const searchUsers = (query: string) =>
+  apiClient
+    .get<{ data: User[] }>('/users/search', { params: { q: query } })
+    .then(r => r.data.data ?? []);
+ 
+// ─── Courses ──────────────────────────────────────────────────────────────────
+ 
+export const getCourses = () =>
+  apiClient.get<{ data: Course[] }>('/courses_search').then(r => r.data.data ?? []);
+ 
 
 export default apiClient;

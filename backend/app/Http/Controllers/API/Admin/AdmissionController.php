@@ -6,8 +6,8 @@ use App\DTOs\AdmissionDTO;
 use App\Http\Controllers\API\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AdmissionResource;
-use App\Services\Admission\AdmissionService;
 use App\Http\Requests\AdmissionRequest;
+use App\Services\Admission\AdmissionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -57,8 +57,6 @@ class AdmissionController extends Controller
             $dto = AdmissionDTO::fromArray(
                 $request->validated()
             );
-
-
 
             $admission = $this->admissionService
                 ->create($dto);

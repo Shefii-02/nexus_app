@@ -1,28 +1,44 @@
 // src/modules/conversations/components/ChatWindow.tsx
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useMessages } from '../hooks/useMessages';
-import { MessageList } from './MessageList';
+import { MessageList, type MessageListHandle } from './MessageList';
 import { MessageComposer } from './MessageComposer';
 import { ChatHeader } from './ChatHeader';
 import { GroupInfoDrawer } from './GroupInfoDrawer';
 import { UserInfoDrawer } from './UserInfoDrawer';
+import { ForwardModal } from './ForwardModal';
+import { PinnedMessageBar } from './PinnedMessageBar';
 import type { Conversation, Message } from '../services/chatService';
 
 interface Props {
   conversation: Conversation;
+  conversations: Conversation[];
   currentUserId: number;
   currentUserName: string;
+  currentUserRole?: string;           // 'admin' | 'staff' | 'student' …
   onBack: () => void;
+  onNewMessage?: (conversationId: number, message: Message) => void;
 }
 
-export function ChatWindow({ conversation, currentUserId, onBack }: Props) {
-  const [replyTo, setReplyTo] = useState<Message | null>(null);
-  const [showInfo, setShowInfo] = useState(false);
-  const bottomRef = useRef<HTMLDivElement>(null);
-  const isFirstLoad = useRef(true);
+export function ChatWindow({
+  conversation,
+  conversations,
+  currentUserId,
+  currentUserName,
+  currentUserRole,
+  onBack,
+  onNewMessage,
+}: Props) {
+  const [replyTo,      setReplyTo]    = useState<Message | null>(null);
+  const [forwardMsg,   setForwardMsg] = useState<Message | null>(null);
+  const [showInfo,     setShowInfo]   = useState(false);
+  const [showPinnedBar, setShowPinnedBar] = useState(true);
+
+  const msgListRef = useRef<MessageListHandle>(null);
 
   const {
     messages,
+    pinnedMsgs,
     loading,
     hasMore,
     typingUsers,
@@ -32,20 +48,28 @@ export function ChatWindow({ conversation, currentUserId, onBack }: Props) {
     deleteMsg,
     reactToMsg,
     removeReact,
+    pinMsg,
+    reportMsg,
     sendTypingSignal,
-  } = useMessages(conversation.id);
+  } = useMessages(conversation.id, onNewMessage);
 
-  // Scroll to bottom on new messages
-  useEffect(() => {
-    if (isFirstLoad.current || messages.length > 0) {
-      bottomRef.current?.scrollIntoView({ behavior: isFirstLoad.current ? 'auto' : 'smooth' });
-      isFirstLoad.current = false;
-    }
-  }, [messages.length]);
-
-  const handleSend = async (params: { message?: string; type?: string; media?: File; reply_to?: number }) => {
-    await sendMsg({ ...params, reply_to: replyTo?.id ?? params.reply_to });
+  const handleSend = async (params: {
+    message?: string;
+    type?: string;
+    media?: File;
+    reply_to?: number;
+  }) => {
+    // reply_to is always set from replyTo state here — composer also passes it
+    // but this is the authoritative source
+    await sendMsg({
+      ...params,
+      reply_to: replyTo?.id ?? params.reply_to,
+    });
     setReplyTo(null);
+  };
+
+  const handleScrollToPin = (messageId: number) => {
+    msgListRef.current?.scrollToMessage(messageId);
   };
 
   return (
@@ -58,21 +82,32 @@ export function ChatWindow({ conversation, currentUserId, onBack }: Props) {
         onInfoOpen={() => setShowInfo(true)}
       />
 
+      {/* Pinned message banner */}
+      {showPinnedBar && pinnedMsgs.length > 0 && (
+        <PinnedMessageBar
+          pinnedMsgs={pinnedMsgs}
+          onScrollTo={handleScrollToPin}
+          onClose={() => setShowPinnedBar(false)}
+        />
+      )}
+
       <MessageList
+        ref={msgListRef}
         messages={messages}
         loading={loading}
         hasMore={hasMore}
         currentUserId={currentUserId}
+        currentUserRole={currentUserRole}
         onLoadMore={loadMore}
         onReply={setReplyTo}
         onEdit={editMsg}
         onDelete={deleteMsg}
         onReact={reactToMsg}
         onRemoveReact={removeReact}
+        onForward={setForwardMsg}
+        onPin={pinMsg}
+        onReport={reportMsg}
       />
-
-      {/* Bottom anchor */}
-      <div ref={bottomRef} />
 
       <MessageComposer
         replyTo={replyTo}
@@ -81,7 +116,6 @@ export function ChatWindow({ conversation, currentUserId, onBack }: Props) {
         onTyping={sendTypingSignal}
       />
 
-      {/* Info Drawers */}
       {showInfo && conversation.type === 'group' && (
         <GroupInfoDrawer
           conversation={conversation}
@@ -93,6 +127,15 @@ export function ChatWindow({ conversation, currentUserId, onBack }: Props) {
         <UserInfoDrawer
           user={conversation.other_user!}
           onClose={() => setShowInfo(false)}
+        />
+      )}
+
+      {forwardMsg && (
+        <ForwardModal
+          message={forwardMsg}
+          conversations={conversations}
+          currentUserId={currentUserId}
+          onClose={() => setForwardMsg(null)}
         />
       )}
     </div>

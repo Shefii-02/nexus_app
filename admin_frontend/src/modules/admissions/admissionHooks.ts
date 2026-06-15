@@ -45,14 +45,23 @@ export const useAdmission = (
 
 export const useCreateAdmission =
   () => {
+
     const qc =
       useQueryClient()
 
     return useMutation({
-      mutationFn:
-        admissionService.create,
+
+      mutationFn: (
+        payload: any
+      ) =>
+        admissionService
+          .create(payload)
+          .then(
+            (r) => r.data
+          ),
 
       onSuccess: () => {
+
         qc.invalidateQueries({
           queryKey: [
             'admissions',

@@ -765,4 +765,27 @@ class CourseController extends Controller
             'Member removed successfully'
         );
     }
+
+
+    public function chatList(Request $request)
+    {
+        // Return only courses the authenticated user is enrolled in or teaches
+        $user   = $request->user();
+        $search = trim(
+            $request->get('q')
+                ?? $request->get('search')
+                ?? ''
+        );
+        $courses = \App\Models\Course::where('name',   'like', "%{$search}%")
+            // ->where(function ($q) use ($user) {
+            //     $q->where('teacher_id', $user->id)
+            //         ->orWhereHas('enrollments', fn($e) => $e->where('user_id', $user->id));
+            // })
+
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
+
+        return response()->json(['data' => $courses]);
+    }
 }

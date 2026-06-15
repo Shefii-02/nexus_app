@@ -54,6 +54,11 @@ import ViewMaterial from '../modules/courseMaterials/ViewMaterial'
 import CourseViewPage from '../modules/courses/pages/CourseViewPage'
 import ConversationPage from '../modules/conversations/ConversationPage'
 import CreateAdmissionPage from '../modules/admissions/pages/CreateAdmissionPage'
+import AdmissionListPage from '../modules/admissions/pages/AdmissionListPage'
+import ViewAdmissionPage from '../modules/admissions/pages/ViewAdmissionPage'
+import EditAdmissionPage from '../modules/admissions/pages/EditAdmissionPage'
+import RenewalDuePage from '../modules/renewal/RenewalDuePage'
+import RenewalHistoryPage from '../modules/renewal/RenewalHistoryPage'
 
 const AppRoutes = () => (
   <Routes>
@@ -104,10 +109,12 @@ const AppRoutes = () => (
 
 
         <Route path="/admissions/create" element={<CreateAdmissionPage />} />
-        <Route path="/admissions" element={<AdmissionsListPage />} />
+        <Route path="/admissions" element={<AdmissionListPage />} />
+        <Route path="/admissions/:id/show" element={<ViewAdmissionPage />} />
+        <Route path="/admissions/:id/edit" element={<EditAdmissionPage />} />
         
-        <Route path="/renewals/due" element={<RenewalPaymentsPage />} />
-        <Route path="/renewals" element={<RenewalPaymentsPage />} />
+        <Route path="/renewals/due" element={<RenewalDuePage />} />
+        <Route path="/renewals" element={<RenewalHistoryPage />} />
 
 
         <Route path="/payments" element={<PaymentListPage />} />

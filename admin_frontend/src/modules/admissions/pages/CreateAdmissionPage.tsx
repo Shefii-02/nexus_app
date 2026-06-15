@@ -17,28 +17,43 @@ const CreateAdmissionPage = () => {
   const createAdmission =
     useCreateAdmission()
 
-  const handleSubmit =
-    async (data: any) => {
+  const handleSubmit = async (data: any) => {
 
-      return handleMutationWithToast({
+    return handleMutationWithToast({
 
-        action: () =>
-          createAdmission.mutateAsync(
-            data
-          ),
+      action: () =>
+        createAdmission.mutateAsync({
+          ...data,
 
-        loadingMessage:
-          'Creating admission...',
+          actual_fee:
+            Number(data.actual_fee),
 
-        successMessage:
-          'Admission created successfully',
+          discount_amount:
+            Number(
+              data.discount_amount || 0
+            ),
 
-        navigate,
+          net_fee:
+            Number(data.net_fee),
 
-        redirect:
-          '/admissions',
-      })
-    }
+          paid_amount:
+            Number(
+              data.paid_amount || 0
+            ),
+        }),
+
+      loadingMessage:
+        'Creating admission...',
+
+      successMessage:
+        'Admission created successfully',
+
+      navigate,
+
+      redirect:
+        '/admissions',
+    })
+  }
 
   return (
     <div>

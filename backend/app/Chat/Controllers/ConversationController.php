@@ -5,6 +5,7 @@ namespace App\Chat\Controllers;
 use App\Http\Controllers\Controller;
 use App\Chat\Models\Conversation;
 use App\Models\ConversationParticipant;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -68,6 +69,7 @@ class ConversationController extends Controller
         $authId   = $request->user()->id;
         $targetId = $request->user_id;
         $moduleId = $request->module_id;
+        $targetUser = User::where('id',$targetId)->first();
 
         if ($authId === $targetId) {
             return response()->json(['message' => 'Cannot chat with yourself.'], 422);
@@ -82,7 +84,8 @@ class ConversationController extends Controller
         DB::beginTransaction();
         try {
             $conversation = Conversation::create([
-                'type'       => 'individual',
+                'type'       => 'single',
+                'title'       => $targetUser->name,
                 'created_by' => $authId,
                 'module_id'  => $moduleId,
             ]);

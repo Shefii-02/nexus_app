@@ -1,5 +1,5 @@
 // src/modules/conversations/components/MessageBubble.tsx
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { Message } from '../services/chatService';
 import { formatMessageTime, getInitials } from '../utils';
 
@@ -8,51 +8,124 @@ interface Props {
   isMine: boolean;
   showAvatar: boolean;
   currentUserId: number;
+  currentUserRole: string,
   onReply: () => void;
   onEdit: (text: string) => void;
   onDelete: (forEveryone: boolean) => void;
   onReact: (emoji: string) => void;
   onRemoveReact: () => void;
+  onPin: () => void;
+  onForward: () => void;
+  onReport: (reason: string) => void;
 }
 
 const EMOJI_REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
 
-export function MessageBubble({ message: msg, isMine, showAvatar, currentUserId, onReply, onEdit, onDelete, onReact, onRemoveReact }: Props) {
+export function MessageBubble({
+  message: msg,
+  isMine,
+  showAvatar,
+  currentUserRole,
+  currentUserId,
+  onReply,
+  onEdit,
+  onDelete,
+  onReact,
+  onRemoveReact,
+  onForward,
+  onPin,
+}: Props) {
   const [showActions, setShowActions] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editText, setEditText] = useState(msg.message ?? '');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [reporting, setReporting] = useState(false);
   const [lightbox, setLightbox] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const isPrivileged = currentUserRole === 'admin' || currentUserRole === 'staff';
+
+  const canDeleteForEveryone = isMine || isPrivileged;
 
   const myReaction = msg.reactions.find(r => r.user_id === currentUserId);
 
-  const reactionGroups: Record<string, number> = {};
+  // Group reactions: emoji → { count, names[] }
+  const reactionGroups: Record<string, { count: number; names: string[] }> = {};
   msg.reactions.forEach(r => {
-    reactionGroups[r.reaction] = (reactionGroups[r.reaction] ?? 0) + 1;
+    if (!reactionGroups[r.reaction])
+      reactionGroups[r.reaction] = { count: 0, names: [] };
+    reactionGroups[r.reaction].count++;
+    if (r.user?.name) reactionGroups[r.reaction].names.push(r.user.name);
   });
 
-  const isRead = msg.reads.length > 0;
+  
+  // msg.reactions.forEach(r => {
+  //   if (!reactionGroups[r.reaction]) {
+  //     reactionGroups[r.reaction] = { count: 0, users: [] };
+  //   }
+  //   reactionGroups[r.reaction].count++;
+  //   if (r.user?.name) reactionGroups[r.reaction].users.push(r.user.name);
+  // });
 
+  const isRead = msg.reads.length > 0;
+  const hasReacts = Object.keys(reactionGroups).length > 0;
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    if (!showDropdown) return;
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showDropdown]);
+
+
+  const handleReport = async () => {
+    if (!reportReason.trim()) return;
+    setReporting(true);
+    try {
+      await onReport(reportReason.trim());
+      setShowReportModal(false);
+      setReportReason('');
+    } finally {
+      setReporting(false);
+    }
+  };
+
+  const closeAll = () => {
+    setShowEmoji(false);
+    setShowDropdown(false);
+  };
+
+  // ── Deleted ──────────────────────────────────────────────────────────────────
   if (msg.is_deleted) {
     return (
       <div className={`msg-row ${isMine ? 'mine' : 'theirs'}`}>
+        {!isMine && <div className="msg-avatar-spacer" />}
         <div className="msg-bubble deleted">
-          <span>🚫 This message was deleted</span>
+          <span className="deleted-icon">🚫</span>
+          <span>This message was deleted</span>
         </div>
       </div>
     );
   }
 
+  // ── Normal ───────────────────────────────────────────────────────────────────
   return (
     <>
       <div
         className={`msg-row ${isMine ? 'mine' : 'theirs'}`}
         onMouseEnter={() => setShowActions(true)}
-        onMouseLeave={() => { setShowActions(false); setShowEmoji(false); setShowDropdown(false); }}
+        onMouseLeave={() => { setShowActions(false); closeAll(); }}
       >
-        {/* Avatar (other users) */}
+        {/* ── Avatar column (others only) ── */}
         {!isMine && (
           <div className="msg-avatar">
             {showAvatar ? (
@@ -65,14 +138,14 @@ export function MessageBubble({ message: msg, isMine, showAvatar, currentUserId,
           </div>
         )}
 
-        {/* Hover action bar — positioned between avatar and bubble */}
+        {/* ── Hover action bar ── */}
         {showActions && (
           <div className={`msg-action-bar ${isMine ? 'mine' : 'theirs'}`}>
-            {/* Emoji reaction button */}
-            <div className="action-bar-item emoji-trigger">
+            {/* Emoji */}
+            <div className="action-bar-item">
               <button
                 className="action-bar-btn"
-                onClick={() => { setShowEmoji(!showEmoji); setShowDropdown(false); }}
+                onClick={() => { setShowEmoji(v => !v); setShowDropdown(false); }}
                 title="React"
               >
                 😊
@@ -82,8 +155,12 @@ export function MessageBubble({ message: msg, isMine, showAvatar, currentUserId,
                   {EMOJI_REACTIONS.map(e => (
                     <button
                       key={e}
-                      className={myReaction?.reaction === e ? 'active' : ''}
-                      onClick={() => { onReact(e); setShowEmoji(false); }}
+                      className={`emoji-btn ${myReaction?.reaction === e ? 'active' : ''}`}
+                      onClick={() => {
+                        myReaction?.reaction === e ? onRemoveReact() : onReact(e);
+                        setShowEmoji(false);
+                      }}
+                      title={e}
                     >
                       {e}
                     </button>
@@ -93,57 +170,99 @@ export function MessageBubble({ message: msg, isMine, showAvatar, currentUserId,
             </div>
 
             {/* Reply */}
-            <button className="action-bar-btn" onClick={onReply} title="Reply">↩️</button>
+            <button className="action-bar-btn" onClick={onReply} title="Reply">
+              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <polyline points="9 17 4 12 9 7" /><path d="M20 18v-2a4 4 0 0 0-4-4H4" />
+              </svg>
+            </button>
 
-            {/* More dropdown */}
-            <div className="action-bar-item dropdown-trigger">
+            {/* More */}
+            <div className="ab-item" ref={dropdownRef}>
               <button
-                className="action-bar-btn"
-                onClick={() => { setShowDropdown(!showDropdown); setShowEmoji(false); }}
+                className="ab-btn"
                 title="More"
+                onClick={() => { setShowDropdown(v => !v); setShowEmoji(false); }}
               >
-                ⋮
+                <svg width="4" height="16" viewBox="0 0 4 20" fill="currentColor">
+                  <circle cx="2" cy="2" r="2" />
+                  <circle cx="2" cy="10" r="2" />
+                  <circle cx="2" cy="18" r="2" />
+                </svg>
               </button>
+
               {showDropdown && (
-                <div className={`msg-dropdown ${isMine ? 'right' : 'left'}`}>
-                  <button onClick={() => { onReply(); setShowDropdown(false); }}>↩ Reply</button>
+                <ul className={`msg-menu ${isMine ? 'right' : 'left'}`}>
+                  <li onClick={() => { onReply(); closeAll(); }}>
+                    <span className="mm-icon">↩</span> Reply
+                  </li>
+                  <li onClick={() => { onForward(); closeAll(); }}>
+                    <span className="mm-icon">↪</span> Forward
+                  </li>
                   {isMine && msg.type === 'text' && (
-                    <button onClick={() => { setEditing(true); setShowDropdown(false); }}>✏️ Edit</button>
+                    <li onClick={() => { setEditing(true); closeAll(); }}>
+                      <span className="mm-icon">✏️</span> Edit
+                    </li>
                   )}
-                  {isMine && (
-                    <button className="danger" onClick={() => { setShowDeleteModal(true); setShowDropdown(false); }}>🗑️ Delete</button>
-                  )}
+                  <li onClick={() => { onPin(); closeAll(); }}>
+                    <span className="mm-icon">{msg.is_pinned ? '📌' : '📍'}</span>
+                    {msg.is_pinned ? 'Unpin' : 'Pin'}
+                  </li>
                   {!isMine && (
-                    <button className="danger" onClick={() => { onDelete(false); setShowDropdown(false); }}>🗑️ Delete for me</button>
+                    <li onClick={() => { setShowReportModal(true); closeAll(); }}>
+                      <span className="mm-icon">🚩</span> Report
+                    </li>
                   )}
-                </div>
+                  {/* Delete for me — always available */}
+                  <li className="danger" onClick={() => { onDelete(false); closeAll(); }}>
+                    <span className="mm-icon">🗑️</span> Delete for me
+                  </li>
+                  {/* Delete for everyone — own messages OR admin/staff */}
+                  {canDeleteForEveryone && (
+                    <li className="danger" onClick={() => { setShowDeleteModal(true); closeAll(); }}>
+                      <span className="mm-icon">🗑️</span> Delete for everyone
+                    </li>
+                  )}
+                </ul>
               )}
             </div>
           </div>
         )}
 
+        {/* ── Bubble ── */}
         <div className={`msg-bubble ${isMine ? 'mine' : 'theirs'} type-${msg.type}`}>
-          {/* Sender name (groups) */}
+
+          {/* Sender name (groups, first in run) */}
           {!isMine && showAvatar && (
             <span className="msg-sender-name">{msg.sender.name}</span>
           )}
 
-          {/* Reply Preview */}
+          {/* ── WhatsApp-style reply quote ── */}
           {msg.reply_message && (
-            <div className="reply-preview">
-              <div className="reply-accent" />
-              <div className="reply-content">
-                <span className="reply-sender">{msg.reply_message.sender?.name ?? 'Unknown'}</span>
-                <span className="reply-text">
-                  {msg.reply_message.type !== 'text'
-                    ? `📎 ${msg.reply_message.type}`
-                    : msg.reply_message.message?.substring(0, 80)}
+            <div className="reply-quote">
+              <div className="reply-quote-bar" />
+              <div className="reply-quote-body">
+                <span className="reply-quote-sender">
+                  {msg.reply_message.sender?.name ?? 'Unknown'}
+                </span>
+                <span className="reply-quote-text">
+                  {msg.reply_message.is_deleted
+                    ? 'This message was deleted'
+                    : msg.reply_message.type !== 'text'
+                      ? mediaLabel(msg.reply_message.type)
+                      : (msg.reply_message.message?.substring(0, 100) ?? '')}
                 </span>
               </div>
+              {msg.reply_message.type === 'image' && msg.reply_message.media_url && (
+                <img
+                  className="reply-quote-thumb"
+                  src={msg.reply_message.media_url}
+                  alt="reply"
+                />
+              )}
             </div>
           )}
 
-          {/* Message Content */}
+          {/* ── Content ── */}
           {msg.type === 'text' && (
             editing ? (
               <div className="edit-area">
@@ -152,13 +271,19 @@ export function MessageBubble({ message: msg, isMine, showAvatar, currentUserId,
                   onChange={e => setEditText(e.target.value)}
                   autoFocus
                   onKeyDown={e => {
-                    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); onEdit(editText); setEditing(false); }
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      onEdit(editText);
+                      setEditing(false);
+                    }
                     if (e.key === 'Escape') setEditing(false);
                   }}
                 />
                 <div className="edit-actions">
                   <button onClick={() => setEditing(false)}>Cancel</button>
-                  <button className="primary" onClick={() => { onEdit(editText); setEditing(false); }}>Save</button>
+                  <button className="primary" onClick={() => { onEdit(editText); setEditing(false); }}>
+                    Save
+                  </button>
                 </div>
               </div>
             ) : (
@@ -192,41 +317,50 @@ export function MessageBubble({ message: msg, isMine, showAvatar, currentUserId,
               <div className="file-icon">📎</div>
               <div className="file-info">
                 <span className="file-name">{msg.media_meta?.original_name ?? 'File'}</span>
-                <span className="file-size">{msg.media_meta?.size ? `${(msg.media_meta.size / 1024).toFixed(1)} KB` : ''}</span>
+                <span className="file-size">
+                  {msg.media_meta?.size
+                    ? `${(msg.media_meta.size / 1024).toFixed(1)} KB`
+                    : ''}
+                </span>
               </div>
               <span className="file-download">⬇</span>
             </a>
           )}
 
-          {/* Meta */}
+          {/* ── Meta row (edited · time · ticks) ── */}
           <div className="msg-meta">
             {msg.is_edited && <span className="edited-label">edited</span>}
             <span className="msg-time">{formatMessageTime(msg.created_at)}</span>
             {isMine && (
               <span className="read-receipt" title={isRead ? 'Read' : 'Delivered'}>
                 {isRead ? (
-                  <svg width="16" height="10" viewBox="0 0 16 10" fill="#53bdeb">
-                    <path d="M1 5l3 3L11 1M6 5l3 3L16 1" stroke="#53bdeb" strokeWidth="1.5" fill="none"/>
+                  /* double blue ticks */
+                  <svg width="18" height="11" viewBox="0 0 18 11" fill="none">
+                    <path d="M1 6l3.5 3.5L12 2" stroke="#53bdeb" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M6 6l3.5 3.5L17 2" stroke="#53bdeb" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 ) : (
-                  <svg width="12" height="10" viewBox="0 0 12 10" fill="none">
-                    <path d="M1 5l3 3L11 1" stroke="#aaa" strokeWidth="1.5"/>
+                  /* single grey tick */
+                  <svg width="12" height="11" viewBox="0 0 12 11" fill="none">
+                    <path d="M1 6l3.5 3.5L11 2" stroke="#999" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 )}
               </span>
             )}
           </div>
 
-          {/* Reactions */}
-          {Object.keys(reactionGroups).length > 0 && (
-            <div className="reactions">
-              {Object.entries(reactionGroups).map(([emoji, count]) => (
+          {/* ── Reaction chips (WhatsApp style) ── */}
+          {hasReacts && (
+            <div className="reaction-row">
+              {Object.entries(reactionGroups).map(([emoji, { count, users }]) => (
                 <button
                   key={emoji}
                   className={`reaction-chip ${myReaction?.reaction === emoji ? 'mine' : ''}`}
-                  onClick={() => myReaction ? onRemoveReact() : onReact(emoji)}
+                  onClick={() => myReaction?.reaction === emoji ? onRemoveReact() : onReact(emoji)}
+                  // title={users.join(', ')}
                 >
-                  {emoji} {count}
+                  <span className="reaction-emoji">{emoji}</span>
+                  {count > 1 && <span className="reaction-count">{count}</span>}
                 </button>
               ))}
             </div>
@@ -234,22 +368,77 @@ export function MessageBubble({ message: msg, isMine, showAvatar, currentUserId,
         </div>
       </div>
 
-      {/* Delete Modal */}
+      {/* ── Delete modal ── */}
       {showDeleteModal && (
         <div className="modal-overlay" onClick={() => setShowDeleteModal(false)}>
-          <div className="modal-box" onClick={e => e.stopPropagation()}>
-            <h3>Delete Message</h3>
-            <p>Who do you want to delete this message for?</p>
+          <div className="modal-box sm" onClick={e => e.stopPropagation()}>
+            <h3>Delete message?</h3>
+            <div className="modal-actions col">
+              <button onClick={() => { onDelete(false); setShowDeleteModal(false); }}>
+                Delete for me
+              </button>
+              <button className="danger" onClick={() => { onDelete(true); setShowDeleteModal(false); }}>
+                Delete for everyone
+              </button>
+              <button className="ghost" onClick={() => setShowDeleteModal(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ── Report modal ── */}
+      {showReportModal && (
+        <div className="modal-overlay" onClick={() => setShowReportModal(false)}>
+          <div className="modal-box sm" onClick={e => e.stopPropagation()}>
+            <h3>Report message</h3>
+            <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '4px 0 12px' }}>
+              Tell us why you're reporting this message.
+            </p>
+            <div className="form-group">
+              <label>Reason</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 12 }}>
+                {['Spam', 'Harassment', 'Inappropriate content', 'Misinformation', 'Other'].map(r => (
+                  <label key={r} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 14 }}>
+                    <input
+                      type="radio"
+                      name="report-reason"
+                      value={r}
+                      checked={reportReason === r}
+                      onChange={() => setReportReason(r)}
+                    />
+                    {r}
+                  </label>
+                ))}
+              </div>
+              {reportReason === 'Other' && (
+                <textarea
+                  placeholder="Describe the issue…"
+                  rows={3}
+                  style={{
+                    width: '100%', resize: 'vertical', padding: '8px 10px', borderRadius: 8,
+                    background: 'var(--surface2)', border: '1px solid var(--border)',
+                    color: 'var(--text)', fontSize: 13, boxSizing: 'border-box'
+                  }}
+                  onChange={e => setReportReason(e.target.value)}
+                />
+              )}
+            </div>
             <div className="modal-actions">
-              <button onClick={() => setShowDeleteModal(false)}>Cancel</button>
-              <button onClick={() => { onDelete(false); setShowDeleteModal(false); }}>Delete for me</button>
-              <button className="danger" onClick={() => { onDelete(true); setShowDeleteModal(false); }}>Delete for everyone</button>
+              <button onClick={() => { setShowReportModal(false); setReportReason(''); }}>Cancel</button>
+              <button
+                className="danger"
+                onClick={handleReport}
+                disabled={!reportReason.trim() || reporting}
+              >
+                {reporting ? 'Sending…' : 'Submit Report'}
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Lightbox */}
+
+
+      {/* ── Lightbox ── */}
       {lightbox && msg.media_url && (
         <div className="lightbox" onClick={() => setLightbox(false)}>
           <img src={msg.media_url} alt="Preview" />
@@ -258,4 +447,13 @@ export function MessageBubble({ message: msg, isMine, showAvatar, currentUserId,
       )}
     </>
   );
+}
+
+function mediaLabel(type: string) {
+  if (type === 'image') return '📷 Photo';
+  if (type === 'video') return '🎥 Video';
+  if (type === 'audio') return '🎵 Audio';
+  if (type === 'voice') return '🎤 Voice message';
+  if (type === 'file') return '📎 File';
+  return `📎 ${type}`;
 }

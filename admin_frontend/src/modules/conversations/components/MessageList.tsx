@@ -1,5 +1,5 @@
 // src/modules/conversations/components/MessageList.tsx
-import { useRef, useCallback, useEffect } from 'react';
+import { useRef, useCallback, useEffect, forwardRef, useImperativeHandle } from 'react';
 import type { Message } from '../services/chatService';
 import { MessageBubble } from './MessageBubble';
 import { formatDateGroup } from '../utils';
@@ -9,108 +9,143 @@ interface Props {
   loading: boolean;
   hasMore: boolean;
   currentUserId: number;
+  currentUserRole?: string;
   onLoadMore: () => void;
   onReply: (msg: Message) => void;
   onEdit: (id: number, text: string) => void;
   onDelete: (id: number, forEveryone: boolean) => void;
   onReact: (id: number, reaction: string) => void;
   onRemoveReact: (id: number) => void;
+  onForward: (msg: Message) => void;
+  onPin: (id: number) => void;
+  onReport: (id: number, reason: string) => void;
 }
 
-export function MessageList({ messages, loading, hasMore, currentUserId, onLoadMore, onReply, onEdit, onDelete, onReact, onRemoveReact }: Props) {
-  const listRef = useRef<HTMLDivElement>(null);
-  const bottomRef = useRef<HTMLDivElement>(null);
-  const isFirstLoad = useRef(true);
-  const prevMessageCount = useRef(0);
+export interface MessageListHandle {
+  scrollToMessage: (messageId: number) => void;
+}
 
-  // Scroll to bottom on first load and new messages
+export const MessageList = forwardRef<MessageListHandle, Props>(function MessageList(
+  {
+    messages, loading, hasMore, currentUserId, currentUserRole,
+    onLoadMore, onReply, onEdit, onDelete, onReact, onRemoveReact,
+    onForward, onPin, onReport,
+  },
+  ref,
+) {
+  const listRef          = useRef<HTMLDivElement>(null);
+  const bottomRef        = useRef<HTMLDivElement>(null);
+  const msgRefs          = useRef<Record<number, HTMLDivElement | null>>({});
+  const isFirstLoad      = useRef(true);
+  const prevCount        = useRef(0);
+
+  // Expose scrollToMessage to parent (for pinned bar click)
+  useImperativeHandle(ref, () => ({
+    scrollToMessage(messageId: number) {
+      const el = msgRefs.current[messageId];
+      if (!el) return;
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Flash highlight
+      el.classList.add('msg-highlight');
+      setTimeout(() => el.classList.remove('msg-highlight'), 1500);
+    },
+  }));
+
+  // Auto-scroll to bottom
   useEffect(() => {
-    if (!bottomRef.current) return;
+    const newCount = messages.length;
+    if (newCount === 0) return;
 
-    const newMessageArrived = messages.length > prevMessageCount.current;
-    const lastMsg = messages[messages.length - 1];
-    const isMyMessage = lastMsg?.sender_id === currentUserId;
-
-    if (isFirstLoad.current || isMyMessage || newMessageArrived) {
-      bottomRef.current.scrollIntoView({ behavior: isFirstLoad.current ? 'instant' : 'smooth' });
+    if (isFirstLoad.current) {
+      bottomRef.current?.scrollIntoView({ behavior: 'instant' });
       isFirstLoad.current = false;
+    } else if (newCount > prevCount.current) {
+      // Only scroll if user is near bottom
+      const list = listRef.current;
+      if (list) {
+        const distFromBottom = list.scrollHeight - list.scrollTop - list.clientHeight;
+        if (distFromBottom < 200) {
+          bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
     }
+    prevCount.current = newCount;
+  }, [messages.length]);
 
-    prevMessageCount.current = messages.length;
-  }, [messages, currentUserId]);
-
-  // Reset on conversation change (messages array reset to empty then refills)
+  // Reset on conversation change
   useEffect(() => {
     if (messages.length === 0) {
       isFirstLoad.current = true;
-      prevMessageCount.current = 0;
+      prevCount.current   = 0;
     }
   }, [messages.length]);
 
-  // Intersection observer for infinite scroll (load older messages)
-  const observerRef = useCallback((node: HTMLDivElement | null) => {
-    if (!node) return;
-    const observer = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasMore && !loading) {
-        onLoadMore();
-      }
-    }, { threshold: 0.1 });
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [hasMore, loading, onLoadMore]);
+  // Intersection observer for loading older messages
+  const topSentinel = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (!node) return;
+      const obs = new IntersectionObserver(
+        ([e]) => { if (e.isIntersecting && hasMore && !loading) onLoadMore(); },
+        { threshold: 0.1 },
+      );
+      obs.observe(node);
+      return () => obs.disconnect();
+    },
+    [hasMore, loading, onLoadMore],
+  );
 
-  // Group messages by date
+  // Group by calendar date
   const grouped: { date: string; messages: Message[] }[] = [];
-  let currentDate = '';
+  let curDate = '';
   messages.forEach(msg => {
     const d = new Date(msg.created_at).toDateString();
-    if (d !== currentDate) {
-      currentDate = d;
-      grouped.push({ date: d, messages: [] });
-    }
+    if (d !== curDate) { curDate = d; grouped.push({ date: d, messages: [] }); }
     grouped[grouped.length - 1].messages.push(msg);
   });
 
   return (
     <div className="message-list" ref={listRef}>
-      {/* Load more trigger at top */}
-      <div ref={observerRef}>
-        {loading && (
-          <div className="loading-spinner">
-            <div className="spinner" />
-          </div>
-        )}
+      {/* Top sentinel */}
+      <div ref={topSentinel}>
+        {loading && <div className="loading-spinner"><div className="spinner" /></div>}
       </div>
 
       {grouped.map(group => (
         <div key={group.date}>
-          <div className="date-separator">
-            <span>{formatDateGroup(group.date)}</span>
-          </div>
+          <div className="date-separator"><span>{formatDateGroup(group.date)}</span></div>
+
           {group.messages.map((msg, i) => {
-            const isMine = msg.sender_id === currentUserId;
-            const prevMsg = group.messages[i - 1];
-            const showAvatar = !isMine && (!prevMsg || prevMsg.sender_id !== msg.sender_id);
+            const isMine     = msg.sender_id === currentUserId;
+            const prev       = group.messages[i - 1];
+            const showAvatar = !isMine && (!prev || prev.sender_id !== msg.sender_id);
+
             return (
-              <MessageBubble
+              <div
                 key={msg.id}
-                message={msg}
-                isMine={isMine}
-                showAvatar={showAvatar}
-                currentUserId={currentUserId}
-                onReply={() => onReply(msg)}
-                onEdit={(text) => onEdit(msg.id, text)}
-                onDelete={(forEveryone) => onDelete(msg.id, forEveryone)}
-                onReact={(reaction) => onReact(msg.id, reaction)}
-                onRemoveReact={() => onRemoveReact(msg.id)}
-              />
+                ref={el => { msgRefs.current[msg.id] = el; }}
+              >
+                <MessageBubble
+                  message={msg}
+                  isMine={isMine}
+                  showAvatar={showAvatar}
+                  currentUserId={currentUserId}
+                  currentUserRole={currentUserRole}
+                  onReply={() => onReply(msg)}
+                  onEdit={text => onEdit(msg.id, text)}
+                  onDelete={fe => onDelete(msg.id, fe)}
+                  onReact={r => onReact(msg.id, r)}
+                  onRemoveReact={() => onRemoveReact(msg.id)}
+                  onForward={() => onForward(msg)}
+                  onPin={() => onPin(msg.id)}
+                  onReport={reason => onReport(msg.id, reason)}
+                />
+              </div>
             );
           })}
         </div>
       ))}
 
-      {/* Scroll anchor */}
       <div ref={bottomRef} />
     </div>
   );
-}
+});

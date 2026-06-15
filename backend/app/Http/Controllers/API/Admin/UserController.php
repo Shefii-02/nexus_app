@@ -45,7 +45,7 @@ class UserController extends Controller
         UserPlatform::updateOrCreate(
             [
                 // 'device_id' => $request->device_id,
-                 'user_id' => $user->id
+                'user_id' => $user->id
             ],
             [
                 'fcm_token' => $request->fcm_token,
@@ -99,5 +99,28 @@ class UserController extends Controller
             'status' => true,
             'message' => 'Time Updated'
         ]);
+    }
+
+    public function search(Request $request)
+    {
+        $q = isset($request->q) ? $request->string('q')->trim() : $request->string('search')->trim();
+
+
+        if ($q->length() < 2) {
+            return response()->json(['data' => []]);
+        }
+
+        $users = \App\Models\User::query()
+            ->where(function ($query) use ($q) {
+                $query->where('name',   'like', "%{$q}%")
+                    ->orWhere('email',  'like', "%{$q}%")
+                    ->orWhere('phone', 'like', "%{$q}%");
+            })
+            ->where('id', '!=', $request->user()->id)
+            ->select('id', 'name', 'email', 'phone', 'avatar')
+            ->limit(20)
+            ->get();
+
+        return response()->json(['status' => true, 'data' => $users]);
     }
 }

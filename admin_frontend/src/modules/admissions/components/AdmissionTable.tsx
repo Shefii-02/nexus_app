@@ -150,7 +150,7 @@ const AdmissionTable = ({
                     View
                   </Button>
 
-                  <Button
+                  {/* <Button
                     size="sm"
                     variant="secondary"
                     onClick={() =>
@@ -158,7 +158,7 @@ const AdmissionTable = ({
                     }
                   >
                     Edit
-                  </Button>
+                  </Button> */}
 
                   <Button
                     size="sm"

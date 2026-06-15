@@ -115,6 +115,9 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/courses/{course}/conversation', [CourseController::class, 'saveConversation']);
 
 
+
+    // Course list for selector
+    Route::get('admission/courses/search/', [CourseController::class, 'chatList']);
     // Course Management
     Route::apiResource('courses', CourseController::class);
 
@@ -144,6 +147,14 @@ Route::middleware(['auth:api'])->group(function () {
         [CourseController::class, 'removeConversationMember']
     );
 
+
+
+    // User search (name, email, mobile)
+    Route::get('users/search', [UserController::class, 'search']);
+
+
+    // Forward message to multiple conversations
+    Route::post('messages/forward', [ConversationController::class, 'forward']);
 
 
     Route::post('courses/{course}/attach-student/{student}', [CourseController::class, 'attachStudent']);
@@ -518,6 +529,37 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/{id}/pin', [MessageController::class, 'pin']);
         Route::delete('/{id}', [MessageController::class, 'destroy']);
     });
+
+
+
+
+     // ── Transactions ──────────────────────────────────────────────
+    Route::get('transactions',       [TransactionController::class, 'index']);
+    Route::post('transactions',      [TransactionController::class, 'store']);
+    Route::get('transactions/{id}',  [TransactionController::class, 'show']);
+    Route::put('transactions/{id}',  [TransactionController::class, 'update']);
+    Route::delete('transactions/{id}', [TransactionController::class, 'destroy']);
+
+    // Filtered sub-lists (Income / Expenses / Refunds sidebar items)
+    Route::get('transactions/income',   [TransactionController::class, 'income']);
+    Route::get('transactions/expenses', [TransactionController::class, 'expenses']);
+    Route::get('transactions/refunds',  [TransactionController::class, 'refunds']);
+
+    // ── Teacher Payments ──────────────────────────────────────────
+    Route::get('teacher-payments',                [TeacherPaymentController::class, 'index']);
+    Route::post('teacher-payments',               [TeacherPaymentController::class, 'store']);
+    Route::get('teacher-payments/{id}',           [TeacherPaymentController::class, 'show']);
+    Route::put('teacher-payments/{id}',           [TeacherPaymentController::class, 'update']);
+    Route::post('teacher-payments/{id}/release',  [TeacherPaymentController::class, 'release']);
+    Route::delete('teacher-payments/{id}',        [TeacherPaymentController::class, 'destroy']);
+
+    // ── Staff Payments ────────────────────────────────────────────
+    Route::get('staff-payments',               [StaffPaymentController::class, 'index']);
+    Route::post('staff-payments',              [StaffPaymentController::class, 'store']);
+    Route::get('staff-payments/{id}',          [StaffPaymentController::class, 'show']);
+    Route::put('staff-payments/{id}',          [StaffPaymentController::class, 'update']);
+    Route::post('staff-payments/{id}/release', [StaffPaymentController::class, 'release']);
+    Route::delete('staff-payments/{id}',       [StaffPaymentController::class, 'destroy']);
 
 
     Route::prefix('payments')->group(function () {
@@ -1089,17 +1131,17 @@ Route::middleware(['auth:api'])->group(function () {
         });
     });
 
+    Route::apiResource(
+        'admissions',
+        AdmissionController::class
+    );
+
 
 
 
     // routes/api.php
 
     Route::prefix('payments')->group(function () {
-
-        Route::apiResource(
-            'admissions',
-            AdmissionController::class
-        );
 
         Route::get(
             'admissions/{id}/payments',
@@ -1165,7 +1207,7 @@ Route::middleware(['auth:api'])->group(function () {
         // Route::get('/renewals', [PaymentController::class, 'renewalList']);
 
         // Transactions
-        Route::get('/transactions', [PaymentController::class, 'transactions']);
+        // Route::get('/transactions', [PaymentController::class, 'transactions']);
 
         // Invoice
         Route::get('/invoice/{type}/{id}', [PaymentController::class, 'invoice']);

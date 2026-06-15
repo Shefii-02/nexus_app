@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API\Admin;
 
+use App\Chat\Events\MessageSent;
 use App\DTOs\ConversationDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ConversationRequest;
@@ -79,7 +80,7 @@ class ConversationController extends Controller
     }
 
 
-       public function clearForMe(int $conversationId)
+    public function clearForMe(int $conversationId)
     {
         $messages = Message::where('conversation_id', $conversationId)->pluck('id');
 
@@ -124,5 +125,44 @@ class ConversationController extends Controller
         ]);
 
         return response()->json(['message' => 'Reported']);
+    }
+
+    public function forward(Request $request)
+    {
+        $request->validate([
+            'message_id'       => 'required|integer|exists:messages,id',
+            'conversation_ids' => 'required|array|min:1',
+            'conversation_ids.*' => 'integer|exists:conversations,id',
+        ]);
+
+        $original = \App\Models\Message::findOrFail($request->message_id);
+        $user     = $request->user();
+        $sent     = [];
+
+        foreach ($request->conversation_ids as $convId) {
+            // Verify the user is an active participant in every target conversation
+            $isMember = \App\Models\ConversationParticipant::where('conversation_id', $convId)
+                ->where('user_id', $user->id)
+                ->where('status', 'active')
+                ->exists();
+
+            if (! $isMember) continue;
+
+            $msg = \App\Models\Message::create([
+                'conversation_id' => $convId,
+                'sender_id'       => $user->id,
+                'message'         => $original->message,
+                'type'            => $original->type,
+                'media_url'       => $original->media_url,
+                'media_meta'      => $original->media_meta,
+                'reply_to'        => null,   // forwarded messages don't carry the quote
+            ]);
+
+            $msg->load('sender', 'reactions', 'reads');
+            broadcast(new MessageSent($msg))->toOthers();
+            $sent[] = $msg;
+        }
+
+        return response()->json(['messages' => $sent]);
     }
 }

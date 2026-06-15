@@ -9,8 +9,11 @@ export const admissionService = {
   getById: (id: number) =>
     apiClient.get(`/admissions/${id}`),
 
-  create: (data: any) =>
-    apiClient.post('/admissions', data),
+  create: (payload: any) =>
+  apiClient.post(
+    '/admissions',
+    payload
+  ),
 
   update: (
     id: number,

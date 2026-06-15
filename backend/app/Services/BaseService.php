@@ -29,10 +29,10 @@ abstract class BaseService
         return $this->repository->find($id);
     }
 
-    public function findWithRelations(int $id, array $relations = []): ?object
-    {
-        return $this->repository->findWithRelations($id, $relations);
-    }
+    // public function findWithRelations(int $id, array $relations = []): ?object
+    // {
+    //     return $this->repository->findWithRelations($id, $relations);
+    // }
 
     public function exists(int $id): bool
     {

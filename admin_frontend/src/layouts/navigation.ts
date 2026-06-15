@@ -107,77 +107,76 @@ export const navSections: NavSection[] = [
     title: 'Finance',
     items: [
 
+      
       {
-        label: 'Admission Payments',
+        label: 'Payments',
         children: [
-          {
-            label: 'All Payments',
-            path: '/admission-payments',
-          },
           {
             label: 'Create Payment',
-            path: '/admission-payments/create',
+            path: '/payments/create',
           },
-        ],
-      },
-
-      {
-        label: 'Transactions',
-        children: [
           {
             label: 'All Transactions',
             path: '/transactions',
           },
-          {
-            label: 'Income',
-            path: '/transactions/income',
-          },
-          {
-            label: 'Expenses',
-            path: '/transactions/expenses',
-          },
-          {
-            label: 'Refunds',
-            path: '/transactions/refunds',
-          },
+          // {
+          //   label: 'Income',
+          //   path: '/transactions/income',
+          // },
+          // {
+          //   label: 'Expenses',
+          //   path: '/transactions/expenses',
+          // },
+          // {
+          //   label: 'Refunds',
+          //   path: '/transactions/refunds',
+          // },
         ],
       },
-
       {
         label: 'Teacher Payments',
-        children: [
-          {
-            label: 'Pending',
-            path: '/teacher-payments/pending',
-          },
-          {
-            label: 'Release',
-            path: '/teacher-payments/release',
-          },
-          {
-            label: 'History',
-            path: '/teacher-payments/history',
-          },
-        ],
+        path: '/',
       },
-
       {
         label: 'Staff Payments',
-        children: [
-          {
-            label: 'Pending',
-            path: '/staff-payments/pending',
-          },
-          {
-            label: 'Release',
-            path: '/staff-payments/release',
-          },
-          {
-            label: 'History',
-            path: '/staff-payments/history',
-          },
-        ],
+        path: '/',
       },
+
+      // {
+      //   label: 'Teacher Payments',
+      //   children: [
+      //     {
+      //       label: 'Pending',
+      //       path: '/teacher-payments/pending',
+      //     },
+      //     {
+      //       label: 'Release',
+      //       path: '/teacher-payments/release',
+      //     },
+      //     {
+      //       label: 'History',
+      //       path: '/teacher-payments/history',
+      //     },
+      //   ],
+      // },
+
+      // {
+      //   label: 'Staff Payments',
+      //   children: [
+      //     {
+      //       label: 'Pending',
+      //       path: '/staff-payments/pending',
+      //     },
+      //     {
+      //       label: 'Release',
+      //       path: '/staff-payments/release',
+      //     },
+      //     {
+      //       label: 'History',
+      //       path: '/staff-payments/history',
+      //     },
+      //   ],
+      // },
 
       // {
       //   label: 'Coupons',
@@ -275,10 +274,10 @@ export const navSections: NavSection[] = [
       {
         label: 'Settings',
         children: [
-          {
-            label: 'General',
-            path: '/notifications',
-          },
+          // {
+          //   label: 'General',
+          //   path: '/notifications',
+          // },
           {
             label: 'Roles',
             path: '/roles',

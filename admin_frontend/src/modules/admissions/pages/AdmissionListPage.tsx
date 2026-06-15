@@ -89,15 +89,15 @@ const AdmissionListPage = () => {
 
         onView={(id) =>
           navigate(
-            `/admissions/${id}`
+            `/admissions/${id}/show`
           )
         }
 
-        onEdit={(id) =>
-          navigate(
-            `/admissions/${id}/edit`
-          )
-        }
+        // onEdit={(id) =>
+        //   navigate(
+        //     `/admissions/${id}/edit`
+        //   )
+        // }
 
         onDelete={setConfirmId}
       />

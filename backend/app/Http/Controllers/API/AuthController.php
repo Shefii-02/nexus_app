@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\RefreshToken;
 use App\Models\User;
+use App\Services\Auth\OtpService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +15,9 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
+    public function __construct(private OtpService $otpService) {}
+
+
     public function login(Request $request)
     {
         $request->validate([
@@ -185,37 +189,76 @@ class AuthController extends Controller
 
     public function sendOtp(Request $request)
     {
-        Log::info('Received OTP request', ['phone' => $request->phone]);
+        Log::info('Received OTP request', ['phone' => $request->phone, 'device_id' => $request->device_id]);
         $request->validate([
-            'phone' => 'required|string',
+            'phone' => 'required|string|min:10|max:15',
+            'device_id' => 'required|string',
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'OTP sent successfully',
-            'otp' => '123456', // dev only
-        ]);
+        $phone    = $request->phone;     // e.g. 918086544828
+        $deviceId = $request->device_id; // e.g. unique device fingerprint
+
+        $result = $this->otpService->sendOtp($phone, $deviceId);
+
+        return response()->json($result, $result['success'] ? 200 : 500);
+
+        // return response()->json([
+        //     'success' => true,
+        //     'message' => 'OTP sent successfully',
+        //     'otp' => '123456', // dev only
+        // ]);
     }
 
     public function verifyOtp(Request $request)
     {
+        $request->validate([
+            'phone'     => 'required|string',
+            'otp'       => 'required|string|size:4',
+            'device_id' => 'required|string',
+        ]);
+
         try {
 
-            if ($request->code !== '1234') {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Invalid OTP',
-                ], 422);
+
+            // if ($request->code !== '1234') {
+            //     return response()->json([
+            //         'status' => false,
+            //         'message' => 'Invalid OTP',
+            //     ], 422);
+            // }
+
+            $result = $this->otpService->verifyOtp(
+                $request->phone,
+                $request->otp,
+                $request->device_id
+            );
+
+
+            if (!$result['success']) {
+                return response()->json($result, 422);
             }
 
-            $user = User::where('phone', $request->phone)->first();
-            // $user = User::first();
-            if (!$user) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'User not found'
-                ], 404);
-            }
+            // Find or create user
+            $user = User::firstOrCreate(
+                ['phone' => $request->phone],
+                [
+                    'name'      => 'User_' . substr($request->phone, -4),
+                    'device_id' => $request->device_id,
+                    'password'  => Hash::make(str()->random(16)),
+                ]
+            );
+
+            // $user->update(['device_id' => $request->device_id]);
+
+
+            // $user = User::where('phone', $request->phone)->first();
+            // // $user = User::first();
+            // if (!$user) {
+            //     return response()->json([
+            //         'status' => false,
+            //         'message' => 'User not found'
+            //     ], 404);
+            // }
 
             $accessToken = auth('api')->login($user);
 
@@ -257,6 +300,13 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+
+
+
+
+
+
 
     // public function verifyOtp(Request $request)
     // {

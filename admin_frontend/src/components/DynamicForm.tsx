@@ -15,21 +15,27 @@ import FileField from './form/FileField'
 import UserSearchField from './form/UserSearchField'
 import UserMultiSearchField from './form/UserMultiSearchField'
 import ToggleField from './form/ToggleField'
+import AsyncSelectField from './form/AsyncSelectField'
 
 interface FieldConfig {
   name: string
   label: string
+
   type: string
   required?: boolean
   options?: any[]
+
   colSpan?: number
   section?: string
   hideOnEdit?: boolean
 
+  endpoint?: string
+  valueKey?: string
+  labelKey?: string
+
   /** 🔥 NEW */
   dependsOn?: string
   dependsValue?: any
-
   readOnly?: boolean
 }
 
@@ -315,6 +321,30 @@ const DynamicForm = ({ config, defaultValues = {}, onSubmit, isEdit }: Props) =>
                             name={field.name}
                             register={register}
                             disabled={field.readOnly}
+                          />
+                        )
+                      case 'async-select':
+                        return (
+                          <AsyncSelectField
+                            label={field.label}
+                            endpoint={
+                              field.endpoint!
+                            }
+                            value={watch(
+                              field.name
+                            )}
+                            valueKey={
+                              field.valueKey
+                            }
+                            labelKey={
+                              field.labelKey
+                            }
+                            onChange={(value) =>
+                              setValue(
+                                field.name,
+                                value
+                              )
+                            }
                           />
                         )
 

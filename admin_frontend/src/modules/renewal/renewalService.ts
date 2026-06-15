@@ -1,18 +1,21 @@
-renewalDue() {
-  return apiClient.get(
-    '/renewals/due'
-  )
-},
+import apiClient from '../../services/apiClient'
 
-renewalHistory() {
-  return apiClient.get(
-    '/renewals'
-  )
-},
+export const renewalService = {
+   getAll: (params?: any) =>
+    apiClient.get('/renewals', {
+      params,
+    }),
 
-payRenewal(payload: any) {
-  return apiClient.post(
-    '/renewals/pay',
-    payload
-  )
-},
+  renewalDue() {
+    return apiClient.get('/renewals/due')
+  },
+
+  renewalHistory() {
+    return apiClient.get('/renewals')
+  },
+
+  payRenewal(payload: any) {
+    return apiClient.post('/renewals/pay', payload)
+  },
+
+}

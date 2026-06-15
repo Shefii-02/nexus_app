@@ -27,55 +27,51 @@ class AdmissionRequest extends BaseRequest
                 'exists:courses,id',
             ],
 
-            'teacher_id' => [
-                'nullable',
-                'exists:users,id',
-            ],
 
-            'actual_fee' => [
-                'required',
-                'numeric',
-                'min:0',
-            ],
+            // 'actual_fee' => [
+            //     'required',
+            //     'numeric',
+            //     'min:0',
+            // ],
 
-            'discount_amount' => [
-                'nullable',
-                'numeric',
-                'min:0',
-            ],
+            // 'discount_amount' => [
+            //     'nullable',
+            //     'numeric',
+            //     'min:0',
+            // ],
 
-            'discount_reason' => [
-                'nullable',
-                'string',
-                'max:500',
-            ],
+            // 'discount_reason' => [
+            //     'nullable',
+            //     'string',
+            //     'max:500',
+            // ],
 
-            'coupon_id' => [
-                'nullable',
-                'exists:coupons,id',
-            ],
+            // 'coupon_id' => [
+            //     'nullable',
+            //     'exists:coupons,id',
+            // ],
 
-            'net_fee' => [
-                'required',
-                'numeric',
-                'min:0',
-            ],
+            // 'net_fee' => [
+            //     'required',
+            //     'numeric',
+            //     'min:0',
+            // ],
 
-            'admission_date' => [
-                'required',
-                'date',
-            ],
+            // 'admission_date' => [
+            //     'required',
+            //     'date',
+            // ],
 
-            'expiry_date' => [
-                'nullable',
-                'date',
-                'after_or_equal:admission_date',
-            ],
+            // 'expiry_date' => [
+            //     'nullable',
+            //     'date',
+            //     'after_or_equal:admission_date',
+            // ],
 
-            'status' => [
-                'nullable',
-                'in:active,inactive,completed,cancelled',
-            ],
+            // 'status' => [
+            //     'nullable',
+            //     'in:active,inactive,completed,cancelled',
+            // ],
 
             /*
             |--------------------------------------------------------------------------

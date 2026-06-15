@@ -24,6 +24,7 @@ export default function ConversationPage() {
     handleToggleMute,
     handleTogglePin,
     markConversationRead,
+    updateConversationLastMessage,
   } = useConversations();
 
   const handleSelectConversation = (conv: Conversation) => {
@@ -54,12 +55,15 @@ export default function ConversationPage() {
       </div>
 
       <div className={`chat-main ${mobileView === 'list' ? 'mobile-hidden' : ''}`}>
-        {activeConversation ? (
+         {activeConversation ? (
           <ChatWindow
+            key={activeConversation.id}
             conversation={activeConversation}
+            conversations={conversations}
             currentUserId={currentUserId}
             currentUserName={currentUserName}
             onBack={handleBack}
+            onNewMessage={updateConversationLastMessage}
           />
         ) : (
           <div className="chat-empty-state">

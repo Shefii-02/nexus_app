@@ -23,7 +23,7 @@ class OtpService
 
 
      // Dummy account for app store review / testing
-        if ($phone === '919846366783') {
+        if ($phone === env('dummyNumber','+91 9846366783')) {
             return ['success' => true, 'message' => 'OTP sent successfully'];
         }
 
@@ -70,7 +70,7 @@ class OtpService
     public function verifyOtp(string $phone, string $otp, string $deviceId): array
     {
         // Dummy account for app store review / testing
-        if ($phone === '919846366783' && $otp === '1234') {
+        if ($phone === env('dummyNumber') && $otp === env('dummyOtp')) {
             return ['success' => true, 'message' => 'OTP verified successfully'];
         }
 

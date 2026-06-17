@@ -176,21 +176,21 @@ class AuthController extends Controller
                             'type'       => 'single',
                             'title'      => null,
                             'created_by' => $admin->id,
-                            'status'     => 1,
+                            'status'     => "active",
                         ]);
 
                         ConversationParticipant::create([
                             'conversation_id' => $conversation->id,
                             'user_id'         => $admin->id,
                             'created_by'      => $admin->id,
-                            'status'          => 1,
+                            'status'          => "active",
                         ]);
 
                         ConversationParticipant::create([
                             'conversation_id' => $conversation->id,
                             'user_id'         => $user->id,
                             'created_by'      => $admin->id,
-                            'status'          => 1,
+                            'status'          => "active",
                         ]);
                     });
                 }

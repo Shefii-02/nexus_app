@@ -98,12 +98,46 @@ class AuthController extends Controller
 
     public function setupProfile(Request $request)
     {
+        $user = $request->user();
 
-        Log::info($request->all());
+        $data = $request->only([
+            'name',
+            'email',
+            'parent_name',
+            'password',
+        ]);
+
+        if (!empty($data['password'])) {
+            $data['password'] = bcrypt($data['password']);
+        } else {
+            unset($data['password']);
+        }
+
+        // Upload avatar if file exists
+        if ($request->hasFile('avatar')) {
+            $media = $this->mediaService->upload(
+                $request->file('avatar'),
+                $user->id,
+                'avatar'
+            );
+
+            $data['avatar'] = $media->id;
+        }
+
+        $user->update($data);
+
+        // Reload latest data
+        $user->refresh();
+
+        Log::info('Profile Updated', [
+            'user_id' => $user->id,
+            'data' => $data,
+        ]);
 
         return response()->json([
             'status' => true,
-            'user' => $request->user()
+            'message' => 'Profile updated successfully',
+            'user' => $user,
         ]);
     }
 

@@ -220,13 +220,6 @@ class AuthController extends Controller
         try {
 
 
-            // if ($request->code !== '1234') {
-            //     return response()->json([
-            //         'status' => false,
-            //         'message' => 'Invalid OTP',
-            //     ], 422);
-            // }
-
             $result = $this->otpService->verifyOtp(
                 $request->phone,
                 $request->otp,
@@ -238,11 +231,12 @@ class AuthController extends Controller
                 return response()->json($result, 422);
             }
 
+            $dummyName = 'User_' . substr($request->phone, -4);
             // Find or create user
             $user = User::firstOrCreate(
                 ['phone' => $request->phone],
                 [
-                    'name'      => 'User_' . substr($request->phone, -4),
+                    'name'      => $dummyName,
                     'device_id' => $request->device_id,
                     'password'  => Hash::make(str()->random(16)),
                 ]
@@ -283,7 +277,7 @@ class AuthController extends Controller
 
                 'refresh_expires_in' => now()->addMonths(6)->timestamp,
 
-                'is_new_user' => false,
+                'is_new_user' => $user->email == '' || $user->email == null ? true : false,
 
                 'user' => [
                     ...$user->toArray(),

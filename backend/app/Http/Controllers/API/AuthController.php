@@ -96,6 +96,17 @@ class AuthController extends Controller
         return $this->respondWithToken($token);
     }
 
+    public function setupProfile(Request $request)
+    {
+
+        Log::info($request->all());
+
+        return response()->json([
+            'status' => true,
+            'user' => $request->user()
+        ]);
+    }
+
     public function profile()
     {
         return response()->json([

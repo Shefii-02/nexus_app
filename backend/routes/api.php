@@ -50,6 +50,8 @@ Route::prefix('auth')->group(function () {
 
 // Protected Auth Routes
 Route::middleware('auth:api')->group(function () {
+
+    Route::post('setup-profile', [AuthController::class, 'setupProfile']);
     Route::get('profile', [AuthController::class, 'profile']);
     Route::post('logout', [AuthController::class, 'logout']);
 });

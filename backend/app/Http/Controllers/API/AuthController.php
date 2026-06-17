@@ -3,19 +3,30 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Conversation;
+use App\Models\ConversationParticipant;
 use App\Models\RefreshToken;
 use App\Models\User;
 use App\Services\Auth\OtpService;
+use App\Services\Media\MediaService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    public function __construct(private OtpService $otpService) {}
+    use ApiResponse;
+
+
+    public function __construct(
+        private OtpService $otpService,
+
+        private MediaService $mediaService
+    ) {}
 
 
     public function login(Request $request)
@@ -98,47 +109,111 @@ class AuthController extends Controller
 
     public function setupProfile(Request $request)
     {
-        $user = $request->user();
+        try {
 
-        $data = $request->only([
-            'name',
-            'email',
-            'parent_name',
-            'password',
-        ]);
+            $user = $request->user();
 
-        if (!empty($data['password'])) {
-            $data['password'] = bcrypt($data['password']);
-        } else {
-            unset($data['password']);
+            $data = $request->only([
+                'name',
+                'email',
+                'parent_name',
+                'password',
+            ]);
+
+            // Hash password if provided
+            if (!empty($data['password'])) {
+                $data['password'] = bcrypt($data['password']);
+            } else {
+                unset($data['password']);
+            }
+
+            // Upload avatar
+            if ($request->hasFile('avatar')) {
+                $media = $this->mediaService->upload(
+                    $request->file('avatar'),
+                    $user->id,
+                    'avatar'
+                );
+
+                $data['avatar'] = $media->id;
+            }
+
+            // Mark profile completed
+            $data['profile_completed'] = 1;
+
+            // Update user
+            $user->update($data);
+            $user->refresh();
+
+            /*
+        |--------------------------------------------------------------------------
+        | Create Direct Chat with First Super Admin
+        |--------------------------------------------------------------------------
+        */
+            $admin = User::where('acc_type', 'admin')
+                ->where('status', 1)
+                ->orderBy('id')
+                ->first();
+
+            if ($admin && $admin->id != $user->id) {
+
+                $conversation = Conversation::where('type', 'single')
+                    ->whereHas('participants', function ($q) use ($user) {
+                        $q->where('user_id', $user->id);
+                    })
+                    ->whereHas('participants', function ($q) use ($admin) {
+                        $q->where('user_id', $admin->id);
+                    })
+                    ->withCount('participants')
+                    ->having('participants_count', 2)
+                    ->first();
+
+                if (!$conversation) {
+
+                    DB::transaction(function () use ($admin, $user) {
+
+                        $conversation = Conversation::create([
+                            'type'       => 'single',
+                            'title'      => null,
+                            'created_by' => $admin->id,
+                            'status'     => 1,
+                        ]);
+
+                        ConversationParticipant::create([
+                            'conversation_id' => $conversation->id,
+                            'user_id'         => $admin->id,
+                            'created_by'      => $admin->id,
+                            'status'          => 1,
+                        ]);
+
+                        ConversationParticipant::create([
+                            'conversation_id' => $conversation->id,
+                            'user_id'         => $user->id,
+                            'created_by'      => $admin->id,
+                            'status'          => 1,
+                        ]);
+                    });
+                }
+            }
+
+            return response()->json([
+                'status'  => true,
+                'message' => 'Profile setup completed successfully',
+                'user'    => $user->load('avatar'),
+            ]);
+        } catch (\Exception $e) {
+
+            Log::error('Setup Profile Error', [
+                'user_id' => auth()->id(),
+                'error'   => $e->getMessage(),
+                'trace'   => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'status'  => false,
+                'message' => $e->getMessage(),
+            ], 500);
         }
-
-        // Upload avatar if file exists
-        if ($request->hasFile('avatar')) {
-            $media = $this->mediaService->upload(
-                $request->file('avatar'),
-                $user->id,
-                'avatar'
-            );
-
-            $data['avatar'] = $media->id;
-        }
-
-        $user->update($data);
-
-        // Reload latest data
-        $user->refresh();
-
-        Log::info('Profile Updated', [
-            'user_id' => $user->id,
-            'data' => $data,
-        ]);
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Profile updated successfully',
-            'user' => $user,
-        ]);
     }
 
     public function profile()

@@ -105,8 +105,8 @@ class MessageController extends Controller
 
         if ($request->hasFile('file')) {
             $uploadService = app(\App\Chat\Services\MediaUploadService::class);
-            $result    = $uploadService->upload($request->file('file'), $conversationId, $request->type);
-            $mediaUrl  = $result['url'];
+            $result    = $uploadService->upload($request->file('file'), $userId, $conversationId, $request->type);
+            $mediaUrl  = $result['media']['id'];
             $mediaMeta = $result['meta'];
 
             if ($request->filled('duration')) {

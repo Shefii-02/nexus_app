@@ -92,30 +92,26 @@ class MessageController extends Controller
             403
         );
 
-
         $request->validate([
-            'message'  => 'nullable|string|max:5000',
-            'type'     => 'required|in:text,image,video,audio,file,voice',
-            'media'    => 'nullable|file|max:51200', // 50MB max
-            'reply_to' => 'nullable|exists:messages,id',
+            'message'   => 'nullable|string|max:5000',
+            'type'      => 'required|in:text,image,video,audio,file,voice',
+            'file'      => 'nullable|file|max:51200',
+            'reply_to'  => 'nullable|exists:messages,id',
+            'duration'  => 'nullable|integer',
         ]);
-
-
-        Log::info(($request->all()));
 
         $mediaUrl  = null;
         $mediaMeta = null;
 
-        if ($request->hasFile('media')) {
-            $file     = $request->file('media');
-            $path     = Storage::disk('public')->put("chat/{$conversationId}", $file);
-            $mediaUrl = Storage::url($path);
-            $mediaMeta = [
-                'original_name' => $file->getClientOriginalName(),
-                'mime_type'     => $file->getMimeType(),
-                'size'          => $file->getSize(),
-                'extension'     => $file->getClientOriginalExtension(),
-            ];
+        if ($request->hasFile('file')) {
+            $uploadService = app(\App\Chat\Services\MediaUploadService::class);
+            $result    = $uploadService->upload($request->file('file'), $conversationId, $request->type);
+            $mediaUrl  = $result['url'];
+            $mediaMeta = $result['meta'];
+
+            if ($request->filled('duration')) {
+                $mediaMeta['duration'] = (int) $request->duration;
+            }
         }
 
         $message = Message::create([
@@ -124,20 +120,17 @@ class MessageController extends Controller
             'message'         => $request->message,
             'type'            => $request->type,
             'media_url'       => $mediaUrl,
-            'reply_to'        => $request->reply_to_id,
+            'media_meta'      => $mediaMeta ? json_encode($mediaMeta) : null,
+            'reply_to'        => $request->reply_to,
         ]);
 
-        // Update conversation's updated_at for sorting
         Conversation::where('id', $conversationId)->touch();
-
-        // Broadcast
         broadcast(new MessageSent($message))->toOthers();
 
         return response()->json([
             'message' => $message->load(['sender:id,name,avatar', 'replyTo.sender:id,name'])
         ], 201);
     }
-
     /**
      * Edit a message.
      */
@@ -162,22 +155,22 @@ class MessageController extends Controller
      */
     public function destroy(Request $request, int $conversationId, int $messageId): JsonResponse
     {
-        $userId  = $request->user()->id;
-        $forAll  = $request->boolean('for_everyone', false);
+        $userId = $request->user()->id;
+        $forAll = $request->boolean('for_everyone', false);
         $message = Message::where('conversation_id', $conversationId)->findOrFail($messageId);
 
         if ($forAll && $message->sender_id === $userId) {
-            Log::info('Deleting');
             $message->update(['is_deleted' => true, 'deleted_at' => now()]);
-            // broadcast(new MessageDeleted($messageId, $conversationId))->toOthers();
         } else {
             DeletedMessage::firstOrCreate([
                 'message_id' => $messageId,
                 'user_id'    => $userId,
             ]);
         }
+
         broadcast(new MessageDeleted($messageId, $conversationId))->toOthers();
-        return response()->json(['message' => 'Deleted.']);
+
+        return response()->json(['success' => true]);
     }
 
     /**

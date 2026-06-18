@@ -45,26 +45,28 @@ class MessageResource extends JsonResource
                 ? 'deleted'
                 : $this->type,
 
-            'media_url' => $this->whenLoaded(
-                'media',
-                fn() => [
-                    'id' =>
-                        $this->media->id,
-                    'file_name' =>
-                        $this->media->file_name,
-                    'file_type' =>
-                        $this->media->file_type,
-                    'file_size' =>
-                        $this->media->file_size,
-                    'file_path' =>
-                        $this->media->file_path,
-                    'url' =>
-                        Storage::disk('public')
-                            ->url(
-                                $this->media->file_path
-                            ),
-                ]
-            ),
+            'media_url' => $this->media?->file_path,
+
+            // 'media_url' => $this->whenLoaded(
+            //     'media',
+            //     fn() => [
+            //         'id' =>
+            //             $this->media->id,
+            //         'file_name' =>
+            //             $this->media->file_name,
+            //         'file_type' =>
+            //             $this->media->file_type,
+            //         'file_size' =>
+            //             $this->media->file_size,
+            //         'file_path' =>
+            //             $this->media->file_path,
+            //         'url' =>
+            //             Storage::disk('public')
+            //                 ->url(
+            //                     $this->media->file_path
+            //                 ),
+            //     ]
+            // ),
 
             // 'media_meta' =>
             //     $this->is_deleted

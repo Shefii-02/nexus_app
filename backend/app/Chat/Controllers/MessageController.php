@@ -53,7 +53,7 @@ class MessageController extends Controller
             ->visibleTo($userId)
             ->latest()
             ->cursorPaginate(40);
-return $messages;
+        return $messages->response();
         $this->markAsRead($conversationId, $userId);
 
         return MessageResource::collection($messages)

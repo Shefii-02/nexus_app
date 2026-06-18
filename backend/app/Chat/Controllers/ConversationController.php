@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class ConversationController extends Controller
 {
@@ -344,8 +345,9 @@ class ConversationController extends Controller
                 // For video, thumb_url could be a separate column if you add one;
                 // for now we use media_url for both.
                 return array_merge($base, [
-                    'media_url' => $row->media_url,
-                    'thumb_url' => $row->media_url, // replace with thumb col if available
+
+                    'media_url' => $row->media?->file_path ?  Storage::disk('public')->url($row->media->file_path) : "",
+                    'thumb_url' => $row->media?->file_path ?  Storage::disk('public')->url($row->media->file_path) : "", // replace with thumb col if available
                 ]);
             }
 
@@ -370,7 +372,7 @@ class ConversationController extends Controller
             if ($type === 'docs') {
                 // media_url holds the file download URL.
                 // Extract file name + extension from the URL path.
-                $url      = $row->media_url ?? '';
+                $url      = $row->media?->file_path ?  Storage::disk('public')->url($row->media->file_path) : "" ?? '';
                 $fileName = basename(parse_url($url, PHP_URL_PATH) ?? '');
                 $fileExt  = strtolower(pathinfo($fileName, PATHINFO_EXTENSION)) ?: null;
 

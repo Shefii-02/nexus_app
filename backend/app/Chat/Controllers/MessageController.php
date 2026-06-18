@@ -58,9 +58,8 @@ class MessageController extends Controller
 
 
         $this->markAsRead($conversationId, $userId);
-return  MessageResource::collection($messages)
-            ->response();
-        // return;
+    $messageDatas =   MessageResource::collection($messages)->response();
+        return $messageDatas;
     }
     // public function index(Request $request, int $conversationId): JsonResponse
     // {

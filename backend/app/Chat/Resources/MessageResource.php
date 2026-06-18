@@ -17,35 +17,35 @@ class MessageResource extends JsonResource
             'id' => $this->id,
 
             'conversation_id' =>
-                $this->conversation_id,
+            $this->conversation_id,
 
             'sender_id' =>
-                $this->sender_id,
+            $this->sender_id,
 
             'sender' =>
-                $this->whenLoaded(
-                    'sender',
-                    fn() => [
-                        'id' =>
-                            $this->sender->id,
-                        'name' =>
-                            $this->sender->name,
-                        'avatar' =>
-                            $this->sender->avatar,
-                    ]
-                ),
+            $this->whenLoaded(
+                'sender',
+                fn() => [
+                    'id' =>
+                    $this->sender->id,
+                    'name' =>
+                    $this->sender->name,
+                    'avatar' =>
+                    $this->sender->avatar,
+                ]
+            ),
 
             'message' =>
-                $this->is_deleted
+            $this->is_deleted
                 ? null
                 : $this->message,
 
             'type' =>
-                $this->is_deleted
+            $this->is_deleted
                 ? 'deleted'
                 : $this->type,
 
-            'media_url' => $this->media?->file_path,
+            'media_url' => $this->media?->file_path ?  Storage::disk('public')->url($this->media->file_path) : "",
 
             // 'media_url' => $this->whenLoaded(
             //     'media',
@@ -74,22 +74,22 @@ class MessageResource extends JsonResource
             //     : $this->media_meta,
 
             'reply_to' =>
-                $this->reply_to,
+            $this->reply_to,
 
             'is_deleted' =>
-                $this->is_deleted,
+            $this->is_deleted,
 
             'is_edited' =>
-                $this->is_edited,
+            $this->is_edited,
 
             'is_pinned' =>
-                $this->is_pinned,
+            $this->is_pinned,
 
             'created_at' =>
-                $this->created_at?->toISOString(),
+            $this->created_at?->toISOString(),
 
             'updated_at' =>
-                $this->updated_at?->toISOString(),
+            $this->updated_at?->toISOString(),
         ];
     }
 }

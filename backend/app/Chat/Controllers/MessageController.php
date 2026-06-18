@@ -15,6 +15,7 @@ use App\Chat\Events\MessageUpdated;
 use App\Chat\Events\MessageDeleted;
 use App\Chat\Events\ReactionAdded;
 use App\Chat\Resources\MessageResource;
+use App\Http\Controllers\API\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
@@ -22,6 +23,7 @@ use Illuminate\Support\Facades\Storage;
 
 class MessageController extends Controller
 {
+    use ApiResponse;
     /**
      * Paginated messages for a conversation (cursor-based).
      */
@@ -53,7 +55,8 @@ class MessageController extends Controller
             ->visibleTo($userId)
             ->latest()
             ->cursorPaginate(40);
-        return $messages->response();
+
+return response()->json($messages);
         $this->markAsRead($conversationId, $userId);
 
         return MessageResource::collection($messages)

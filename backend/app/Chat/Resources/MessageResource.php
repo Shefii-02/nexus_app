@@ -73,8 +73,27 @@ class MessageResource extends JsonResource
             //     ? null
             //     : $this->media_meta,
 
-            'reply_to' =>
-            $this->reply_to,
+            // 'reply_to' =>
+            // $this->reply_to,
+            'reply_to'        => $this->reply_to,
+            'reply_to_message' => $this->whenLoaded(
+                'replyTo',
+                fn() =>
+                $this->replyTo ? [
+                    'id'              => $this->replyTo->id,
+                    'conversation_id' => $this->replyTo->conversation_id,
+                    'sender_id'       => $this->replyTo->sender_id,
+                    'message'         => $this->replyTo->message,
+                    'type'            => $this->replyTo->type,
+                    'media_url'       => $this->replyTo->media_url,
+                    'is_deleted'      => $this->replyTo->is_deleted,
+                    'created_at'      => $this->replyTo->created_at?->toISOString(),
+                    'sender'          => $this->replyTo->sender ? [
+                        'id'   => $this->replyTo->sender->id,
+                        'name' => $this->replyTo->sender->name,
+                    ] : null,
+                ] : null
+            ),
 
             'is_deleted' =>
             $this->is_deleted,

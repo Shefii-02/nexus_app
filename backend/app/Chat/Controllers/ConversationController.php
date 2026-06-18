@@ -70,7 +70,7 @@ class ConversationController extends Controller
         $authId   = $request->user()->id;
         $targetId = $request->user_id;
         $moduleId = $request->module_id;
-        $targetUser = User::where('id',$targetId)->first();
+        $targetUser = User::where('id', $targetId)->first();
 
         if ($authId === $targetId) {
             return response()->json(['message' => 'Cannot chat with yourself.'], 422);
@@ -278,120 +278,136 @@ class ConversationController extends Controller
         return response()->json(['message' => 'Reported successfully.']);
     }
 
-
     public function sharedMedia(Request $request, int $conversationId)
     {
-        // ── Auth guard ────────────────────────────────────────────────────────
         $user = $request->user();
 
-        // Make sure the authenticated user is actually a participant
         $isMember = DB::table('conversation_participants')
             ->where('conversation_id', $conversationId)
             ->where('user_id', $user->id)
             ->exists();
 
         if (!$isMember) {
-            return response()->json(['message' => 'Forbidden'], 403);
+            return response()->json([
+                'message' => 'Forbidden'
+            ], 403);
         }
 
-        // ── Filter by type ────────────────────────────────────────────────────
-        // ?type=media  → image + video rows
-        // ?type=links  → link rows
-        // ?type=docs   → file rows
         $type = $request->query('type', 'media');
 
         $query = DB::table('messages')
-            ->where('conversation_id', $conversationId)
-            ->where('is_deleted', 0)          // exclude soft-deleted
-            ->whereNull('deleted_at')         // double-check hard deletes
-            ->orderBy('id', 'desc');
+            ->leftJoin(
+                'media_files',
+                'media_files.id',
+                '=',
+                'messages.media_url'
+            )
+            ->where('messages.conversation_id', $conversationId)
+            ->where('messages.is_deleted', 0)
+            ->whereNull('messages.deleted_at')
+            ->orderByDesc('messages.id');
 
         switch ($type) {
+
             case 'media':
-                $query->whereIn('type', ['image', 'video', 'audio']);
+                $query->whereIn('messages.type', [
+                    'image',
+                    'video',
+                    'audio',
+                    'voice'
+                ]);
                 break;
 
             case 'links':
-                $query->where('type', 'link');
+                $query->where('messages.type', 'link');
                 break;
 
             case 'docs':
-                $query->where('type', 'file');
+                $query->where('messages.type', 'file');
                 break;
 
             default:
-                return response()->json(['message' => 'Invalid type'], 422);
+                return response()->json([
+                    'message' => 'Invalid type'
+                ], 422);
         }
 
         $rows = $query->get([
-            'id',
-            'type',
-            'message',      // used as fallback text / link url
-            'media_url',
-            'created_at',
+            'messages.id',
+            'messages.type',
+            'messages.message',
+            'messages.media_url',
+            'messages.created_at',
+
+            'media_files.file_name',
+            'media_files.file_path',
+            'media_files.file_size',
+            'media_files.file_type',
         ]);
 
-        // ── Shape the response to match SharedMediaItem in Flutter ────────────
         $data = $rows->map(function ($row) use ($type) {
 
             $base = [
-                'id'       => $row->id,
-                'type'     => $row->type,
-                'sent_at'  => $row->created_at,
+                'id'      => $row->id,
+                'type'    => $row->type,
+                'sent_at' => $row->created_at,
             ];
 
-            if ($type === 'media') {
-                // media_url holds the image / video URL
-                // For video, thumb_url could be a separate column if you add one;
-                // for now we use media_url for both.
-                return array_merge($base, [
+            $fileUrl = $row->file_path
+                ? Storage::disk('public')->url($row->file_path)
+                : null;
 
-                    'media_url' => $row->media?->file_path ?  Storage::disk('public')->url($row->media->file_path) : "",
-                    'thumb_url' => $row->media?->file_path ?  Storage::disk('public')->url($row->media->file_path) : "", // replace with thumb col if available
+            if ($type === 'media') {
+
+                return array_merge($base, [
+                    'media_url' => $fileUrl,
+                    'thumb_url' => $fileUrl,
                 ]);
             }
 
             if ($type === 'links') {
-                // Your link messages store the URL in `message` or `media_url`.
-                // Adjust the fields below to match how you save links.
-                $url    = $row->media_url ?? $row->message;
+
+                $url = $row->message;
+
                 $domain = null;
 
-                if ($url) {
+                if (!empty($url)) {
                     $parsed = parse_url($url);
                     $domain = $parsed['host'] ?? null;
                 }
 
                 return array_merge($base, [
-                    'link_title'  => null,          // add a link_title column if needed
+                    'link_title'  => null,
                     'link_url'    => $url,
                     'link_domain' => $domain,
                 ]);
             }
 
             if ($type === 'docs') {
-                // media_url holds the file download URL.
-                // Extract file name + extension from the URL path.
-                $url      = $row->media?->file_path ?  Storage::disk('public')->url($row->media->file_path) : "" ?? '';
-                $fileName = basename(parse_url($url, PHP_URL_PATH) ?? '');
-                $fileExt  = strtolower(pathinfo($fileName, PATHINFO_EXTENSION)) ?: null;
 
-                // File size: add a `file_size` column to messages if you want it,
-                // otherwise leave null — Flutter handles null gracefully.
+                $fileName = $row->file_name
+                    ?: basename(parse_url($fileUrl, PHP_URL_PATH) ?? '');
+
+                $fileExt = strtolower(
+                    pathinfo($fileName, PATHINFO_EXTENSION)
+                );
+
                 return array_merge($base, [
-                    'file_name' => $fileName ?: ($row->message ?: 'Document'),
+                    'file_name' => $fileName,
                     'file_ext'  => $fileExt,
-                    'file_size' => null,   // e.g. $row->file_size if column exists
-                    'media_url' => $url,
+                    'file_size' => $row->file_size,
+                    'media_url' => $fileUrl,
                 ]);
             }
 
             return $base;
         });
 
-        return response()->json(['data' => $data]);
+        return response()->json([
+            'success' => true,
+            'data' => $data
+        ]);
     }
-
 
     // public function sharedMedia(Conversation $conversation, Request $request)
     // {

@@ -110,7 +110,7 @@ class AuthController extends Controller
     public function setupProfile(Request $request)
     {
         try {
-
+            Log::info($request->all());
             $user = $request->user();
 
             $data = $request->only([

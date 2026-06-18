@@ -56,11 +56,11 @@ class MessageController extends Controller
             ->latest()
             ->cursorPaginate(40);
 
-return response()->json($messages);
-        $this->markAsRead($conversationId, $userId);
 
-        return MessageResource::collection($messages)
+        $this->markAsRead($conversationId, $userId);
+return  MessageResource::collection($messages)
             ->response();
+        // return;
     }
     // public function index(Request $request, int $conversationId): JsonResponse
     // {

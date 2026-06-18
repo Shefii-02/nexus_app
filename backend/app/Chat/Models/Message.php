@@ -48,6 +48,8 @@ class Message extends Model
         return $this->belongsTo(\App\Chat\Models\Message::class, 'reply_to');
     }
 
+
+
     public function media(): BelongsTo
     {
         return $this->belongsTo(

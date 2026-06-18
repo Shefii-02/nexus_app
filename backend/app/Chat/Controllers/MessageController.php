@@ -140,7 +140,7 @@ class MessageController extends Controller
             'message'         => $request->message,
             'type'            => $request->type,
             'media_url'       => $mediaId,
-            'media_meta'      => $mediaMeta,
+            // 'media_meta'      => $mediaMeta,
             'reply_to'        => $request->reply_to,
         ]);
 

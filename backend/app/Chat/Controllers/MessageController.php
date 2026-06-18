@@ -82,35 +82,55 @@ class MessageController extends Controller
     /**
      * Send a message (text or media).
      */
-    public function store(Request $request, int $conversationId): JsonResponse
-    {
+    public function store(
+        Request $request,
+        int $conversationId
+    ): JsonResponse {
+
         $userId = $request->user()->id;
 
         abort_unless(
-            ConversationParticipant::where('conversation_id', $conversationId)
-                ->where('user_id', $userId)->where('status', 'active')->exists(),
+            ConversationParticipant::where(
+                'conversation_id',
+                $conversationId
+            )
+                ->where('user_id', $userId)
+                ->where('status', 'active')
+                ->exists(),
             403
         );
 
         $request->validate([
-            'message'   => 'nullable|string|max:5000',
-            'type'      => 'required|in:text,image,video,audio,file,voice',
-            'file'      => 'nullable|file|max:51200',
-            'reply_to'  => 'nullable|exists:messages,id',
-            'duration'  => 'nullable|integer',
+            'message'  => 'nullable|string|max:5000',
+            'type'     => 'required|in:text,image,video,audio,file,voice',
+            'file'     => 'nullable|file|max:51200',
+            'reply_to' => 'nullable|exists:messages,id',
+            'duration' => 'nullable|integer',
         ]);
 
-        $mediaUrl  = null;
+        $mediaId = null;
         $mediaMeta = null;
 
         if ($request->hasFile('file')) {
-            $uploadService = app(\App\Chat\Services\MediaUploadService::class);
-            $result    = $uploadService->upload($request->file('file'), $userId, $conversationId, $request->type);
-            $mediaUrl  = $result['media']['id'];
+
+            $uploadService = app(
+                \App\Chat\Services\MediaUploadService::class
+            );
+
+            $result = $uploadService->upload(
+                $request->file('file'),
+                $userId,
+                $conversationId,
+                $request->type
+            );
+
+            $mediaId = $result['media']->id;
+
             $mediaMeta = $result['meta'];
 
             if ($request->filled('duration')) {
-                $mediaMeta['duration'] = (int) $request->duration;
+                $mediaMeta['duration'] =
+                    (int)$request->duration;
             }
         }
 
@@ -119,16 +139,28 @@ class MessageController extends Controller
             'sender_id'       => $userId,
             'message'         => $request->message,
             'type'            => $request->type,
-            'media_url'       => $mediaUrl,
-            'media_meta'      => $mediaMeta ? json_encode($mediaMeta) : null,
+            'media_url'       => $mediaId,
+            'media_meta'      => $mediaMeta,
             'reply_to'        => $request->reply_to,
         ]);
 
-        Conversation::where('id', $conversationId)->touch();
-        broadcast(new MessageSent($message))->toOthers();
+        Conversation::where(
+            'id',
+            $conversationId
+        )->touch();
+
+        broadcast(
+            new MessageSent($message)
+        )->toOthers();
 
         return response()->json([
-            'message' => $message->load(['sender:id,name,avatar', 'replyTo.sender:id,name'])
+            'message' => new MessageResource(
+                $message->load([
+                    'sender:id,name,avatar',
+                    'replyTo.sender:id,name',
+                    'media'
+                ])
+            )
         ], 201);
     }
     /**

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Conversation;
 use App\Models\ConversationParticipant;
 use App\Models\RefreshToken;
+use App\Models\Student;
 use App\Models\User;
 use App\Services\Auth\OtpService;
 use App\Services\Media\MediaService;
@@ -144,6 +145,14 @@ class AuthController extends Controller
             // Update user
             $user->update($data);
             $user->refresh();
+
+            $student = Student::where('user_id',$user->id)->first();
+            if(!$student){
+                $student = new Student();
+            }
+
+            $student->guardian_name = $request->parent_name;
+            $student->save();
 
             /*
         |--------------------------------------------------------------------------

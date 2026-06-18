@@ -3,6 +3,7 @@
 namespace App\Chat\Events;
 
 use App\Chat\Models\Message;
+use App\Chat\Resources\MessageResource;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -37,23 +38,26 @@ class MessageSent implements ShouldBroadcast
 
         Log::info('message sending  Broadcast',  $data);
 
-        $this->message->load(['sender:id,name,avatar', 'replyTo:id,message,sender_id', 'reactions']);
+        $this->message->load(['sender:id,name,avatar', 'replyTo:id,message,sender_id', 'reactions', 'media']);
         return [
-            'message' => [
-                'id'              => $this->message->id,
-                'conversation_id' => $this->message->conversation_id,
-                'sender_id'       => $this->message->sender_id,
-                'sender'          => $this->message->sender,
-                'message'         => $this->message->message,
-                'type'            => $this->message->type,
-                'media_url'       => $this->message->media_url,
-                'reply_to'        => $this->message->reply_to,
-                'reply_message'   => $this->message->replyTo,
-                'is_edited'       => $this->message->is_edited,
-                'is_pinned'       => $this->message->is_pinned,
-                'reactions'       => $this->message->reactions,
-                'created_at'      => $this->message->created_at->toISOString(),
-            ],
+            'message' => new MessageResource(
+                $this->message
+            )
+            // 'message' => [
+            //     'id'              => $this->message->id,
+            //     'conversation_id' => $this->message->conversation_id,
+            //     'sender_id'       => $this->message->sender_id,
+            //     'sender'          => $this->message->sender,
+            //     'message'         => $this->message->message,
+            //     'type'            => $this->message->type,
+            //     'media_url'       => $this->message->media?->file_path ?? '',
+            //     'reply_to'        => $this->message->reply_to,
+            //     'reply_message'   => $this->message->replyTo,
+            //     'is_edited'       => $this->message->is_edited,
+            //     'is_pinned'       => $this->message->is_pinned,
+            //     'reactions'       => $this->message->reactions,
+            //     'created_at'      => $this->message->created_at->toISOString(),
+            // ],
         ];
     }
 }

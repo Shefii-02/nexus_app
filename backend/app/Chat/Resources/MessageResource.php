@@ -80,17 +80,17 @@ class MessageResource extends JsonResource
                 'replyTo',
                 fn() =>
                 $this->replyTo ? [
-                    'id'              => $this->replyTo->id,
-                    'conversation_id' => $this->replyTo->conversation_id,
-                    'sender_id'       => $this->replyTo->sender_id,
-                    'message'         => $this->replyTo->message,
-                    'type'            => $this->replyTo->type,
-                    'media_url'       => $this->replyTo->media_url,
-                    'is_deleted'      => $this->replyTo->is_deleted,
-                    'created_at'      => $this->replyTo->created_at?->toISOString(),
-                    'sender'          => $this->replyTo->sender ? [
-                        'id'   => $this->replyTo->sender->id,
-                        'name' => $this->replyTo->sender->name,
+                    'id'              => $this->replyTo?->id,
+                    'conversation_id' => $this->replyTo?->conversation_id,
+                    'sender_id'       => $this->replyTo?->sender_id,
+                    'message'         => $this->replyTo?->message,
+                    'type'            => $this->replyTo?->type,
+                    'media_url'       => $this->replyTo?->media_url,
+                    'is_deleted'      => $this->replyTo?->is_deleted,
+                    'created_at'      => $this->replyTo?->created_at?->toISOString(),
+                    'sender'          => $this->replyTo?->sender ? [
+                        'id'   => $this->replyTo?->sender->id,
+                        'name' => $this->replyTo?->sender->name,
                     ] : null,
                 ] : null
             ),

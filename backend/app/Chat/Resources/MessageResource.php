@@ -75,6 +75,7 @@ class MessageResource extends JsonResource
 
             // 'reply_to' =>
             // $this->reply_to,
+
             'reply_to'        => $this->reply_to,
             'reply_to_message' => $this->whenLoaded(
                 'replyTo',

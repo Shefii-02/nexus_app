@@ -43,10 +43,7 @@ class MessageController extends Controller
         $messages = Message::with([
             'media',
             'sender:id,name,avatar',
-            'replyTo:id,conversation_id,
-            sender_id,message,type,
-            media_url,is_deleted,
-            created_at',
+            'replyTo:id,conversation_id,sender_id,message,type,media_url,is_deleted,created_at',
             'replyTo.sender:id,name',
             'reactions.user:id,name',
             'reads:message_id,user_id,read_at',

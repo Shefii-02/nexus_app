@@ -92,12 +92,16 @@ class MessageController extends Controller
             403
         );
 
+
         $request->validate([
             'message'  => 'nullable|string|max:5000',
             'type'     => 'required|in:text,image,video,audio,file,voice',
             'media'    => 'nullable|file|max:51200', // 50MB max
             'reply_to' => 'nullable|exists:messages,id',
         ]);
+
+
+        Log::info(($request->all()));
 
         $mediaUrl  = null;
         $mediaMeta = null;

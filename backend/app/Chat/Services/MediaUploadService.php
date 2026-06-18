@@ -59,9 +59,16 @@ class MediaUploadService
 
         $folder = "chat/{$conversationId}/{$type}";
 
-        $filename = Str::uuid() . '.' . strtolower(
-            $file->getClientOriginalExtension()
-        );
+        // Create folder if not exists
+        $fullPath = storage_path('app/public/' . $folder);
+
+        if (!file_exists($fullPath)) {
+            mkdir($fullPath, 0775, true);
+            chmod($fullPath, 0775);
+        }
+
+        $filename = Str::uuid() . '.' .
+            strtolower($file->getClientOriginalExtension());
 
         $path = $file->storeAs(
             $folder,
@@ -79,19 +86,17 @@ class MediaUploadService
             'file_size' => $file->getSize(),
         ]);
 
-        $meta = [
-            'original_name' => $file->getClientOriginalName(),
-            'mime_type'     => $file->getMimeType(),
-            'size'          => $file->getSize(),
-            'extension'     => strtolower(
-                $file->getClientOriginalExtension()
-            ),
-        ];
-
         return [
-            'url'   => $url,
-            'meta'  => $meta,
-            'media' => $media
+            'url' => $url,
+            'meta' => [
+                'original_name' => $file->getClientOriginalName(),
+                'mime_type'     => $file->getMimeType(),
+                'size'          => $file->getSize(),
+                'extension'     => strtolower(
+                    $file->getClientOriginalExtension()
+                ),
+            ],
+            'media' => $media,
         ];
     }
 

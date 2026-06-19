@@ -25,16 +25,16 @@ import CreateCourseClassPage from '../modules/courseClasses/pages/CreateCourseCl
 import EditCourseClassPage from '../modules/courseClasses/pages/EditCourseClassPage'
 import ClassLinksPage from '../modules/courseClasses/pages/ClassLinksPage'
 import ClassMaterialsPage from '../modules/courseMaterials/ClassMaterialsPage'
-import GroupListPage from '../modules/groups/pages/GroupListPage'
+
 import CreateGroupPage from '../modules/groups/pages/CreateGroupPage'
 import EditGroupPage from '../modules/groups/pages/EditGroupPage'
 import PaymentListPage from '../modules/payments/pages/PaymentListPage'
-import CreatePaymentPage from '../modules/payments/pages/CreatePaymentPage'
+
 import EditPaymentPage from '../modules/payments/pages/EditPaymentPage'
-import EnrollAdmissionPage from '../modules/payments/pages/EnrollAdmissionPage'
-import AdmissionsListPage from '../modules/payments/pages/AdmissionsListPage'
+
+
 import TransactionListPage from '../modules/payments/pages/TransactionListPage'
-import RenewalPaymentsPage from '../modules/payments/pages/RenewalPaymentsPage'
+
 import AnnouncementListPage from '../modules/announcements/pages/AnnouncementListPage'
 import CreateAnnouncementPage from '../modules/announcements/pages/CreateAnnouncementPage'
 import EditAnnouncementPage from '../modules/announcements/pages/EditAnnouncementPage'
@@ -57,8 +57,8 @@ import CreateAdmissionPage from '../modules/admissions/pages/CreateAdmissionPage
 import AdmissionListPage from '../modules/admissions/pages/AdmissionListPage'
 import ViewAdmissionPage from '../modules/admissions/pages/ViewAdmissionPage'
 import EditAdmissionPage from '../modules/admissions/pages/EditAdmissionPage'
-import RenewalDuePage from '../modules/renewal/RenewalDuePage'
-import RenewalHistoryPage from '../modules/renewal/RenewalHistoryPage'
+// import RenewalDuePage from '../modules/renewal/RenewalDuePage'
+// import RenewalHistoryPage from '../modules/renewal/RenewalHistoryPage'
 
 const AppRoutes = () => (
   <Routes>
@@ -113,12 +113,12 @@ const AppRoutes = () => (
         <Route path="/admissions/:id/show" element={<ViewAdmissionPage />} />
         <Route path="/admissions/:id/edit" element={<EditAdmissionPage />} />
         
-        <Route path="/renewals/due" element={<RenewalDuePage />} />
-        <Route path="/renewals" element={<RenewalHistoryPage />} />
+        {/* <Route path="/renewals/due" element={<RenewalDuePage />} />
+        <Route path="/renewals" element={<RenewalHistoryPage />} /> */}
 
 
         <Route path="/payments" element={<PaymentListPage />} />
-        <Route path="/payments/create" element={<CreatePaymentPage />} />
+        {/* <Route path="/payments/create" element={<CreatePaymentPage />} /> */}
         <Route path="/payments/:id/edit" element={<EditPaymentPage />} />
 
         <Route path="/payments/transactions" element={<TransactionListPage />} />

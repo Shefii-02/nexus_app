@@ -4,6 +4,7 @@ namespace App\Chat\Events;
 
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -23,12 +24,13 @@ class TypingIndicator implements ShouldBroadcast
 
     public function broadcastOn(): array
     {
-        return [new PresenceChannel("conversation.{$this->conversationId}")];
+        return [new PrivateChannel("conversation.{$this->conversationId}")];
+        // return [new PresenceChannel("conversation.{$this->conversationId}")];
     }
 
     public function broadcastAs(): string
     {
-        return 'typing';
+        return 'user.typing';
     }
 
     public function broadcastWith(): array

@@ -13,7 +13,10 @@ use App\Models\MessageRead;
 use App\Chat\Events\MessageSent;
 use App\Chat\Events\MessageUpdated;
 use App\Chat\Events\MessageDeleted;
+use App\Chat\Events\MessagePinned;
 use App\Chat\Events\ReactionAdded;
+use App\Chat\Events\ReactionRemoved;
+use App\Chat\Events\UserNewMessage;
 use App\Chat\Resources\MessageResource;
 use App\Http\Controllers\API\ApiResponse;
 use Illuminate\Http\Request;
@@ -156,6 +159,28 @@ class MessageController extends Controller
             new MessageSent($message)
         )->toOthers();
 
+        // After: broadcast(new MessageSent($message))->toOthers();
+
+        $participants = ConversationParticipant::where('conversation_id', $conversationId)
+            ->where('user_id', '!=', $userId)
+            ->where('status', 'active')
+            ->pluck('user_id');
+
+        foreach ($participants as $recipientId) {
+            $unread = Message::where('conversation_id', $conversationId)
+                ->where('sender_id', '!=', $recipientId)
+                ->whereDoesntHave('reads', fn($q) => $q->where('user_id', $recipientId))
+                ->count();
+
+            broadcast(new UserNewMessage(
+                $recipientId,
+                $conversationId,
+                $request->user()->name,
+                $request->message ?? '📎 Media',
+                $unread
+            ));
+        }
+
         return response()->json([
             'message' => new MessageResource(
                 $message->load([
@@ -240,14 +265,25 @@ class MessageController extends Controller
     /**
      * Remove a reaction.
      */
+    // removeReaction in MessageController
     public function removeReaction(Request $request, int $conversationId, int $messageId): JsonResponse
     {
         MessageReaction::where('message_id', $messageId)
             ->where('user_id', $request->user()->id)
             ->delete();
 
+        broadcast(new ReactionRemoved($conversationId, $messageId, $request->user()->id))->toOthers();
+
         return response()->json(['status' => 'ok']);
     }
+    // public function removeReaction(Request $request, int $conversationId, int $messageId): JsonResponse
+    // {
+    //     MessageReaction::where('message_id', $messageId)
+    //         ->where('user_id', $request->user()->id)
+    //         ->delete();
+
+    //     return response()->json(['status' => 'ok']);
+    // }
 
     /**
      * Report a message.
@@ -275,7 +311,7 @@ class MessageController extends Controller
             ->where('is_pinned', true)
             ->where('is_deleted', false)
             ->get();
-
+        broadcast(new MessageUpdated($messages))->toOthers();
         return response()->json(['messages' => $messages]);
     }
 
@@ -291,6 +327,7 @@ class MessageController extends Controller
 
     //     return response()->json(['is_pinned' => $message->is_pinned]);
     // }
+    // togglePin in MessageController
     public function togglePin(Request $request, int $conversationId, int $messageId): JsonResponse
     {
         Message::where('conversation_id', $conversationId)
@@ -301,13 +338,27 @@ class MessageController extends Controller
 
         $message->update(['is_pinned' => true]);
 
-        broadcast(new MessageUpdated($message))->toOthers();
+        broadcast(new MessagePinned($conversationId, $messageId, true))->toOthers();
 
-        return response()->json([
-            'success' => true,
-            'is_pinned' => true,
-        ]);
+        return response()->json(['success' => true, 'is_pinned' => true]);
     }
+    // public function togglePin(Request $request, int $conversationId, int $messageId): JsonResponse
+    // {
+    //     Message::where('conversation_id', $conversationId)
+    //         ->update(['is_pinned' => false]);
+
+    //     $message = Message::where('conversation_id', $conversationId)
+    //         ->findOrFail($messageId);
+
+    //     $message->update(['is_pinned' => true]);
+
+    //     broadcast(new MessageUpdated($message))->toOthers();
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'is_pinned' => true,
+    //     ]);
+    // }
 
     // ─── Private ─────────────────────────────────────────────────────────
 

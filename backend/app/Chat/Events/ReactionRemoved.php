@@ -10,16 +10,14 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-// ─── ReactionAdded ────────────────────────────────────────────────────────────
-class ReactionAdded implements ShouldBroadcast
+class ReactionRemoved implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public function __construct(
         public int $conversationId,
         public int $messageId,
-        public int $userId,
-        public string $reaction
+        public int $userId
     ) {}
 
     public function broadcastOn(): array
@@ -27,39 +25,22 @@ class ReactionAdded implements ShouldBroadcast
         return [new PrivateChannel("conversation.{$this->conversationId}")];
     }
 
-    public function broadcastAs(): string
-    {
-        return 'reaction.added';
-    }
+    public function broadcastAs(): string { return 'reaction.removed'; }
 
     public function broadcastWith(): array
     {
-
-        $reactions = MessageReaction::where('message_id', $this->messageId)
+        $reactions = \App\Models\MessageReaction::where('message_id', $this->messageId)
             ->with('user:id,name')
             ->get()
             ->groupBy('reaction')
-            ->map(fn($group) => $group->map(fn($r) => [
+            ->map(fn($g) => $g->map(fn($r) => [
                 'user_id' => $r->user_id,
                 'user'    => $r->user,
             ]))->toArray();
-        Log::info('message reactinh  Broadcast',  $reactions);
+
         return [
             'message_id' => $this->messageId,
             'reactions'  => $reactions,
         ];
-
-        // $data = [
-        //     'message' => $this->reaction
-        // ];
-
-
-        //
-
-        // return [
-        //     'message_id' => $this->messageId,
-        //     'user_id'    => $this->userId,
-        //     'reaction'   => $this->reaction,
-        // ];
     }
 }

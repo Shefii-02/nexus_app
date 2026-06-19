@@ -149,6 +149,8 @@ class AuthController extends Controller
             $student = Student::where('user_id',$user->id)->first();
             if(!$student){
                 $student = new Student();
+                $student->user_id = $user->id;
+                $student-> roll_number = rand(11111,99999);
             }
 
             $student->guardian_name = $request->parent_name;

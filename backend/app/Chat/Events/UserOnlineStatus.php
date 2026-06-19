@@ -35,10 +35,15 @@ class UserOnlineStatus implements ShouldBroadcast
 
         $data = [
             'userId' => $this->userId,
+            'online' => $this->online,
             'lastSeen' => $this->lastSeen,
         ];
 
-        Log::info('message user online status  Broadcast', $data);
+        Log::info('UserOnlineStatus created', [
+            'userId' => $data['userId'],
+            'online' => $data['online'],
+            'lastSeen' => $data['lastSeen'],
+        ]);
 
         return [
             'user_id'   => $this->userId,

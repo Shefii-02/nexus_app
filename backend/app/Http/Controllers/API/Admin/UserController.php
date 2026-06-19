@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\API\Admin;
 
-
+use App\Chat\Events\UserOnlineStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\API\ApiResponse;
 use App\Http\Requests\StoreTeacherRequest;
@@ -61,6 +61,10 @@ class UserController extends Controller
                 'city'    => $request->city,
                 'status' => 'active'
             ]
+        );
+
+        broadcast(
+            new UserOnlineStatus($user->id, true, now())
         );
 
         return response()->json([

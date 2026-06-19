@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Log;
 */
 
 
- Broadcast::channel('conversation.{conversationId}', function ($user, $conversationId) {
+Broadcast::channel('conversation.{conversationId}', function ($user, $conversationId) {
     Log::info('Channel auth', [
         'user_id'         => $user->id,
         'conversation_id' => $conversationId,
@@ -38,6 +38,14 @@ use Illuminate\Support\Facades\Log;
 Broadcast::channel('user-status', function ($user) {
     return true;
 });
+
+Broadcast::channel('online-users', function ($user) {
+    return [
+        'id'   => $user->id,
+        'name' => $user->name,
+    ];
+});
+
 
 // ── private-user.{id} ────────────────────────────────────────────────────────
 Broadcast::channel('user.{userId}', function ($user, $userId) {
@@ -74,5 +82,3 @@ Broadcast::channel('user.{userId}', function ($user, $userId) {
 // Broadcast::channel('user.{userId}', function ($user, $userId) {
 //     return (int) $user->id === (int) $userId;
 // });
-
-

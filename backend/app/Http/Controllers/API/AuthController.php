@@ -351,7 +351,6 @@ class AuthController extends Controller
         ]);
 
         try {
-      Log::info('Received OTP Subimt', ['phone' => $request->phone,'otp' => $request->otp, 'device_id' => $request->device_id]);
 
             $result = $this->otpService->verifyOtp(
                 $request->phone,
@@ -360,9 +359,12 @@ class AuthController extends Controller
             );
 
 
-            if (!$result['success']) {
+
+
+            if (!$result['success']) {Log::info('Failed');
                 return response()->json($result, 422);
             }
+                  Log::info('Received OTP Subimt', ['phone' => $request->phone,'otp' => $request->otp, 'device_id' => $request->device_id]);
 
             $dummyName = 'User_' . substr($request->phone, -4);
             // Find or create user

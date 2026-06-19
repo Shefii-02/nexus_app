@@ -351,7 +351,7 @@ class AuthController extends Controller
         ]);
 
         try {
-
+      Log::info('Received OTP Subimt', ['phone' => $request->phone,'otp' => $request->otp, 'device_id' => $request->device_id]);
 
             $result = $this->otpService->verifyOtp(
                 $request->phone,

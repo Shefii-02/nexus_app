@@ -114,11 +114,11 @@ class User extends Authenticatable implements JWTSubject
 
     public function avatar()
     {
-        return $this->hasOne(MediaFile::class, 'user_id')->where('file_type', 'avatar');
+        return $this->hasOne(MediaFile::class, 'avatar');
     }
 
     public function getAvatarUrlAttribute()
     {
-        return $this->avatar  ? asset('storage/' . $this->avatar->file_path) : 'https://ui-avatars.com/api/?name=' . urlencode($this->name);
+        return $this->avatar  ? asset('storage/' . $this->avatar?->file_path) : 'https://ui-avatars.com/api/?name=' . urlencode($this->name);
     }
 }

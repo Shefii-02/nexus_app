@@ -424,7 +424,7 @@ class AuthController extends Controller
                 //     'permissions' => $user->getAllPermissions()->pluck('name'),
                 // ]
             ];
-                     Log::info($resposne);
+
             return response()->json($resposne);
         } catch (\Exception $e) {
 

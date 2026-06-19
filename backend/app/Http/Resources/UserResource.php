@@ -16,6 +16,7 @@ class UserResource extends JsonResource
             'acc_type' => $this->acc_type,
             'status' => $this->status,
             'avatar' => $this->avatar_url,
+            'parent_name' => $this->student?->parent_name,
             'role' => $this->acc_type,
             'roles' => $this->getRoleNames(),
             'permissions' => $this->getAllPermissions()->pluck('name'),

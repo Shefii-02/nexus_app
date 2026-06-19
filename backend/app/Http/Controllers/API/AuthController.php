@@ -401,6 +401,7 @@ class AuthController extends Controller
                 'access_token_expires_at' => now()->addDays(30),
             ]);
 
+            Log::info($user);
             return response()->json([
                 'status' => true,
 
@@ -424,7 +425,7 @@ class AuthController extends Controller
                 // ]
             ]);
         } catch (\Exception $e) {
-Log::info($e->getMessage());
+
             return response()->json([
                 'status' => false,
                 'message' => $e->getMessage()

@@ -401,8 +401,8 @@ class AuthController extends Controller
                 'access_token_expires_at' => now()->addDays(30),
             ]);
 
-            Log::info($user);
-            return response()->json([
+
+            $resposne = [
                 'status' => true,
 
                 'access_token' => $accessToken,
@@ -423,7 +423,9 @@ class AuthController extends Controller
                 //     'roles' => $user->getRoleNames(),
                 //     'permissions' => $user->getAllPermissions()->pluck('name'),
                 // ]
-            ]);
+            ];
+                     Log::info($resposne);
+            return response()->json($resposne);
         } catch (\Exception $e) {
 
             return response()->json([

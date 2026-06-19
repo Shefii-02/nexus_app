@@ -212,7 +212,7 @@ class AuthController extends Controller
             return response()->json([
                 'status'  => true,
                 'message' => 'Profile setup completed successfully',
-                'user'    => $user->load('avatar'),
+                'user'    => new UserResource($user->load('avatar')),
             ]);
         } catch (\Exception $e) {
 

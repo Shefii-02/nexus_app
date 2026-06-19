@@ -361,7 +361,8 @@ class AuthController extends Controller
 
 
 
-            if (!$result['success']) {Log::info('Failed');
+            if (!$result['success']) {
+                Log::info('Failed');
                 return response()->json($result, 422);
             }
                   Log::info('Received OTP Subimt', ['phone' => $request->phone,'otp' => $request->otp, 'device_id' => $request->device_id]);
@@ -423,7 +424,7 @@ class AuthController extends Controller
                 // ]
             ]);
         } catch (\Exception $e) {
-
+Log::info($e->getMessage());
             return response()->json([
                 'status' => false,
                 'message' => $e->getMessage()

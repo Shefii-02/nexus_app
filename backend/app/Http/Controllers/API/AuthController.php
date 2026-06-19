@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use App\Models\Conversation;
 use App\Models\ConversationParticipant;
 use App\Models\RefreshToken;
@@ -82,11 +83,12 @@ class AuthController extends Controller
             'access_token_expires_at' => config('jwt.ttl', 60) * 60, // Convert to seconds
             'refresh_token_expires_at' => config('jwt.refresh_ttl', 43200), // 7 days in seconds
 
-            'user' => [
-                ...$user->toArray(),
-                'roles' => $user->getRoleNames(),
-                'permissions' => $user->getAllPermissions()->pluck('name'),
-            ],
+            'user' => new UserResource($user),
+            // 'user' => [
+            //     ...$user->toArray(),
+            //     'roles' => $user->getRoleNames(),
+            //     'permissions' => $user->getAllPermissions()->pluck('name'),
+            // ],
 
         ]);
 
@@ -410,12 +412,13 @@ class AuthController extends Controller
 
                 'is_new_user' => $user->email == '' || $user->email == null ? true : false,
 
-                'user' => [
-                    ...$user->toArray(),
-                    'role'  => $user->acc_type,
-                    'roles' => $user->getRoleNames(),
-                    'permissions' => $user->getAllPermissions()->pluck('name'),
-                ]
+                'user' => new UserResource($user),
+                // 'user' => [
+                //     ...$user->toArray(),
+                //     'role'  => $user->acc_type,
+                //     'roles' => $user->getRoleNames(),
+                //     'permissions' => $user->getAllPermissions()->pluck('name'),
+                // ]
             ]);
         } catch (\Exception $e) {
 

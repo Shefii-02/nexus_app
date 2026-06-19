@@ -15,7 +15,11 @@ class UserResource extends JsonResource
             'phone' => $this->phone,
             'acc_type' => $this->acc_type,
             'status' => $this->status,
-            'avatar' => $this->avatar,
+            'avatar' => $this->avatar_url,
+            'role' => $this->acc_type,
+            'roles' => $this->getRoleNames(),
+            'permissions' => $this->getAllPermissions()->pluck('name'),
+            'profile_complete' => !empty($this->email),
         ];
     }
 }

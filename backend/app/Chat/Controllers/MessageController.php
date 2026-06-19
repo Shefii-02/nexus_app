@@ -330,18 +330,60 @@ class MessageController extends Controller
     // togglePin in MessageController
     public function togglePin(Request $request, int $conversationId, int $messageId): JsonResponse
     {
-        Message::where('conversation_id', $conversationId)
-            ->update(['is_pinned' => false]);
-
         $message = Message::where('conversation_id', $conversationId)
             ->findOrFail($messageId);
 
-        $message->update(['is_pinned' => true]);
+        // If already pinned → unpin
+        if ($message->is_pinned) {
+            $message->update([
+                'is_pinned' => false,
+            ]);
 
-        broadcast(new MessagePinned($conversationId, $messageId, true))->toOthers();
+            broadcast(
+                new MessagePinned($conversationId, $messageId, false)
+            )->toOthers();
 
-        return response()->json(['success' => true, 'is_pinned' => true]);
+            return response()->json([
+                'success' => true,
+                'is_pinned' => false,
+            ]);
+        }
+
+        // Unpin all messages in this conversation
+        Message::where('conversation_id', $conversationId)
+            ->where('is_pinned', true)
+            ->update([
+                'is_pinned' => false,
+            ]);
+
+        // Pin selected message
+        $message->update([
+            'is_pinned' => true,
+        ]);
+
+        broadcast(
+            new MessagePinned($conversationId, $messageId, true)
+        )->toOthers();
+
+        return response()->json([
+            'success' => true,
+            'is_pinned' => true,
+        ]);
     }
+    // public function togglePin(Request $request, int $conversationId, int $messageId): JsonResponse
+    // {
+    //     Message::where('conversation_id', $conversationId)
+    //         ->update(['is_pinned' => false]);
+
+    //     $message = Message::where('conversation_id', $conversationId)
+    //         ->findOrFail($messageId);
+
+    //     $message->update(['is_pinned' => true]);
+
+    //     broadcast(new MessagePinned($conversationId, $messageId, true))->toOthers();
+
+    //     return response()->json(['success' => true, 'is_pinned' => true]);
+    // }
     // public function togglePin(Request $request, int $conversationId, int $messageId): JsonResponse
     // {
     //     Message::where('conversation_id', $conversationId)

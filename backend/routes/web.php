@@ -13,6 +13,11 @@ Route::get('/privacy', function () {
     return view('privacy');
 });
 
+Route::get('/my-nikah-privacy', function () {
+    return view('my_nikah_privacy');
+});
+
+
   Route::get('/fcm-call/{token}/{platform}', [PushNotificationController::class, 'sendClassNotification']);
 
 

@@ -12,20 +12,20 @@ return new class extends Migration
     public function up(): void
     {
 
-        Schema::create('teachers_courses', function (Blueprint $table) {
-            $table->foreignId('teacher_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('course_id')->constrained('courses')->onDelete('cascade');
-            $table->timestamps();
-        });
+        // Schema::create('teachers_courses', function (Blueprint $table) {
+        //     $table->foreignId('teacher_id')->constrained()->cascadeOnDelete();
+        //     $table->foreignId('course_id')->constrained('courses')->onDelete('cascade');
+        //     $table->timestamps();
+        // });
 
 
-        Schema::table('course_classes', function (Blueprint $table) {
-            $table->string('class_number')->nullable()->change();
-            $table->timestamp('started_at')->nullable()->after('class_number');
-            $table->timestamp('ended_at')->nullable()->after('started_at');
-            $table->enum('status', ['draft', 'scheduled', 'completed', 'cancelled'])->change();
-            $table->softDeletes();
-        });
+        // Schema::table('course_classes', function (Blueprint $table) {
+        //     $table->string('class_number')->nullable()->change();
+        //     $table->timestamp('started_at')->nullable()->after('class_number');
+        //     $table->timestamp('ended_at')->nullable()->after('started_at');
+        //     $table->enum('status', ['draft', 'scheduled', 'completed', 'cancelled'])->change();
+        //     $table->softDeletes();
+        // });
     }
 
     /**

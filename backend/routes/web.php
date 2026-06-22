@@ -22,6 +22,12 @@ Route::get('/my-nikah-delete-account', function () {
 });
 
 
+Route::get('/csae-policy', function () {
+    return view('my_nikah_csae_policy');
+});
+
+
+
   Route::get('/fcm-call/{token}/{platform}', [PushNotificationController::class, 'sendClassNotification']);
 
 

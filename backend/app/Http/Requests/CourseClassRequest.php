@@ -24,7 +24,7 @@ class CourseClassRequest extends BaseRequest
 
             'teacher_id' => [
                 'nullable',
-                'exists:teachers,id',
+                'exists:users,id',
             ],
 
             // 🔹 BASIC

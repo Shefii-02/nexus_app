@@ -54,3 +54,13 @@ Route::get('/privacy', function () {
 //       ]
 //     }
 //   }'
+
+
+
+
+
+// curl -i -X POST \
+//   https://graph.facebook.com/v25.0/1130141250186556/messages \
+//   -H 'Authorization: Bearer EAAOU8L2kyGkBRw9aaPixbJb0ikY1e9ofeRARF2WeVDZBVJnZAv6ZAmCiuwY9fZAxeZB4EC1Ns7J6L85EAxWq8RHGn20P37ACVUWA4BSv6MGvV2WOBnIfb8ZChPv0kcZBMhVRE3py4RoYpZAbhgmjlDOeaeEWz5xrVFfsVJjKk7egbHe7SD2hyYkWdFkBWiC9sYfxgKwbBw4mcz8Ru6WOhk0By1NEHH5sZBlWQaIZAtMWL9C9FMam3iFFgpyTMeJov1EIfxbyUBvOudlJVzZAScYZBZA8rnFQC' \
+//   -H 'Content-Type: application/json' \
+//   -d '{ "messaging_product": "whatsapp", "to": "919495568482", "type": "template", "template": { "name": "welcome_message_sakinah", "language": { "code": "en" } } }'

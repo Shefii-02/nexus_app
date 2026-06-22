@@ -21,6 +21,7 @@ class CourseClassController extends Controller
 
     public function __construct(private CourseClassService $courseClassService) {}
 
+
     public function index($courseId): JsonResponse
     {
         $page = request()->query('page', 1);

@@ -17,11 +17,16 @@ export const useCourseClasses = (
     enabled: !!courseId,
   })
 
-  export const useCourseTeachers = (params?: Record<string, string | number | boolean>) =>
-    useQuery<TeacherListResponse, Error>({
-      queryKey: ['teachers', params],
-      queryFn: () => courseClassService.getCourseTeachers(params).then((res) => res.data),
-    })
+export const useCourseTeachers = (courseId: number, params?: Record<string, string | number | boolean>) =>
+  useQuery<TeacherListResponse, Error>({
+    queryKey: ['teachers', courseId, params],
+    queryFn: () =>
+      courseClassService
+        .getCourseTeachers(courseId, params)
+        .then((res) => res.data),
+
+    enabled: !!courseId,
+  })
 
 
 export const useCourseClass = (id: number, courseId: number) => {

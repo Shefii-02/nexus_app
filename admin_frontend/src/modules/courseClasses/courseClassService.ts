@@ -49,11 +49,14 @@ export const courseClassService = {
 
     return apiClient.get<{ data: CourseClass }>(url) // ✅ MUST RETURN
   },
+  getCourseTeachers: (courseId: number, params?: Record<string, string | number | boolean>) => {
+    const url = `/courses/${courseId}/teachers`;
 
-   getCourseTeachers: (courseId: number,params?: Record<string, string | number | boolean>) =>{
-    const url = `/courses/${courseId}/teachers`
-     return apiClient.get<{ data: TeacherListResponse }>(url)
-   },
+    // Pass params inside the options configuration object as the second argument
+    return apiClient.get<{ data: TeacherListResponse }>(url, { params });
+  },
+
+
   // getById: (id: number, courseId: number) =>{
   //     console.log('API URL:', `/courses/${courseId}/classes/${id}`) // ✅ print here
   //   apiClient.get<{ data: CourseClass }>(`/courses/${courseId}/classes/${id}`)

@@ -22,7 +22,7 @@ const CreateCourseClassPage = () => {
   }
 
   // ✅ FETCH TEACHERS HERE (NOT in config file)
-  const { data: teacherData } = useCourseTeachers()
+  const { data: teacherData } = useCourseTeachers(Number(courseId))
 
   // ✅ INJECT options dynamically
   const config = courseClassFormConfig.map((field) =>

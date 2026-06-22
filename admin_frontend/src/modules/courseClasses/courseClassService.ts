@@ -50,9 +50,10 @@ export const courseClassService = {
     return apiClient.get<{ data: CourseClass }>(url) // ✅ MUST RETURN
   },
 
-   getCourseTeachers: (params?: Record<string, string | number | boolean>) =>
-    apiClient.get<TeacherListResponse>('/courses/${courseId}/teachers', { params }),
-   
+   getCourseTeachers: (courseId: number,params?: Record<string, string | number | boolean>) =>{
+    const url = `/courses/${courseId}/teachers`
+     return apiClient.get<{ data: TeacherListResponse }>(url)
+   },
   // getById: (id: number, courseId: number) =>{
   //     console.log('API URL:', `/courses/${courseId}/classes/${id}`) // ✅ print here
   //   apiClient.get<{ data: CourseClass }>(`/courses/${courseId}/classes/${id}`)

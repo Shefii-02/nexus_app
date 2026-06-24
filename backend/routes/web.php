@@ -22,6 +22,11 @@ Route::get('/my-nikah-delete-account', function () {
 });
 
 
+Route::get('/delete-account', function () {
+    return view('my_nikah_privacy');
+});
+
+
 Route::get('/csae-policy', function () {
     return view('my_nikah_csae_policy');
 });

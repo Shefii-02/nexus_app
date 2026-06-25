@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class MyCourseDetailResource extends JsonResource
@@ -10,6 +11,8 @@ class MyCourseDetailResource extends JsonResource
     {
         $now     = now();
         $teacher = $this->teachers->first();
+
+
 
         return [
             'course'    => [
@@ -30,7 +33,7 @@ class MyCourseDetailResource extends JsonResource
                 'description'      => $class->description,
                 'scheduled_at'     => $class->scheduled_date,
                 'duration_minutes' => $class->duration_minutes,
-                'status'           => $class->status,           // live | upcoming | completed
+                'status'           => $this->resolveClassStatus($class),         // live | upcoming | completed
                 'meeting_url'      => $class->class_link,
                 'recording_url'    => $class->record_link,
                 'teacher_name'     => $teacher?->name ?? '--',
@@ -48,5 +51,22 @@ class MyCourseDetailResource extends JsonResource
                 'uploaded_by'  => $teacher?->name ?? '--',
             ]),
         ];
+    }
+
+    private function resolveClassStatus($class): string
+    {
+        if ($class->status != '1') {
+            return 'upcoming';
+        }
+
+        $now   = Carbon::now();
+        $start = Carbon::parse($class->started_at);
+        $end   = Carbon::parse($class->ended_at);
+
+        if ($now->lt($start))                return 'upcoming';
+        if ($now->between($start, $end))     return 'live';
+        if ($now->gt($end))                  return 'completed';
+
+        return 'upcoming';
     }
 }

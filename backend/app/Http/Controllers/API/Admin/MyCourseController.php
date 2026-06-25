@@ -31,4 +31,22 @@ class MyCourseController extends Controller
             'data'    => MyCourseResource::collection($myCourses),
         ]);
     }
+
+     // MyCourseController.php
+
+public function single(Request $request, int $id)
+{
+    $user = $request->user();
+
+    $course = Course::with([
+        'teachers',
+        'classes' => fn($q) => $q->whereNull('deleted_at')->orderBy('scheduled_date'),
+        'materials' => fn($q) => $q->whereNull('deleted_at')->orderBy('order'),
+    ])->findOrFail($id);
+
+    return response()->json([
+        'success' => true,
+        'data'    => new MyCourseDetailResource($course),
+    ]);
+}
 }

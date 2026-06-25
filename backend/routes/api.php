@@ -176,156 +176,159 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::get('/my_courses', [MyCourseController::class, 'index']);
 
+    Route::get('/my_courses/{id}', [MyCourseController::class, 'single']);
 
-    Route::get('/my_courses/{id}', function () {
-        $getCourseDetail = [
-            'success' => true,
-            'data' => [
 
-                'course' => [
-                    'id'                => 1,
-                    'name'              => 'Flutter & Dart – Complete Bootcamp',
-                    'description'       => 'Build stunning cross-platform apps from scratch. Covers widgets, state management, APIs and deployment.',
-                    'teacher_name'      => 'Arjun Menon',
-                    'teacher_avatar'    => '👨‍🏫',
-                    'category'          => 'Mobile Development',
-                    'total_classes'     => 24,
-                    'completed_classes' => 14,
-                    'expires_at'        => '2025-08-10T00:00:00.000000Z',
-                    'status'            => 'active',
-                ],
 
-                'classes' => [
-                    // ── LIVE ──────────────────────────────────────────────────────
-                    [
-                        'id'               => 101,
-                        'title'            => 'Riverpod State Management – Deep Dive',
-                        'description'      => 'We cover providers, notifiers, and async state patterns with real examples.',
-                        'scheduled_at'     => '2025-06-07T05:00:00.000000Z', // now - 15 min
-                        'duration_minutes' => 90,
-                        'status'           => 'live',           // 'upcoming' | 'live' | 'completed'
-                        'meeting_url'      => 'https://meet.google.com/abc-defg-hij',
-                        'recording_url'    => null,
-                        'teacher_name'     => 'Arjun Menon',
-                        'attendance_count' => 22,
-                    ],
-                    // ── UPCOMING ─────────────────────────────────────────────────
-                    [
-                        'id'               => 102,
-                        'title'            => 'Navigation 2.0 & GoRouter',
-                        'description'      => 'Declarative routing, deep links and nested navigators.',
-                        'scheduled_at'     => '2025-06-09T06:00:00.000000Z',
-                        'duration_minutes' => 75,
-                        'status'           => 'upcoming',
-                        'meeting_url'      => null,
-                        'recording_url'    => null,
-                        'teacher_name'     => 'Arjun Menon',
-                        'attendance_count' => 0,
-                    ],
-                    [
-                        'id'               => 103,
-                        'title'            => 'Flutter Animations – Implicit & Explicit',
-                        'description'      => 'AnimationController, Tween, Hero transitions and custom painters.',
-                        'scheduled_at'     => '2025-06-12T06:00:00.000000Z',
-                        'duration_minutes' => 90,
-                        'status'           => 'upcoming',
-                        'meeting_url'      => null,
-                        'recording_url'    => null,
-                        'teacher_name'     => 'Arjun Menon',
-                        'attendance_count' => 0,
-                    ],
-                    // ── COMPLETED ────────────────────────────────────────────────
-                    [
-                        'id'               => 105,
-                        'title'            => 'Introduction to Flutter & Dart Basics',
-                        'description'      => null,
-                        'scheduled_at'     => '2025-05-18T06:00:00.000000Z',
-                        'duration_minutes' => 60,
-                        'status'           => 'completed',
-                        'meeting_url'      => null,
-                        'recording_url'    => 'https://youtu.be/sample1',
-                        'teacher_name'     => 'Arjun Menon',
-                        'attendance_count' => 34,
-                    ],
-                    [
-                        'id'               => 106,
-                        'title'            => 'Widgets, Layouts & Theming',
-                        'description'      => null,
-                        'scheduled_at'     => '2025-05-21T06:00:00.000000Z',
-                        'duration_minutes' => 75,
-                        'status'           => 'completed',
-                        'meeting_url'      => null,
-                        'recording_url'    => 'https://youtu.be/sample2',
-                        'teacher_name'     => 'Arjun Menon',
-                        'attendance_count' => 30,
-                    ],
-                ],
+    // Route::get('/my_courses/{id}', function () {
+    //     $getCourseDetail = [
+    //         'success' => true,
+    //         'data' => [
 
-                'materials' => [
-                    // ── PDF ───────────────────────────────────────────────────────
-                    [
-                        'id'             => 201,
-                        'title'          => 'Course Syllabus & Schedule',
-                        'description'    => 'Complete 24-week syllabus with topics, assignments and resources.',
-                        'type'           => 'pdf',
-                        'file_extension' => 'pdf',
-                        'file_url'       => 'https://yourdomain.com/storage/materials/syllabus.pdf',
-                        'file_size_mb'   => 0.4,
-                        'uploaded_at'    => '2025-04-15T00:00:00.000000Z',
-                        'uploaded_by'    => 'Arjun Menon',
-                    ],
-                    [
-                        'id'             => 202,
-                        'title'          => 'Flutter Widget Cheat Sheet',
-                        'description'    => 'Quick reference for commonly used Flutter widgets.',
-                        'type'           => 'pdf',
-                        'file_extension' => 'pdf',
-                        'file_url'       => 'https://yourdomain.com/storage/materials/cheatsheet.pdf',
-                        'file_size_mb'   => 1.2,
-                        'uploaded_at'    => '2025-04-22T00:00:00.000000Z',
-                        'uploaded_by'    => 'Arjun Menon',
-                    ],
-                    // ── DOCX ──────────────────────────────────────────────────────
-                    [
-                        'id'             => 203,
-                        'title'          => 'Project Brief – Todo App',
-                        'description'    => 'Assignment 1: Build a feature-complete Todo application.',
-                        'type'           => 'docx',
-                        'file_extension' => 'docx',
-                        'file_url'       => 'https://yourdomain.com/storage/materials/assignment1.docx',
-                        'file_size_mb'   => 0.2,
-                        'uploaded_at'    => '2025-05-05T00:00:00.000000Z',
-                        'uploaded_by'    => 'Arjun Menon',
-                    ],
-                    // ── AUDIO ─────────────────────────────────────────────────────
-                    [
-                        'id'             => 205,
-                        'title'          => 'Lecture – Dart Null Safety Explained',
-                        'description'    => 'Audio explanation of null safety, nullable types and the ! operator.',
-                        'type'           => 'mp3',
-                        'file_extension' => 'mp3',
-                        'file_url'       => 'https://yourdomain.com/storage/materials/null-safety.mp3',
-                        'file_size_mb'   => 8.4,
-                        'uploaded_at'    => '2025-05-25T00:00:00.000000Z',
-                        'uploaded_by'    => 'Arjun Menon',
-                    ],
-                    // ── IMAGE ─────────────────────────────────────────────────────
-                    [
-                        'id'             => 207,
-                        'title'          => 'App Architecture Diagram',
-                        'description'    => 'Visual overview of the clean architecture pattern used in this course.',
-                        'type'           => 'image',
-                        'file_extension' => 'png',
-                        'file_url'       => 'https://yourdomain.com/storage/materials/architecture.png',
-                        'file_size_mb'   => 0.3,
-                        'uploaded_at'    => '2025-05-28T00:00:00.000000Z',
-                        'uploaded_by'    => 'Arjun Menon',
-                    ],
-                ],
-            ],
-        ];
-        return response()->json($getCourseDetail);
-    });
+    //             'course' => [
+    //                 'id'                => 1,
+    //                 'name'              => 'Flutter & Dart – Complete Bootcamp',
+    //                 'description'       => 'Build stunning cross-platform apps from scratch. Covers widgets, state management, APIs and deployment.',
+    //                 'teacher_name'      => 'Arjun Menon',
+    //                 'teacher_avatar'    => '👨‍🏫',
+    //                 'category'          => 'Mobile Development',
+    //                 'total_classes'     => 24,
+    //                 'completed_classes' => 14,
+    //                 'expires_at'        => '2025-08-10T00:00:00.000000Z',
+    //                 'status'            => 'active',
+    //             ],
+
+    //             'classes' => [
+    //                 // ── LIVE ──────────────────────────────────────────────────────
+    //                 [
+    //                     'id'               => 101,
+    //                     'title'            => 'Riverpod State Management – Deep Dive',
+    //                     'description'      => 'We cover providers, notifiers, and async state patterns with real examples.',
+    //                     'scheduled_at'     => '2025-06-07T05:00:00.000000Z', // now - 15 min
+    //                     'duration_minutes' => 90,
+    //                     'status'           => 'live',           // 'upcoming' | 'live' | 'completed'
+    //                     'meeting_url'      => 'https://meet.google.com/abc-defg-hij',
+    //                     'recording_url'    => null,
+    //                     'teacher_name'     => 'Arjun Menon',
+    //                     'attendance_count' => 22,
+    //                 ],
+    //                 // ── UPCOMING ─────────────────────────────────────────────────
+    //                 [
+    //                     'id'               => 102,
+    //                     'title'            => 'Navigation 2.0 & GoRouter',
+    //                     'description'      => 'Declarative routing, deep links and nested navigators.',
+    //                     'scheduled_at'     => '2025-06-09T06:00:00.000000Z',
+    //                     'duration_minutes' => 75,
+    //                     'status'           => 'upcoming',
+    //                     'meeting_url'      => null,
+    //                     'recording_url'    => null,
+    //                     'teacher_name'     => 'Arjun Menon',
+    //                     'attendance_count' => 0,
+    //                 ],
+    //                 [
+    //                     'id'               => 103,
+    //                     'title'            => 'Flutter Animations – Implicit & Explicit',
+    //                     'description'      => 'AnimationController, Tween, Hero transitions and custom painters.',
+    //                     'scheduled_at'     => '2025-06-12T06:00:00.000000Z',
+    //                     'duration_minutes' => 90,
+    //                     'status'           => 'upcoming',
+    //                     'meeting_url'      => null,
+    //                     'recording_url'    => null,
+    //                     'teacher_name'     => 'Arjun Menon',
+    //                     'attendance_count' => 0,
+    //                 ],
+    //                 // ── COMPLETED ────────────────────────────────────────────────
+    //                 [
+    //                     'id'               => 105,
+    //                     'title'            => 'Introduction to Flutter & Dart Basics',
+    //                     'description'      => null,
+    //                     'scheduled_at'     => '2025-05-18T06:00:00.000000Z',
+    //                     'duration_minutes' => 60,
+    //                     'status'           => 'completed',
+    //                     'meeting_url'      => null,
+    //                     'recording_url'    => 'https://youtu.be/sample1',
+    //                     'teacher_name'     => 'Arjun Menon',
+    //                     'attendance_count' => 34,
+    //                 ],
+    //                 [
+    //                     'id'               => 106,
+    //                     'title'            => 'Widgets, Layouts & Theming',
+    //                     'description'      => null,
+    //                     'scheduled_at'     => '2025-05-21T06:00:00.000000Z',
+    //                     'duration_minutes' => 75,
+    //                     'status'           => 'completed',
+    //                     'meeting_url'      => null,
+    //                     'recording_url'    => 'https://youtu.be/sample2',
+    //                     'teacher_name'     => 'Arjun Menon',
+    //                     'attendance_count' => 30,
+    //                 ],
+    //             ],
+
+    //             'materials' => [
+    //                 // ── PDF ───────────────────────────────────────────────────────
+    //                 [
+    //                     'id'             => 201,
+    //                     'title'          => 'Course Syllabus & Schedule',
+    //                     'description'    => 'Complete 24-week syllabus with topics, assignments and resources.',
+    //                     'type'           => 'pdf',
+    //                     'file_extension' => 'pdf',
+    //                     'file_url'       => 'https://yourdomain.com/storage/materials/syllabus.pdf',
+    //                     'file_size_mb'   => 0.4,
+    //                     'uploaded_at'    => '2025-04-15T00:00:00.000000Z',
+    //                     'uploaded_by'    => 'Arjun Menon',
+    //                 ],
+    //                 [
+    //                     'id'             => 202,
+    //                     'title'          => 'Flutter Widget Cheat Sheet',
+    //                     'description'    => 'Quick reference for commonly used Flutter widgets.',
+    //                     'type'           => 'pdf',
+    //                     'file_extension' => 'pdf',
+    //                     'file_url'       => 'https://yourdomain.com/storage/materials/cheatsheet.pdf',
+    //                     'file_size_mb'   => 1.2,
+    //                     'uploaded_at'    => '2025-04-22T00:00:00.000000Z',
+    //                     'uploaded_by'    => 'Arjun Menon',
+    //                 ],
+    //                 // ── DOCX ──────────────────────────────────────────────────────
+    //                 [
+    //                     'id'             => 203,
+    //                     'title'          => 'Project Brief – Todo App',
+    //                     'description'    => 'Assignment 1: Build a feature-complete Todo application.',
+    //                     'type'           => 'docx',
+    //                     'file_extension' => 'docx',
+    //                     'file_url'       => 'https://yourdomain.com/storage/materials/assignment1.docx',
+    //                     'file_size_mb'   => 0.2,
+    //                     'uploaded_at'    => '2025-05-05T00:00:00.000000Z',
+    //                     'uploaded_by'    => 'Arjun Menon',
+    //                 ],
+    //                 // ── AUDIO ─────────────────────────────────────────────────────
+    //                 [
+    //                     'id'             => 205,
+    //                     'title'          => 'Lecture – Dart Null Safety Explained',
+    //                     'description'    => 'Audio explanation of null safety, nullable types and the ! operator.',
+    //                     'type'           => 'mp3',
+    //                     'file_extension' => 'mp3',
+    //                     'file_url'       => 'https://yourdomain.com/storage/materials/null-safety.mp3',
+    //                     'file_size_mb'   => 8.4,
+    //                     'uploaded_at'    => '2025-05-25T00:00:00.000000Z',
+    //                     'uploaded_by'    => 'Arjun Menon',
+    //                 ],
+    //                 // ── IMAGE ─────────────────────────────────────────────────────
+    //                 [
+    //                     'id'             => 207,
+    //                     'title'          => 'App Architecture Diagram',
+    //                     'description'    => 'Visual overview of the clean architecture pattern used in this course.',
+    //                     'type'           => 'image',
+    //                     'file_extension' => 'png',
+    //                     'file_url'       => 'https://yourdomain.com/storage/materials/architecture.png',
+    //                     'file_size_mb'   => 0.3,
+    //                     'uploaded_at'    => '2025-05-28T00:00:00.000000Z',
+    //                     'uploaded_by'    => 'Arjun Menon',
+    //                 ],
+    //             ],
+    //         ],
+    //     ];
+    //     return response()->json($getCourseDetail);
+    // });
 
 
     // Route::get('/classes/today', [CourseClassController::class, 'today']);

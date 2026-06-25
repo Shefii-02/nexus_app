@@ -3,15 +3,8 @@
 namespace App\Http\Controllers\API\Admin;
 
 use App\Http\Controllers\Controller;
-use App\DTOs\MessageDTO;
-use App\Http\Requests\MessageRequest;
-use App\Http\Resources\MessageResource;
 use App\Http\Resources\MyCourseResource;
 use App\Models\Course;
-use App\Models\DeletedMessage;
-use App\Models\Message;
-use App\Models\MessageReport;
-use App\Services\Message\MessageService;
 use Illuminate\Http\Request;
 
 class MyCourseController extends Controller

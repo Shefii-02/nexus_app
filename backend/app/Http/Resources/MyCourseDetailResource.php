@@ -55,7 +55,7 @@ class MyCourseDetailResource extends JsonResource
 
     private function resolveClassStatus($class): string
     {
-        if ($class->status != '1') {
+        if ($class->status != 'active') {
             return 'upcoming';
         }
 

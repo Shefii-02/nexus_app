@@ -28,7 +28,7 @@ use App\Http\Controllers\API\Admin\UserController;
 use App\Http\Controllers\API\Admin\StaffPaymentController;
 use App\Http\Controllers\API\Admin\TeacherPaymentItemController;
 use App\Http\Controllers\API\Admin\ReportController;
-use App\Http\Controllers\Api\Admin\MyCourseController;
+use App\Http\Controllers\API\Admin\MyCourseController;
 use App\Http\Controllers\API\AppPaymentController;
 // routes/api.php
 use Illuminate\Support\Facades\Broadcast;

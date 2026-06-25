@@ -338,7 +338,7 @@ class CourseController extends Controller
     {
         $students = Admission::query()
             ->where('course_id', $course)
-            ->where('status', 'active')
+            // ->where('status', 'active')
             ->with([
                 'student',
                 'course'

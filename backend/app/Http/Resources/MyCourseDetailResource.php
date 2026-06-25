@@ -55,18 +55,19 @@ class MyCourseDetailResource extends JsonResource
 
     private function resolveClassStatus($class): string
     {
-        // if ($class->status != 'active') {
-        //     return 'upcoming';
-        // }
+        if ($class->status == 'scheduled') {
 
-        $now   = Carbon::now();
-        $start = Carbon::parse($class->started_at);
-        $end   = Carbon::parse($class->ended_at);
+            $now   = Carbon::now();
+            $start = Carbon::parse($class->started_at);
+            $end   = Carbon::parse($class->ended_at);
 
-        if ($now->lt($start)) return 'upcoming';
-        if ($now->between($start, $end))     return 'live';
-        if ($now->gt($end))                  return 'completed';
+            if ($now->lt($start)) return 'upcoming';
+            if ($now->between($start, $end))     return 'live';
+            if ($now->gt($end))                  return 'completed';
 
-        return 'upcoming';
+            return 'upcoming';
+        } else {
+            return $class->status;
+        }
     }
 }

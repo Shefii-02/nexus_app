@@ -63,9 +63,9 @@ class MyCourseDetailResource extends JsonResource
         $start = Carbon::parse($class->started_at);
         $end   = Carbon::parse($class->ended_at);
 
-        if ($now->gt($end))                  return 'completed';
         if ($now->lt($start)) return 'upcoming';
         if ($now->between($start, $end))     return 'live';
+        if ($now->gt($end))                  return 'completed';
 
         return 'upcoming';
     }

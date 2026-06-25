@@ -55,9 +55,9 @@ class MyCourseDetailResource extends JsonResource
 
     private function resolveClassStatus($class): string
     {
-        if ($class->status != 'active') {
-            return 'upcoming';
-        }
+        // if ($class->status != 'active') {
+        //     return 'upcoming';
+        // }
 
         $now   = Carbon::now();
         $start = Carbon::parse($class->started_at);

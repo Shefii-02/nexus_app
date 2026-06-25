@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\MyCourseDetailResource;
 use App\Http\Resources\MyCourseResource;
 use App\Models\Course;
 use Illuminate\Http\Request;

@@ -33,6 +33,10 @@ use App\Http\Controllers\API\AppPaymentController;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Log;
 
+
+// routes/api.php
+Route::get('/ping', fn() => response()->json(['status' => 'ok']));
+
 Route::post('/broadcasting/auth', function () {
     return Broadcast::auth(request());
 })->middleware('auth:api');

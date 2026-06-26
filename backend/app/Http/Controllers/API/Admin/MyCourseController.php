@@ -9,6 +9,7 @@ use App\Models\Course;
 use App\Models\CourseClass;
 use App\Services\Course\CourseClassService;
 use App\Services\Course\CourseMaterialService;
+use App\Services\Media\MediaService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -18,6 +19,7 @@ class MyCourseController extends Controller
     public function __construct(
         protected CourseClassService    $classService,
         protected CourseMaterialService $materialService,
+        private MediaService $mediaService
     ) {}
 
 
@@ -216,17 +218,36 @@ class MyCourseController extends Controller
     public function storeMaterial(Request $request, int $courseId)
     {
         $user = $request->user();
+
         $data = $request->validate([
             'title'         => 'required|string|max:255',
             'description'   => 'nullable|string',
-            'file_url'      => 'required|string',
+            'file_url'      => 'required_without:file_url_string|file|max:102400', // 100MB
+            'file_url_string' => 'required_without:file_url|string|url',           // fallback URL
             'material_type' => 'required|in:pdf,docx,mp3,wav,image,video,other',
             'order'         => 'nullable|integer',
             'status'        => 'nullable|in:0,1',
         ]);
 
-        $data['course_id'] = $courseId;
+        // ── Handle file upload ─────────────────────────────────────────────────
+        if ($request->hasFile('file_url')) {
+            $media = $this->mediaService->upload(
+                $request->file('file_url'),
+                $user->id,
+                'courses/materials'
+            );
+            $data['file_url'] = $media->id;        // store media ID (int)
+        } elseif ($request->filled('file_url_string')) {
+            $data['file_url'] = $request->file_url_string; // store raw URL (string)
+        }
+
+        $data['course_id']  = $courseId;
         $data['teacher_id'] = $user->id;
+        $data['status']     = $data['status'] ?? 1;
+
+        // Remove the fallback key before saving
+        unset($data['file_url_string']);
+
         $material = $this->materialService->create($data);
 
         return response()->json([
@@ -241,13 +262,43 @@ class MyCourseController extends Controller
     public function updateMaterial(Request $request, int $materialId)
     {
         $data = $request->validate([
-            'title'         => 'sometimes|string|max:255',
-            'description'   => 'nullable|string',
-            'file_url'      => 'sometimes|string',
-            'material_type' => 'sometimes|in:pdf,docx,mp3,wav,image,video,other',
-            'order'         => 'nullable|integer',
-            'status'        => 'nullable|in:0,1',
+            'title'           => 'sometimes|string|max:255',
+            'description'     => 'nullable|string',
+            'file_url'        => 'sometimes|file|max:102400',
+            'file_url_string' => 'sometimes|string|url',
+            'material_type'   => 'sometimes|in:pdf,docx,mp3,wav,image,video,other',
+            'order'           => 'nullable|integer',
+            'status'          => 'nullable|in:0,1',
         ]);
+
+        $material = $this->materialService->find($materialId);
+
+        if (!$material) {
+            return response()->json(['success' => false, 'message' => 'Material not found'], 404);
+        }
+
+        // ── Handle file replacement ────────────────────────────────────────────
+        if ($request->hasFile('file_url')) {
+            // Delete old media if it was an uploaded file (stored as int ID)
+            if ($material->file_url && is_numeric($material->file_url)) {
+                $this->mediaService->delete((int) $material->file_url);
+            }
+
+            $media = $this->mediaService->upload(
+                $request->file('file_url'),
+                $request->user()->id,
+                'courses/materials'
+            );
+            $data['file_url'] = $media->id;
+        } elseif ($request->filled('file_url_string')) {
+            // Switching from uploaded file to a plain URL
+            if ($material->file_url && is_numeric($material->file_url)) {
+                $this->mediaService->delete((int) $material->file_url);
+            }
+            $data['file_url'] = $request->file_url_string;
+        }
+
+        unset($data['file_url_string']);
 
         $this->materialService->update($materialId, $data);
 
@@ -261,6 +312,17 @@ class MyCourseController extends Controller
 
     public function destroyMaterial(int $materialId)
     {
+        $material = $this->materialService->find($materialId);
+
+        if (!$material) {
+            return response()->json(['success' => false, 'message' => 'Material not found'], 404);
+        }
+
+        // Delete uploaded file from media storage if applicable
+        if ($material->file_url && is_numeric($material->file_url)) {
+            $this->mediaService->delete((int) $material->file_url);
+        }
+
         $this->materialService->delete($materialId);
 
         return response()->json([

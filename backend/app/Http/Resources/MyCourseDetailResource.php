@@ -47,7 +47,9 @@ class MyCourseDetailResource extends JsonResource
                 'description'  => $mat->description,
                 'type'         => $mat->material_type,
                 'file_extension' => pathinfo($mat->file_url, PATHINFO_EXTENSION) ?: $mat->material_type,
-                'file_url'     => $mat->file_url,
+                'file_url'     => $mat->media
+                    ? asset('storage/' . $mat->media->file_path)
+                    : null,
                 'file_size_mb' => null,                         // add column if needed
                 'uploaded_at'  => $mat->created_at,
                 'uploaded_by'  => $teacher?->name ?? '--',

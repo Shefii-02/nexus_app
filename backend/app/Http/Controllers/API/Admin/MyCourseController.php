@@ -159,7 +159,7 @@ class MyCourseController extends Controller
             'record_link'      => 'nullable|url',
             'room_location'    => 'nullable|string|max:255',
             'source'           => 'nullable|in:online,offline',
-            'status'           => 'nullable|in:0,1,2',
+            'status'           => 'nullable',
         ]);
 
         $data['course_id'] = $courseId;
@@ -190,7 +190,7 @@ class MyCourseController extends Controller
             'record_link'      => 'nullable|url',
             'room_location'    => 'nullable|string|max:255',
             'source'           => 'nullable|in:online,offline',
-            'status'           => 'nullable|in:0,1,2'
+            'status'           => 'nullable'
         ]);
 
         $this->classService->update($classId, $data);

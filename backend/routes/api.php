@@ -439,7 +439,15 @@ Route::middleware(['auth:api'])->group(function () {
     //     ]);
     // });
 
+    // ── Class CRUD ────────────────────────────────────────────────────────────────
+    Route::post  ('/my_courses/{courseId}/classes', [MyCourseController::class, 'storeClass']);
+    Route::put   ('/my_courses/classes/{classId}',  [MyCourseController::class, 'updateClass']);
+    Route::delete('/my_courses/classes/{classId}',  [MyCourseController::class, 'destroyClass']);
 
+    // ── Material CRUD ─────────────────────────────────────────────────────────────
+    Route::post  ('/my_courses/{courseId}/materials',    [MyCourseController::class, 'storeMaterial']);
+    Route::put   ('/my_courses/materials/{materialId}',  [MyCourseController::class, 'updateMaterial']);
+    Route::delete('/my_courses/materials/{materialId}',  [MyCourseController::class, 'destroyMaterial']);
 
 
     // Announcement Management

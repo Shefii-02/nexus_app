@@ -13,6 +13,12 @@ use Illuminate\Http\Request;
 class MyCourseController extends Controller
 {
 
+    public function __construct(
+        protected CourseClassService    $classService,
+        protected CourseMaterialService $materialService,
+    ) {}
+
+
     public function index(Request $request)
     {
         $user = $request->user();
@@ -129,5 +135,132 @@ class MyCourseController extends Controller
                 'avatar' => $teacher->avatar_url ?? null,
             ] : null,
         ];
+    }
+
+
+    // ── POST /my_courses/{courseId}/classes ───────────────────────────────────
+
+    public function storeClass(Request $request, int $courseId)
+    {
+        $data = $request->validate([
+            'title'            => 'required|string|max:255',
+            'description'      => 'nullable|string',
+            'class_number'     => 'nullable|integer',
+            'scheduled_date'   => 'nullable|date',
+            'started_at'       => 'nullable|date',
+            'ended_at'         => 'nullable|date',
+            'duration_minutes' => 'nullable|integer',
+            'class_link'       => 'nullable|url',
+            'record_link'      => 'nullable|url',
+            'room_location'    => 'nullable|string|max:255',
+            'source'           => 'nullable|in:online,offline',
+            'status'           => 'nullable|in:0,1,2',
+            'teacher_id'       => 'nullable|exists:teachers,id',
+        ]);
+
+        $data['course_id'] = $courseId;
+        $class = $this->classService->create($data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Class created successfully.',
+            'data'    => $class,
+        ], 201);
+    }
+
+    // ── PUT /my_courses/classes/{classId} ─────────────────────────────────────
+
+    public function updateClass(Request $request, int $classId)
+    {
+        $data = $request->validate([
+            'title'            => 'sometimes|string|max:255',
+            'description'      => 'nullable|string',
+            'class_number'     => 'nullable|integer',
+            'scheduled_date'   => 'nullable|date',
+            'started_at'       => 'nullable|date',
+            'ended_at'         => 'nullable|date',
+            'duration_minutes' => 'nullable|integer',
+            'class_link'       => 'nullable|url',
+            'record_link'      => 'nullable|url',
+            'room_location'    => 'nullable|string|max:255',
+            'source'           => 'nullable|in:online,offline',
+            'status'           => 'nullable|in:0,1,2',
+            'teacher_id'       => 'nullable|exists:teachers,id',
+        ]);
+
+        $this->classService->update($classId, $data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Class updated successfully.',
+        ]);
+    }
+
+    // ── DELETE /my_courses/classes/{classId} ──────────────────────────────────
+
+    public function destroyClass(int $classId)
+    {
+        $this->classService->delete($classId);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Class deleted successfully.',
+        ]);
+    }
+
+    // ── POST /my_courses/{courseId}/materials ─────────────────────────────────
+
+    public function storeMaterial(Request $request, int $courseId)
+    {
+        $data = $request->validate([
+            'title'         => 'required|string|max:255',
+            'description'   => 'nullable|string',
+            'file_url'      => 'required|string',
+            'material_type' => 'required|in:pdf,docx,mp3,wav,image,video,other',
+            'order'         => 'nullable|integer',
+            'status'        => 'nullable|in:0,1',
+        ]);
+
+        $data['course_id'] = $courseId;
+        $material = $this->materialService->create($data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Material added successfully.',
+            'data'    => $material,
+        ], 201);
+    }
+
+    // ── PUT /my_courses/materials/{materialId} ────────────────────────────────
+
+    public function updateMaterial(Request $request, int $materialId)
+    {
+        $data = $request->validate([
+            'title'         => 'sometimes|string|max:255',
+            'description'   => 'nullable|string',
+            'file_url'      => 'sometimes|string',
+            'material_type' => 'sometimes|in:pdf,docx,mp3,wav,image,video,other',
+            'order'         => 'nullable|integer',
+            'status'        => 'nullable|in:0,1',
+        ]);
+
+        $this->materialService->update($materialId, $data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Material updated successfully.',
+        ]);
+    }
+
+    // ── DELETE /my_courses/materials/{materialId} ─────────────────────────────
+
+    public function destroyMaterial(int $materialId)
+    {
+        $this->materialService->delete($materialId);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Material deleted successfully.',
+        ]);
     }
 }

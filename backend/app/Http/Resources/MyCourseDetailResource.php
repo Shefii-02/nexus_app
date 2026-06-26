@@ -32,6 +32,8 @@ class MyCourseDetailResource extends JsonResource
                 'title'            => $class->title,
                 'description'      => $class->description,
                 'scheduled_at'     => $class->scheduled_date,
+                'started_at'       => $class->started_at,
+                'ended_at'         => $class->ended_at,
                 'duration_minutes' => $class->duration_minutes,
                 'status'           => $this->resolveClassStatus($class),         // live | upcoming | completed
                 'meeting_url'      => $class->class_link,

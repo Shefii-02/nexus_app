@@ -36,7 +36,7 @@ class MyCourseDetailResource extends JsonResource
                 'status'           => $this->resolveClassStatus($class),         // live | upcoming | completed
                 'meeting_url'      => $class->class_link,
                 'recording_url'    => $class->record_link,
-                'teacher_name'     => $teacher?->name ?? '--',
+                'teacher_name'     => $class->teacher?->name ?? '--',
                 'attendance_count' => 0,                        // wire up when attendance table exists
             ]),
             'materials' => $this->materials->map(fn($mat) => [

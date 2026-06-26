@@ -331,112 +331,113 @@ Route::middleware(['auth:api'])->group(function () {
     // });
 
 
-    // Route::get('/classes/today', [CourseClassController::class, 'today']);
-    Route::get('/classes/today', function () {
-        $now = now();
+    Route::get('/classes/today', [MyCourseController::class, 'today']);
 
-        return response()->json([
-            'data' => [
-                // ── LIVE class ──────────────────────────────────────────────
-                [
-                    'id'          => 1,
-                    'title'       => 'Advanced Mathematics',
-                    'description' => 'Calculus and differential equations — Chapter 7 continuation.',
-                    'start_time'  => $now->copy()->subMinutes(20)->toISOString(),
-                    'end_time'    => $now->copy()->addMinutes(40)->toISOString(),
-                    'status'      => 'live',
-                    'class_link'  => 'https://meet.google.com/abc-defg-hij',
-                    'record_link' => null,
-                    'teacher'     => [
-                        'id'     => 101,
-                        'name'   => 'Dr. Sarah Johnson',
-                        'avatar' => null,
-                    ],
-                ],
+    // Route::get('/classes/today', function () {
+    //     $now = now();
 
-                // ── UPCOMING class ───────────────────────────────────────────
-                [
-                    'id'          => 2,
-                    'title'       => 'Physics — Quantum Mechanics',
-                    'description' => 'Introduction to wave-particle duality and Heisenberg uncertainty principle.',
-                    'start_time'  => $now->copy()->addHours(1)->addMinutes(30)->toISOString(),
-                    'end_time'    => $now->copy()->addHours(3)->toISOString(),
-                    'status'      => 'upcoming',
-                    'class_link'  => 'https://zoom.us/j/123456789',
-                    'record_link' => null,
-                    'teacher'     => [
-                        'id'     => 102,
-                        'name'   => 'Prof. Alan Turing',
-                        'avatar' => null,
-                    ],
-                ],
+    //     return response()->json([
+    //         'data' => [
+    //             // ── LIVE class ──────────────────────────────────────────────
+    //             [
+    //                 'id'          => 1,
+    //                 'title'       => 'Advanced Mathematics',
+    //                 'description' => 'Calculus and differential equations — Chapter 7 continuation.',
+    //                 'start_time'  => $now->copy()->subMinutes(20)->toISOString(),
+    //                 'end_time'    => $now->copy()->addMinutes(40)->toISOString(),
+    //                 'status'      => 'live',
+    //                 'class_link'  => 'https://meet.google.com/abc-defg-hij',
+    //                 'record_link' => null,
+    //                 'teacher'     => [
+    //                     'id'     => 101,
+    //                     'name'   => 'Dr. Sarah Johnson',
+    //                     'avatar' => null,
+    //                 ],
+    //             ],
 
-                // ── UPCOMING class (no description) ──────────────────────────
-                [
-                    'id'          => 3,
-                    'title'       => 'English Literature',
-                    'description' => null,
-                    'start_time'  => $now->copy()->addHours(4)->toISOString(),
-                    'end_time'    => $now->copy()->addHours(5)->toISOString(),
-                    'status'      => 'upcoming',
-                    'class_link'  => 'https://teams.microsoft.com/l/meetup-join/abc',
-                    'record_link' => null,
-                    'teacher'     => [
-                        'id'     => 103,
-                        'name'   => 'Ms. Emily Clarke',
-                        'avatar' => null,
-                    ],
-                ],
+    //             // ── UPCOMING class ───────────────────────────────────────────
+    //             [
+    //                 'id'          => 2,
+    //                 'title'       => 'Physics — Quantum Mechanics',
+    //                 'description' => 'Introduction to wave-particle duality and Heisenberg uncertainty principle.',
+    //                 'start_time'  => $now->copy()->addHours(1)->addMinutes(30)->toISOString(),
+    //                 'end_time'    => $now->copy()->addHours(3)->toISOString(),
+    //                 'status'      => 'upcoming',
+    //                 'class_link'  => 'https://zoom.us/j/123456789',
+    //                 'record_link' => null,
+    //                 'teacher'     => [
+    //                     'id'     => 102,
+    //                     'name'   => 'Prof. Alan Turing',
+    //                     'avatar' => null,
+    //                 ],
+    //             ],
 
-                // ── COMPLETED with recording ──────────────────────────────────
-                [
-                    'id'          => 4,
-                    'title'       => 'Chemistry — Organic Reactions',
-                    'description' => 'Nucleophilic substitution reactions SN1 and SN2 mechanisms.',
-                    'start_time'  => $now->copy()->subHours(3)->toISOString(),
-                    'end_time'    => $now->copy()->subHours(2)->toISOString(),
-                    'status'      => 'completed',
-                    'class_link'  => 'https://meet.google.com/xyz-abcd-efg',
-                    'record_link' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-                    'teacher'     => [
-                        'id'     => 104,
-                        'name'   => 'Dr. Marie Curie',
-                        'avatar' => null,
-                    ],
-                ],
+    //             // ── UPCOMING class (no description) ──────────────────────────
+    //             [
+    //                 'id'          => 3,
+    //                 'title'       => 'English Literature',
+    //                 'description' => null,
+    //                 'start_time'  => $now->copy()->addHours(4)->toISOString(),
+    //                 'end_time'    => $now->copy()->addHours(5)->toISOString(),
+    //                 'status'      => 'upcoming',
+    //                 'class_link'  => 'https://teams.microsoft.com/l/meetup-join/abc',
+    //                 'record_link' => null,
+    //                 'teacher'     => [
+    //                     'id'     => 103,
+    //                     'name'   => 'Ms. Emily Clarke',
+    //                     'avatar' => null,
+    //                 ],
+    //             ],
 
-                // ── COMPLETED without recording (triggers WhatsApp sheet) ─────
-                [
-                    'id'          => 5,
-                    'title'       => 'Computer Science — Data Structures',
-                    'description' => 'Binary trees, AVL trees and heap sort algorithms.',
-                    'start_time'  => $now->copy()->subHours(5)->toISOString(),
-                    'end_time'    => $now->copy()->subHours(4)->toISOString(),
-                    'status'      => 'completed',
-                    'class_link'  => 'https://zoom.us/j/987654321',
-                    'record_link' => null,
-                    'teacher'     => [
-                        'id'     => 105,
-                        'name'   => 'Mr. Dennis Ritchie',
-                        'avatar' => null,
-                    ],
-                ],
+    //             // ── COMPLETED with recording ──────────────────────────────────
+    //             [
+    //                 'id'          => 4,
+    //                 'title'       => 'Chemistry — Organic Reactions',
+    //                 'description' => 'Nucleophilic substitution reactions SN1 and SN2 mechanisms.',
+    //                 'start_time'  => $now->copy()->subHours(3)->toISOString(),
+    //                 'end_time'    => $now->copy()->subHours(2)->toISOString(),
+    //                 'status'      => 'completed',
+    //                 'class_link'  => 'https://meet.google.com/xyz-abcd-efg',
+    //                 'record_link' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    //                 'teacher'     => [
+    //                     'id'     => 104,
+    //                     'name'   => 'Dr. Marie Curie',
+    //                     'avatar' => null,
+    //                 ],
+    //             ],
 
-                // ── COMPLETED without recording (no teacher) ──────────────────
-                [
-                    'id'          => 6,
-                    'title'       => 'History — World War II',
-                    'description' => null,
-                    'start_time'  => $now->copy()->subHours(6)->toISOString(),
-                    'end_time'    => $now->copy()->subHours(5)->toISOString(),
-                    'status'      => 'completed',
-                    'class_link'  => null,
-                    'record_link' => null,
-                    'teacher'     => null,
-                ],
-            ],
-        ]);
-    });
+    //             // ── COMPLETED without recording (triggers WhatsApp sheet) ─────
+    //             [
+    //                 'id'          => 5,
+    //                 'title'       => 'Computer Science — Data Structures',
+    //                 'description' => 'Binary trees, AVL trees and heap sort algorithms.',
+    //                 'start_time'  => $now->copy()->subHours(5)->toISOString(),
+    //                 'end_time'    => $now->copy()->subHours(4)->toISOString(),
+    //                 'status'      => 'completed',
+    //                 'class_link'  => 'https://zoom.us/j/987654321',
+    //                 'record_link' => null,
+    //                 'teacher'     => [
+    //                     'id'     => 105,
+    //                     'name'   => 'Mr. Dennis Ritchie',
+    //                     'avatar' => null,
+    //                 ],
+    //             ],
+
+    //             // ── COMPLETED without recording (no teacher) ──────────────────
+    //             [
+    //                 'id'          => 6,
+    //                 'title'       => 'History — World War II',
+    //                 'description' => null,
+    //                 'start_time'  => $now->copy()->subHours(6)->toISOString(),
+    //                 'end_time'    => $now->copy()->subHours(5)->toISOString(),
+    //                 'status'      => 'completed',
+    //                 'class_link'  => null,
+    //                 'record_link' => null,
+    //                 'teacher'     => null,
+    //             ],
+    //         ],
+    //     ]);
+    // });
 
 
 

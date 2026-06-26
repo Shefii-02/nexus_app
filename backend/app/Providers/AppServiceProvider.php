@@ -32,13 +32,11 @@ use App\Services\Payment\PaymentService;
 
 use App\Repositories\Announcement\AnnouncementRepositoryInterface as AnnouncementRepositoryInterfaceContract;
 use App\Repositories\Announcement\AnnouncementRepository as AnnouncementRepositoryImplementation;
-use App\Repositories\Course\CourseMaterialRepositoryInterface;
 use App\Services\Announcement\AnnouncementService;
 
 use App\Repositories\Notification\NotificationRepositoryInterface as NotificationRepositoryInterfaceContract;
 use App\Repositories\Notification\NotificationRepository as NotificationRepositoryImplementation;
 use App\Services\Auth\OtpService;
-use App\Services\Course\CourseMaterialService;
 use App\Services\Notification\NotificationService;
 
 class AppServiceProvider extends ServiceProvider
@@ -97,16 +95,16 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // ── Course Class ──────────────────────────────────────────────────────────────
-        $this->app->bind(CourseClassRepositoryInterfaceContract::class, CourseClassRepositoryImplementation::class);
-        $this->app->singleton(CourseClassService::class, function ($app) {
-            return new CourseClassService($app->make(CourseClassRepositoryInterfaceContract::class));
-        });
+        $this->app->bind(
+            \App\Repositories\Course\CourseClassRepositoryInterface::class,
+            \App\Repositories\Course\CourseClassRepository::class,
+        );
 
         // ── Course Material ───────────────────────────────────────────────────────────
-        $this->app->bind(CourseMaterialRepositoryInterface::class, CourseMaterialRepositoryInterface::class);
-        $this->app->singleton(CourseMaterialService::class, function ($app) {
-            return new CourseMaterialService($app->make(CourseMaterialRepositoryInterface::class));
-        });
+        $this->app->bind(
+            \App\Repositories\Course\CourseMaterialRepositoryInterface::class,
+            \App\Repositories\Course\CourseMaterialRepository::class,
+        );
 
 
         $this->app->singleton(OtpService::class);

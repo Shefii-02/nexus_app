@@ -144,6 +144,7 @@ class MyCourseController extends Controller
 
     public function storeClass(Request $request, int $courseId)
     {
+        $user = $request->user();
         $data = $request->validate([
             'title'            => 'required|string|max:255',
             'description'      => 'nullable|string',
@@ -157,10 +158,11 @@ class MyCourseController extends Controller
             'room_location'    => 'nullable|string|max:255',
             'source'           => 'nullable|in:online,offline',
             'status'           => 'nullable|in:0,1,2',
-            'teacher_id'       => 'nullable|exists:teachers,id',
         ]);
 
         $data['course_id'] = $courseId;
+        $data['teacher_id'] = $user->id;
+
         $class = $this->classService->create($data);
 
         return response()->json([
@@ -186,8 +188,7 @@ class MyCourseController extends Controller
             'record_link'      => 'nullable|url',
             'room_location'    => 'nullable|string|max:255',
             'source'           => 'nullable|in:online,offline',
-            'status'           => 'nullable|in:0,1,2',
-            'teacher_id'       => 'nullable|exists:teachers,id',
+            'status'           => 'nullable|in:0,1,2'
         ]);
 
         $this->classService->update($classId, $data);
@@ -214,6 +215,7 @@ class MyCourseController extends Controller
 
     public function storeMaterial(Request $request, int $courseId)
     {
+        $user = $request->user();
         $data = $request->validate([
             'title'         => 'required|string|max:255',
             'description'   => 'nullable|string',
@@ -224,6 +226,7 @@ class MyCourseController extends Controller
         ]);
 
         $data['course_id'] = $courseId;
+        $data['teacher_id'] = $user->id;
         $material = $this->materialService->create($data);
 
         return response()->json([

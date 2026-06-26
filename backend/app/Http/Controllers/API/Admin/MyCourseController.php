@@ -7,6 +7,8 @@ use App\Http\Resources\MyCourseDetailResource;
 use App\Http\Resources\MyCourseResource;
 use App\Models\Course;
 use App\Models\CourseClass;
+use App\Services\Course\CourseClassService;
+use App\Services\Course\CourseMaterialService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 

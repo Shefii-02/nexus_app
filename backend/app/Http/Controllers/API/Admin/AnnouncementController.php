@@ -12,6 +12,7 @@ use App\Models\AnnouncementUser;
 use App\Services\Announcement\AnnouncementService;
 use App\Services\Media\MediaService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class AnnouncementController extends Controller
 {
@@ -49,6 +50,7 @@ class AnnouncementController extends Controller
 
     public function show(int $id)
     {
+        Log::info($id);
         return new AnnouncementResource(
             $this->service->findWithRelations($id, ['users'])
         );

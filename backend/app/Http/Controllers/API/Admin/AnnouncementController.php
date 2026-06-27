@@ -176,12 +176,14 @@ class AnnouncementController extends Controller
             // ->where(function ($q) use ($now) {
             //     $q->whereNull('end_date')->orWhere('end_date', '>=', $now);
             // })
-            ->where(function ($q) use ($userId) {
-                $q
-                // ->where('target_type', 'all_users')
-                    ->WhereHas('users', fn($u) => $u->where('user_id', $userId));
-            })
+            // ->where(function ($q) use ($userId) {
+            //     $q
+            //     // ->where('target_type', 'all_users')
+            //         ->WhereHas('users', fn($u) => $u->where('user_id', $userId));
+            // })
             ->findOrFail($id);
+
+            Log::info($announcement);
 
         // Upsert pivot: mark delivered + read
         $pivot = AnnouncementUser::firstOrNew([

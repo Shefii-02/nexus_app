@@ -50,7 +50,7 @@ class AnnouncementController extends Controller
     public function show(int $id)
     {
         return new AnnouncementResource(
-            $this->service->findWithRelations($id, ['users', 'roles', 'batches'])
+            $this->service->findWithRelations($id, ['users'])
         );
     }
 

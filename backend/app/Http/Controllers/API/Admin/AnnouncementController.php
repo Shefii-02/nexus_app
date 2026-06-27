@@ -118,7 +118,7 @@ class AnnouncementController extends Controller
             ->where(function ($q) use ($userId) {
                 // target_type: 'all' means everyone; 'user' means only via pivot
                 $q
-                // ->orWhere('target_type', 'all_users')
+                    // ->orWhere('target_type', 'all_users')
                     ->WhereHas('users', fn($u) => $u->where('user_id', $userId));
             })
             ->orderByDesc('is_pinned')
@@ -126,14 +126,14 @@ class AnnouncementController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
-        Log::info($announcements);
+
 
         // Fetch this user's pivot rows in one query
         $pivotMap = AnnouncementUser::where('user_id', $userId)
             ->whereIn('announcement_id', $announcements->pluck('id'))
             ->get()
             ->keyBy('announcement_id');
-        Log::info($pivotMap);
+
         $data = $announcements->map(function (Announcement $a) use ($pivotMap, $userId) {
             $pivot = $pivotMap->get($a->id);
 
@@ -141,7 +141,11 @@ class AnnouncementController extends Controller
                 'id'         => $a->id,
                 'title'      => $a->title,
                 'content'    => $a->content,
-                'image'      => $a->image ? asset('storage/' . $a->image) : null,
+                'image'      =>
+                // $a->image ? asset('storage/' . $a->image) : null,
+                $a->thumbnailMedia
+                    ? asset('storage/' . $a->thumbnailMedia->file_path)
+                    : null,
                 'priority'   => $a->priority,
                 'is_pinned'  => (bool) $a->is_pinned,
                 'position'   => $a->position,
@@ -184,7 +188,7 @@ class AnnouncementController extends Controller
             // })
             ->findOrFail($id);
 
-            Log::info($announcement);
+        Log::info($announcement);
 
         // Upsert pivot: mark delivered + read
         $pivot = AnnouncementUser::firstOrNew([
@@ -206,7 +210,11 @@ class AnnouncementController extends Controller
                 'id'         => $announcement->id,
                 'title'      => $announcement->title,
                 'content'    => $announcement->content,
-                'image'      => $announcement->image ? asset('storage/' . $announcement->image) : null,
+                'image'      =>
+                // $announcement->image ? asset('storage/' . $announcement->image) : null,
+                $announcement->thumbnailMedia
+                    ? asset('storage/' . $announcement->thumbnailMedia->file_path)
+                    : null,
                 'priority'   => $announcement->priority,
                 'is_pinned'  => (bool) $announcement->is_pinned,
                 'position'   => $announcement->position,

@@ -31,7 +31,7 @@ class AnnouncementRequest extends BaseRequest
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'position' => 'nullable|integer',
             'is_pin' => 'nullable',
-            'priority' => 'nullable|in:low,normal,medium,high',
+            'priority' => 'nullable',//'|in:low,normal,medium,high',
             'status' => 'required|in:draft,published,archived',
         ];
     }

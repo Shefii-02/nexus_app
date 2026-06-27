@@ -117,7 +117,8 @@ class AnnouncementController extends Controller
             })
             ->where(function ($q) use ($userId) {
                 // target_type: 'all' means everyone; 'user' means only via pivot
-                $q->orWhere('target_type', 'all_users')
+                $q
+                // ->orWhere('target_type', 'all_users')
                     ->WhereHas('users', fn($u) => $u->where('user_id', $userId));
             })
             ->orderByDesc('is_pinned')

@@ -50,7 +50,7 @@ class AnnouncementController extends Controller
 
     public function show(int $id)
     {
-        Log::info($id);
+
         return new AnnouncementResource(
             $this->service->findWithRelations($id, ['users'])
         );
@@ -117,8 +117,7 @@ class AnnouncementController extends Controller
             })
             ->where(function ($q) use ($userId) {
                 // target_type: 'all' means everyone; 'user' means only via pivot
-                $q
-                // ->orWhere('target_type', 'all_users')
+                $q->orWhere('target_type', 'all_users')
                     ->WhereHas('users', fn($u) => $u->where('user_id', $userId));
             })
             ->orderByDesc('is_pinned')
@@ -126,12 +125,14 @@ class AnnouncementController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
+        Log::info($announcements);
+
         // Fetch this user's pivot rows in one query
         $pivotMap = AnnouncementUser::where('user_id', $userId)
             ->whereIn('announcement_id', $announcements->pluck('id'))
             ->get()
             ->keyBy('announcement_id');
-
+        Log::info($pivotMap);
         $data = $announcements->map(function (Announcement $a) use ($pivotMap, $userId) {
             $pivot = $pivotMap->get($a->id);
 
@@ -174,7 +175,7 @@ class AnnouncementController extends Controller
             })
             ->where(function ($q) use ($userId) {
                 $q
-                // ->where('target_type', 'all')
+                    // ->where('target_type', 'all')
                     ->WhereHas('users', fn($u) => $u->where('user_id', $userId));
             })
             ->findOrFail($id);

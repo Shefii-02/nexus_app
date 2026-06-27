@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['title', 'content', 'created_by', 'target_type', 'start_date', 'end_date', 'priority', 'status','is_pinned','image','position'])]
+#[Fillable(['title', 'content', 'created_by', 'target_type', 'start_date', 'end_date', 'priority', 'status', 'is_pinned', 'image', 'position'])]
 class Announcement extends Model
 {
     use HasFactory, SoftDeletes;
@@ -106,5 +106,11 @@ class Announcement extends Model
                         });
                     });
             });
+    }
+
+
+    public function thumbnailMedia()
+    {
+        return $this->belongsTo(MediaFile::class, 'image', 'id');
     }
 }

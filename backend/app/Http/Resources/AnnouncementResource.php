@@ -11,7 +11,9 @@ class AnnouncementResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'content' => $this->content,
-            'image'   =>
+            'thumbnail' => $this->thumbnailMedia
+                ? asset('storage/' . $this->thumbnailMedia->file_path)
+                : null,
             'target_type' => $this->target_type,
             'priority' => $this->priority,
             'status' => $this->status,

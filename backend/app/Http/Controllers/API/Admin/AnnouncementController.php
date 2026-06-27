@@ -141,7 +141,7 @@ class AnnouncementController extends Controller
                 'id'         => $a->id,
                 'title'      => $a->title,
                 'content'    => $a->content,
-                'image'      =>
+                'thumbnail'      =>
                 // $a->image ? asset('storage/' . $a->image) : null,
                 $a->thumbnailMedia
                     ? asset('storage/' . $a->thumbnailMedia->file_path)
@@ -210,7 +210,7 @@ class AnnouncementController extends Controller
                 'id'         => $announcement->id,
                 'title'      => $announcement->title,
                 'content'    => $announcement->content,
-                'image'      =>
+                'thumbnail'      =>
                 // $announcement->image ? asset('storage/' . $announcement->image) : null,
                 $announcement->thumbnailMedia
                     ? asset('storage/' . $announcement->thumbnailMedia->file_path)

@@ -166,13 +166,16 @@ class AnnouncementController extends Controller
         $userId = $request->user()->id;
         $now    = now();
 
+        Log::info("message");
+        Log::info($userId);
+
         $announcement = Announcement::where('status', 'published')
             // ->where(function ($q) use ($now) {
             //     $q->whereNull('start_date')->orWhere('start_date', '<=', $now);
             // })
-            ->where(function ($q) use ($now) {
-                $q->whereNull('end_date')->orWhere('end_date', '>=', $now);
-            })
+            // ->where(function ($q) use ($now) {
+            //     $q->whereNull('end_date')->orWhere('end_date', '>=', $now);
+            // })
             ->where(function ($q) use ($userId) {
                 $q->where('target_type', 'all_users')
                     ->WhereHas('users', fn($u) => $u->where('user_id', $userId));

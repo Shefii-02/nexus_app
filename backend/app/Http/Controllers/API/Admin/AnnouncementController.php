@@ -174,8 +174,7 @@ class AnnouncementController extends Controller
                 $q->whereNull('end_date')->orWhere('end_date', '>=', $now);
             })
             ->where(function ($q) use ($userId) {
-                $q
-                    // ->where('target_type', 'all')
+                $q->where('target_type', 'all_users')
                     ->WhereHas('users', fn($u) => $u->where('user_id', $userId));
             })
             ->findOrFail($id);

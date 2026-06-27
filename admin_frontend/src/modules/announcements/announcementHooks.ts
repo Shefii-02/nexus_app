@@ -67,8 +67,10 @@ export const useCreateAnnouncement =
       useQueryClient()
 
     return useMutation({
-      mutationFn:
-        announcementService.create,
+      mutationFn: (payload: FormData) =>
+            announcementService.create(payload).then((res) => res.data),
+      // mutationFn:
+      //   announcementService.create,
 
       onSuccess: () => {
         qc.invalidateQueries({
@@ -89,14 +91,23 @@ export const useUpdateAnnouncement =
       useQueryClient()
 
     return useMutation({
-      mutationFn: ({
-        id,
-        data,
-      }: any) =>
-        announcementService.update(
-          id,
-          data
-        ),
+       mutationFn: ({
+            id,
+            payload,
+          }: {
+            id: number
+            payload: FormData
+          }) => announcementService.update(id, payload).then((res) => res.data),
+      
+
+      // mutationFn: ({
+      //   id,
+      //   data,
+      // }: any) =>
+      //   announcementService.update(
+      //     id,
+      //     data
+      //   ),
 
       onSuccess: () => {
         qc.invalidateQueries({

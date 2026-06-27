@@ -11,8 +11,13 @@ const CreateAnnouncementPage = () => {
   const createAnnouncement = useCreateAnnouncement()
 
   const handleSubmit = async (data: any) => {
+    const formData = new FormData()
+
+    Object.keys(data).forEach((key) => {
+      formData.append(key, data[key])
+    })
     return handleMutationWithToast({
-      action: () => createAnnouncement.mutateAsync(data),
+      action: () => createAnnouncement.mutateAsync(formData),
       loadingMessage: 'Creating announcement...',
       successMessage: 'Announcement created successfully',
       navigate,

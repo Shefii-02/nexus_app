@@ -19,12 +19,27 @@ const EditAnnouncementPage = () => {
 
   const updateAnnouncement = useUpdateAnnouncement()
 
-  const handleSubmit = async (formData: any) => {
+  const handleSubmit = async (form: any) => {
+    const formData = new FormData()
+
+    Object.keys(form).forEach((key) => {
+      const value = form[key]
+
+      if (value === null || value === undefined) return
+
+      /** 🔥 skip old image */
+      if (key === 'thumbnail' && typeof value === 'string') {
+        return
+      }
+
+      formData.append(key, value)
+    })
+
     return handleMutationWithToast({
       action: () =>
         updateAnnouncement.mutateAsync({
           id: Number(id),
-          data: formData,
+          payload: formData,
         }),
 
       loadingMessage: 'Updating announcement...',
@@ -40,28 +55,30 @@ const EditAnnouncementPage = () => {
 
   const defaultValues = data
     ? {
-        ...data,
+      ...data,
 
-        start_date: data.start_date
-          ? data.start_date.split(' ')[0]
-          : '',
+      start_date: data.start_date
+        ? data.start_date.split(' ')[0]
+        : '',
 
-        end_date: data.end_date
-          ? data.end_date.split(' ')[0]
-          : '',
+      end_date: data.end_date
+        ? data.end_date.split(' ')[0]
+        : '',
 
-        target_type: String(
-          data.target_type ?? ''
-        ),
+      target_type: String(
+        data.target_type ?? ''
+      ),
 
-        priority: String(
-          data.priority ?? ''
-        ),
+      priority: String(
+        data.priority ?? ''
+      ),
 
-        status: String(
-          data.status ?? ''
-        ),
-      }
+      status: String(
+        data.status ?? ''
+      ),
+
+      thumbnail: data.thumbnail || '',
+    }
     : {}
 
   return (

@@ -6,24 +6,26 @@ export interface Announcement {
   content: string
   created_by: number
 
+  thumbnail?: string
+
   target_type:
-    | 'all'
-    | 'students'
-    | 'teachers'
-    | 'staff'
+  | 'all'
+  | 'students'
+  | 'teachers'
+  | 'staff'
 
   start_date: string
   end_date: string
 
   priority:
-    | 'low'
-    | 'medium'
-    | 'high'
-    | 'urgent'
+  | 'low'
+  | 'medium'
+  | 'high'
+  | 'urgent'
 
   status:
-    | 'active'
-    | 'inactive'
+  | 'active'
+  | 'inactive'
 
   created_at?: string
   updated_at?: string
@@ -62,20 +64,27 @@ export const announcementService = {
     ),
 
   create: (
-    data: AnnouncementPayload
+    data: FormData
+    // data: AnnouncementPayload
   ) =>
     apiClient.post(
-      '/announcements',
-      data
+      '/announcements', data,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }
+
     ),
 
   update: (
     id: number,
-    data: AnnouncementPayload
+    data: FormData
+    // data: AnnouncementPayload
   ) =>
     apiClient.put(
-      `/announcements/${id}`,
-      data
+      `/announcements/${id}?_method=PUT`,
+      data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }
     ),
 
   remove: (id: number) =>

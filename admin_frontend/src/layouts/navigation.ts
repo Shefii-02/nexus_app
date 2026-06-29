@@ -111,14 +111,14 @@ export const navSections: NavSection[] = [
       {
         label: 'Payments',
         children: [
-          {
-            label: 'Create Payment',
-            path: '/payments/create',
-          },
-          {
-            label: 'All Transactions',
-            path: '/transactions',
-          },
+          // {
+          //   label: 'Create Payment',
+          //   path: '/payments/create',
+          // },
+          // {
+          //   label: 'All Transactions',
+          //   path: '/transactions',
+          // },
           // {
           //   label: 'Income',
           //   path: '/transactions/income',

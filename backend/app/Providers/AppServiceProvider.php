@@ -36,8 +36,10 @@ use App\Services\Announcement\AnnouncementService;
 
 use App\Repositories\Notification\NotificationRepositoryInterface as NotificationRepositoryInterfaceContract;
 use App\Repositories\Notification\NotificationRepository as NotificationRepositoryImplementation;
+use App\Repositories\TeacherPayment\TeacherPaymentRepository;
 use App\Services\Auth\OtpService;
 use App\Services\Notification\NotificationService;
+use App\Services\TeacherPayment\TeacherPaymentService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -114,6 +116,10 @@ class AppServiceProvider extends ServiceProvider
             AdmissionRepositoryInterface::class,
             AdmissionRepository::class
         );
+
+        $this->app->bind(TeacherPaymentService::class, function () {
+            return new TeacherPaymentService(new TeacherPaymentRepository());
+        });
     }
 
     /**

@@ -1,95 +1,68 @@
 <?php
 
-namespace App\Http\Controllers\Api\Admin;
+namespace App\Http\Controllers\API\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\TeacherPaymentItemRequest;
-use App\Http\Resources\TeacherPaymentItemResource;
-use App\Services\TeacherPaymentItem\TeacherPaymentItemService;
-use App\Services\TeacherPayment\TeacherPaymentService;
-use App\DTOs\TeacherPaymentItemDTO;
-use App\Http\Controllers\API\ApiResponse;
+use App\DTO\TeacherPaymentDTO;
+use App\Http\Requests\TeacherPaymentRequest;
+use App\Http\Resources\TeacherPaymentResource;
+
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Services\TeacherPayment\TeacherPaymentService;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
-class TeacherPaymentController
-extends Controller
+class TeacherPaymentController extends Controller
 {
-    use ApiResponse;
-
     public function __construct(
-        private TeacherPaymentItemService $itemService,
-        private TeacherPaymentService $paymentService
+        private readonly TeacherPaymentService $service
     ) {}
 
-    public function pending()
+    public function index(Request $request): AnonymousResourceCollection
     {
-        return $this->paginatedResponse(
-            TeacherPaymentItemResource::collection(
-                $this->itemService->pending()
-            )
+        $payments = $this->service->list($request->only([
+            'search', 'status', 'teacher_id', 'per_page', 'page',
+        ]));
+
+        return TeacherPaymentResource::collection($payments);
+    }
+
+    public function store(TeacherPaymentRequest $request): TeacherPaymentResource
+    {
+        $payment = $this->service->create(
+            TeacherPaymentDTO::fromRequest($request->validated())
+        );
+
+        return new TeacherPaymentResource($payment);
+    }
+
+    public function show(int $id): TeacherPaymentResource
+    {
+        return new TeacherPaymentResource(
+            $this->service->find($id)
         );
     }
 
-    public function storeCalculation(
-        TeacherPaymentItemRequest $request
-    ) {
+    public function update(TeacherPaymentRequest $request, int $id): TeacherPaymentResource
+    {
+        $payment = $this->service->update(
+            $id,
+            TeacherPaymentDTO::fromRequest($request->validated())
+        );
 
-        return $this->successResponse(
+        return new TeacherPaymentResource($payment);
+    }
 
-            new TeacherPaymentItemResource(
-
-                $this->itemService->create(
-
-                    TeacherPaymentItemDTO::fromArray(
-                        $request->validated()
-                    )
-                )
-            )
+    public function release(int $id): TeacherPaymentResource
+    {
+        return new TeacherPaymentResource(
+            $this->service->release($id)
         );
     }
 
-    public function release(
-        Request $request
-    ) {
-
-        return $this->successResponse(
-
-            $this->paymentService->release(
-
-                $request->item_ids,
-
-                $request->payment_method,
-
-                $request->transaction_no,
-
-                $request->remarks
-            ),
-
-            'Teacher payment released'
-        );
-    }
-
-
-    public function pendingByTeacher(
-        int $teacherId
-    ) {
-        return \App\Models\TeacherPaymentItem::query()
-
-            ->with([
-                'teacher',
-                'course'
-            ])
-
-            ->where(
-                'teacher_id',
-                $teacherId
-            )
-
-            ->where(
-                'status',
-                'pending'
-            )
-
-            ->get();
+    public function destroy(int $id): JsonResponse
+    {
+        $this->service->delete($id);
+        return response()->json(['message' => 'Payment deleted successfully.']);
     }
 }

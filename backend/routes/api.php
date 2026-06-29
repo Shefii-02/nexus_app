@@ -442,13 +442,13 @@ Route::middleware(['auth:api'])->group(function () {
     // });
 
     // ── Class CRUD ────────────────────────────────────────────────────────────────
-    Route::post  ('/my_courses/{courseId}/classes', [MyCourseController::class, 'storeClass']);
-    Route::put   ('/my_courses/classes/{classId}',  [MyCourseController::class, 'updateClass']);
+    Route::post('/my_courses/{courseId}/classes', [MyCourseController::class, 'storeClass']);
+    Route::put('/my_courses/classes/{classId}',  [MyCourseController::class, 'updateClass']);
     Route::delete('/my_courses/classes/{classId}',  [MyCourseController::class, 'destroyClass']);
 
     // ── Material CRUD ─────────────────────────────────────────────────────────────
-    Route::post  ('/my_courses/{courseId}/materials',    [MyCourseController::class, 'storeMaterial']);
-    Route::put   ('/my_courses/materials/{materialId}',  [MyCourseController::class, 'updateMaterial']);
+    Route::post('/my_courses/{courseId}/materials',    [MyCourseController::class, 'storeMaterial']);
+    Route::put('/my_courses/materials/{materialId}',  [MyCourseController::class, 'updateMaterial']);
     Route::delete('/my_courses/materials/{materialId}',  [MyCourseController::class, 'destroyMaterial']);
 
 
@@ -493,7 +493,7 @@ Route::middleware(['auth:api'])->group(function () {
 
 
 
-     // ── Transactions ──────────────────────────────────────────────
+    // ── Transactions ──────────────────────────────────────────────
     Route::get('transactions',       [TransactionController::class, 'index']);
     Route::post('transactions',      [TransactionController::class, 'store']);
     Route::get('transactions/{id}',  [TransactionController::class, 'show']);
@@ -506,12 +506,24 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('transactions/refunds',  [TransactionController::class, 'refunds']);
 
     // ── Teacher Payments ──────────────────────────────────────────
-    Route::get('teacher-payments',                [TeacherPaymentController::class, 'index']);
-    Route::post('teacher-payments',               [TeacherPaymentController::class, 'store']);
-    Route::get('teacher-payments/{id}',           [TeacherPaymentController::class, 'show']);
-    Route::put('teacher-payments/{id}',           [TeacherPaymentController::class, 'update']);
-    Route::post('teacher-payments/{id}/release',  [TeacherPaymentController::class, 'release']);
-    Route::delete('teacher-payments/{id}',        [TeacherPaymentController::class, 'destroy']);
+
+
+    Route::prefix('teacher-payments')->group(function () {
+        Route::get('/',              [TeacherPaymentController::class, 'index']);
+        Route::post('/',             [TeacherPaymentController::class, 'store']);
+        Route::get('/{id}',          [TeacherPaymentController::class, 'show']);
+        Route::put('/{id}',          [TeacherPaymentController::class, 'update']);
+        Route::patch('/{id}/release', [TeacherPaymentController::class, 'release']);
+        Route::delete('/{id}',       [TeacherPaymentController::class, 'destroy']);
+    });
+
+
+    // Route::get('teacher-payments',                [TeacherPaymentController::class, 'index']);
+    // Route::post('teacher-payments',               [TeacherPaymentController::class, 'store']);
+    // Route::get('teacher-payments/{id}',           [TeacherPaymentController::class, 'show']);
+    // Route::put('teacher-payments/{id}',           [TeacherPaymentController::class, 'update']);
+    // Route::post('teacher-payments/{id}/release',  [TeacherPaymentController::class, 'release']);
+    // Route::delete('teacher-payments/{id}',        [TeacherPaymentController::class, 'destroy']);
 
     // ── Staff Payments ────────────────────────────────────────────
     Route::get('staff-payments',               [StaffPaymentController::class, 'index']);

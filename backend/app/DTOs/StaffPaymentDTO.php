@@ -56,7 +56,7 @@ class StaffPaymentDTO
             transaction_no: $data['transaction_no'],
             payment_date: $data['payment_date'],
             status: $data['status'],
-            created_by: auth()->id,
+            created_by: auth()->id(),
 
         );
     }

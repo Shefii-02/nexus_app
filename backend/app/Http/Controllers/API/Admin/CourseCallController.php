@@ -27,34 +27,34 @@ class CourseCallController extends Controller
                 'mobile' => '43534534534545',
                 'avatar' => 'https://i.pravatar.cc/150?img=1',
             ],
-            [
-                'id' => 2,
-                'name' => 'Anjali Nair',
-                'email' => 'anjali@example.com',
-                'mobile' => '5645634564545',
-                'avatar' => 'https://i.pravatar.cc/150?img=2',
-            ],
-            [
-                'id' => 3,
-                'name' => 'Mohammed Ali',
-                'email' => 'mohammed@example.com',
-                'mobile' => '45453564564',
-                'avatar' => 'https://i.pravatar.cc/150?img=3',
-            ],
-            [
-                'id' => 4,
-                'name' => 'Priya Sharma',
-                'email' => 'priya@example.com',
-                'mobile' => '98348734874',
-                'avatar' => 'https://i.pravatar.cc/150?img=4',
-            ],
-            [
-                'id' => 5,
-                'name' => 'Arjun Menon',
-                'email' => 'arjun@example.com',
-                'mobile' => '94848957344',
-                'avatar' => 'https://i.pravatar.cc/150?img=5',
-            ],
+            // [
+            //     'id' => 2,
+            //     'name' => 'Anjali Nair',
+            //     'email' => 'anjali@example.com',
+            //     'mobile' => '5645634564545',
+            //     'avatar' => 'https://i.pravatar.cc/150?img=2',
+            // ],
+            // [
+            //     'id' => 3,
+            //     'name' => 'Mohammed Ali',
+            //     'email' => 'mohammed@example.com',
+            //     'mobile' => '45453564564',
+            //     'avatar' => 'https://i.pravatar.cc/150?img=3',
+            // ],
+            // [
+            //     'id' => 4,
+            //     'name' => 'Priya Sharma',
+            //     'email' => 'priya@example.com',
+            //     'mobile' => '98348734874',
+            //     'avatar' => 'https://i.pravatar.cc/150?img=4',
+            // ],
+            // [
+            //     'id' => 5,
+            //     'name' => 'Arjun Menon',
+            //     'email' => 'arjun@example.com',
+            //     'mobile' => '94848957344',
+            //     'avatar' => 'https://i.pravatar.cc/150?img=5',
+            // ],
         ];
 
         return response()->json([

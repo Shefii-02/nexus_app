@@ -99,7 +99,7 @@ class StaffPaymentDTO
             $this->transaction_no,
             'payment_date' =>
             $this->payment_date,
-            'created_by' => $this->created_by,
+            'created_by' => auth()->id(),
 
         ];
     }

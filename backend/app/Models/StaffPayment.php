@@ -34,6 +34,7 @@ class StaffPayment extends Model
         'payment_date',
 
         'remarks',
+        'created_by',
 
         'released_by',
     ];

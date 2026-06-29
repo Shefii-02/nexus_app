@@ -1,9 +1,10 @@
 <?php
 
-namespace App\DTO;
+namespace App\DTOs;
 
 class TeacherPaymentDTO
 {
+
     public function __construct(
         public readonly int     $teacher_id,
         public readonly string  $period_start,
@@ -20,6 +21,27 @@ class TeacherPaymentDTO
         public readonly ?string $remarks,
         public readonly string  $status,
     ) {}
+
+
+      public static function fromArray(array $data): self
+    {
+        return new self(
+              teacher_id:        $data['teacher_id'],
+            period_start:      $data['period_start'],
+            period_end:        $data['period_end'],
+            total_classes:     $data['total_classes']     ?? null,
+            gross_amount:      $data['gross_amount'],
+            deduction_amount:  $data['deduction_amount']  ?? 0,
+            deduction_reason:  $data['deduction_reason']  ?? null,
+            amount:            $data['amount'],
+            payment_method:    $data['payment_method']    ?? null,
+            payment_reference: $data['payment_reference'] ?? null,
+            transaction_no:    $data['transaction_no']    ?? null,
+            payment_date:      $data['payment_date']      ?? null,
+            remarks:           $data['remarks']           ?? null,
+            status:            $data['status']            ?? 'pending',
+        );
+    }
 
     public static function fromRequest(array $data): self
     {
@@ -40,6 +62,8 @@ class TeacherPaymentDTO
             status:            $data['status']            ?? 'pending',
         );
     }
+
+
 
     public function toArray(): array
     {

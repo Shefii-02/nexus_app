@@ -2,7 +2,7 @@
 
 namespace App\Repositories\TeacherPayment;
 
-use App\DTO\TeacherPaymentDTO;
+use App\DTOs\TeacherPaymentDTO;
 use App\Models\TeacherPayment;
 use Illuminate\Pagination\LengthAwarePaginator;
 

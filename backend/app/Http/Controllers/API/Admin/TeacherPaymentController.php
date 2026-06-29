@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\API\Admin;
 
-use App\DTO\TeacherPaymentDTO;
+use App\DTOs\TeacherPaymentDTO;
 use App\Http\Requests\TeacherPaymentRequest;
 use App\Http\Resources\TeacherPaymentResource;
 
@@ -21,7 +21,11 @@ class TeacherPaymentController extends Controller
     public function index(Request $request): AnonymousResourceCollection
     {
         $payments = $this->service->list($request->only([
-            'search', 'status', 'teacher_id', 'per_page', 'page',
+            'search',
+            'status',
+            'teacher_id',
+            'per_page',
+            'page',
         ]));
 
         return TeacherPaymentResource::collection($payments);
@@ -29,9 +33,11 @@ class TeacherPaymentController extends Controller
 
     public function store(TeacherPaymentRequest $request): TeacherPaymentResource
     {
-        $payment = $this->service->create(
-            TeacherPaymentDTO::fromRequest($request->validated())
-        );
+
+        $dto = TeacherPaymentDTO::fromArray($request->validated());
+
+        $payment = $this->service->create($dto);
+
 
         return new TeacherPaymentResource($payment);
     }

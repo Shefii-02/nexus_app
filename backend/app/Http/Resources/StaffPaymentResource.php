@@ -22,7 +22,7 @@ extends JsonResource
             ],
 
             'salary_month' =>
-                $this->month,
+                date('Y-m',strtotime($this->salary_month)),
 
             'salary_amount' =>
                 $this->salary_amount,

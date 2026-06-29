@@ -8,7 +8,7 @@ class StaffPaymentDTO
 
         public int $staff_id,
 
-        public string $month,
+        public string $salary_month,
 
         public float $salary_amount,
 
@@ -37,7 +37,7 @@ class StaffPaymentDTO
 
             staff_id: $data['staff_id'],
 
-            month: $data['month'],
+            salary_month: $data['month'],
 
             salary_amount: $data['salary_amount'],
 
@@ -66,8 +66,8 @@ class StaffPaymentDTO
             'staff_id' =>
             $this->staff_id,
 
-            'month' =>
-            $this->month,
+            'salary_month' =>
+            $this->salary_month,
 
             'salary_amount' =>
             $this->salary_amount,

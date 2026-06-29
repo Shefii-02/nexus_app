@@ -13,7 +13,7 @@ class StaffPayment extends Model
 
         'staff_id',
 
-        'month',
+        'salary_month',
 
         'salary_amount',
 

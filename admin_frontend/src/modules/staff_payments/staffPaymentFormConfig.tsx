@@ -12,7 +12,7 @@ export const staffPaymentFormConfig = [
   },
   {
     section: 'Payment Info',
-    name: 'month',
+    name: 'salary_month',
     label: 'Payment Month',
     type: 'month',
     required: true, 

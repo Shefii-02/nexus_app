@@ -60,6 +60,8 @@ import EditAdmissionPage from '../modules/admissions/pages/EditAdmissionPage'
 import RenewalDuePage from '../modules/admission_renewal/pages/RenewalDuePage'
 import RenewalHistoryPage from '../modules/admission_renewal/pages/RenewalHistoryPage'
 import CreateTeacherPaymentPage from '../modules/teacher_payments/pages/CreateTeacherPaymentPage'
+import TeacherPaymentListPage from '../modules/teacher_payments/pages/TeacherPaymentListPage'
+import EditTeacherPaymentPage from '../modules/teacher_payments/pages/EditTeacherPaymentPage'
 
 const AppRoutes = () => (
   <Routes>
@@ -122,8 +124,10 @@ const AppRoutes = () => (
         <Route path="/announcements/:id/edit" element={<EditAnnouncementPage />} />
 
 
-        <Route path="/teacher-payments" element={< CreateTeacherPaymentPage/>} />
+        <Route path="/teacher-payments" element={<TeacherPaymentListPage/>} />
         <Route path="/teacher-teachers/create" element={<CreateTeacherPaymentPage />} />
+        <Route path="/teacher-teachers/:id/show" element={<ViewAdmissionPage />} />
+        <Route path="/teacher-teachers/:id/edit" element={<EditTeacherPaymentPage />} />
 
 
         <Route path="/staff-payments" element={<TransactionListPage />} />

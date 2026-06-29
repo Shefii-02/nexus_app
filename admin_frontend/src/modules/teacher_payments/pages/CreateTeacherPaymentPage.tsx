@@ -16,13 +16,14 @@ const CreateTeacherPaymentPage = () => {
       action: () =>
         createPayment.mutateAsync({
           ...data,
-          gross_amount:    Number(data.gross_amount    || 0),
+          total_classes:    Number(data.total_classes    || 0),
+          gross_amount:     Number(data.gross_amount     || 0),
           deduction_amount: Number(data.deduction_amount || 0),
-          transfer_amount: Number(data.transfer_amount || 0),
+          amount:           Number(data.amount           || 0),
         }),
 
-      loadingMessage:  'Creating payment...',
-      successMessage:  'Teacher payment created successfully',
+      loadingMessage: 'Creating payment...',
+      successMessage: 'Teacher payment created successfully',
 
       navigate,
       redirect: '/teacher-payments',

@@ -3,34 +3,43 @@ import apiClient from '../../services/apiClient'
 export interface TeacherPayment {
   id: number
   teacher_id: number
-  period_start: string
-  period_end: string
-  gross_amount: number
-  deduction_amount: number
-  transfer_amount: number
-  payment_method: string
-  tax_no: string
-  payment_date: string
-  remark: string
-  status: 'pending' | 'released'
   teacher?: {
     id: number
     name: string
     email: string
   }
+  period_start: string
+  period_end: string
+  total_classes: number
+  gross_amount: number
+  deduction_amount: number
+  deduction_reason?: string
+  amount: number
+  payment_method: string
+  payment_reference?: string
+  transaction_no?: string
+  payment_date: string
+  remarks?: string
+  status: 'pending' | 'released'
+  paid_at?: string
+  created_by?: number
+  released_by?: number
 }
 
 export interface TeacherPaymentFormPayload {
   teacher_id: number
   period_start: string
   period_end: string
+  total_classes: number
   gross_amount: number
   deduction_amount: number
-  transfer_amount: number
-  payment_method: string
-  tax_no?: string
-  payment_date: string
-  remark?: string
+  deduction_reason?: string
+  amount: number
+  payment_method?: string
+  payment_reference?: string
+  transaction_no?: string
+  payment_date?: string
+  remarks?: string
   status: 'pending' | 'released'
 }
 
@@ -56,6 +65,5 @@ export const teacherPaymentService = {
   update: (id: number, payload: TeacherPaymentFormPayload) =>
     apiClient.put<TeacherPayment>(`/teacher-payments/${id}`, payload),
 
-  remove: (id: number) =>
-    apiClient.delete<void>(`/teacher-payments/${id}`),
+  remove: (id: number) => apiClient.delete<void>(`/teacher-payments/${id}`),
 }

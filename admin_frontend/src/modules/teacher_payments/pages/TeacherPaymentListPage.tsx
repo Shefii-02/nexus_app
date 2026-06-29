@@ -11,7 +11,7 @@ import {
   useDeleteTeacherPayment,
 } from '../teacherPaymentHooks'
 
-import PaymentTable from '../components/PaymentTable'
+import PaymentTable from './PaymentTable'
 
 const TeacherPaymentListPage = () => {
   const navigate = useNavigate()
@@ -25,7 +25,6 @@ const TeacherPaymentListPage = () => {
 
   return (
     <div className="space-y-6">
-
       <PageHeader
         title="Teacher Payments"
         subtitle="Manage teacher salary and payment records"
@@ -48,7 +47,7 @@ const TeacherPaymentListPage = () => {
       <PaymentTable
         data={data?.data || []}
         loading={isLoading}
-        onView={(id) => navigate(`/teacher-payments/${id}`)}
+        onView={(id) => navigate(`/teacher-payments/${id}/show`)}
         onEdit={(id) => navigate(`/teacher-payments/${id}/edit`)}
         onDelete={setConfirmId}
       />

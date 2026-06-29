@@ -12,6 +12,13 @@ export const teacherPaymentFormConfig = [
   },
   {
     section: 'Payment Info',
+    name: 'total_classes',
+    label: 'Total Classes',
+    type: 'number',
+    required: true,
+  },
+  {
+    section: 'Payment Info',
     name: 'period_start',
     label: 'Period Start',
     type: 'date',
@@ -52,6 +59,14 @@ export const teacherPaymentFormConfig = [
   // ── Transaction Details ───────────────────────────────────
   {
     section: 'Transaction Details',
+    name: 'deduction_reason',
+    label: 'Deduction Reason',
+    type: 'textarea',
+    fullWidth: true,
+    colSpan: 2,
+  },
+  {
+    section: 'Transaction Details',
     name: 'payment_method',
     label: 'Payment Method',
     type: 'select',
@@ -64,8 +79,14 @@ export const teacherPaymentFormConfig = [
   },
   {
     section: 'Transaction Details',
-    name: 'tax_no',
+    name: 'transaction_no',       // was: tax_no
     label: 'Transaction Number',
+    type: 'text',
+  },
+  {
+    section: 'Transaction Details',
+    name: 'payment_reference',
+    label: 'Payment Reference',
     type: 'text',
   },
   {
@@ -78,8 +99,8 @@ export const teacherPaymentFormConfig = [
   },
   {
     section: 'Transaction Details',
-    name: 'remark',
-    label: 'Remark',
+    name: 'remarks',              // was: remark
+    label: 'Remarks',
     type: 'textarea',
     fullWidth: true,
     colSpan: 2,

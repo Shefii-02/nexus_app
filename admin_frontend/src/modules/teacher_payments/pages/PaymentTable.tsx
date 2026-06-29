@@ -43,18 +43,27 @@ const PaymentTable = ({ data, loading, onView, onEdit, onDelete }: Props) => {
             </tr>
           ) : (
             data.map((p) => (
-              <tr key={p.id} className="border-t hover:bg-gray-50 transition-colors">
+              <tr
+                key={p.id}
+                className="border-t hover:bg-gray-50 transition-colors"
+              >
                 <td className="p-3">
                   <div className="font-medium">{p.teacher?.name || '-'}</div>
-                  <div className="text-gray-400 text-xs">{p.teacher?.email || '-'}</div>
+                  <div className="text-gray-400 text-xs">
+                    {p.teacher?.email || '-'}
+                  </div>
                 </td>
                 <td className="p-3">
                   <div>{p.period_start}</div>
                   <div className="text-gray-400 text-xs">to {p.period_end}</div>
                 </td>
-                <td className="p-3">₹{p.gross_amount.toLocaleString()}</td>
-                <td className="p-3 text-red-500">-₹{p.deduction_amount.toLocaleString()}</td>
-                <td className="p-3 font-medium text-green-600">₹{p.transfer_amount.toLocaleString()}</td>
+                <td className="p-3">₹{p.gross_amount?.toLocaleString()}</td>
+                <td className="p-3 text-red-500">
+                  -₹{p.deduction_amount?.toLocaleString()}
+                </td>
+                <td className="p-3 font-medium text-green-600">
+                  ₹{p.amount?.toLocaleString()}
+                </td>
                 <td className="p-3">{p.payment_date || '-'}</td>
                 <td className="p-3 capitalize">{p.payment_method || '-'}</td>
                 <td className="p-3">
@@ -76,9 +85,13 @@ const PaymentTable = ({ data, loading, onView, onEdit, onDelete }: Props) => {
                       </button>
                     }
                     items={[
-                      { label: 'View',   onClick: () => onView(p.id) },
-                      { label: 'Edit',   onClick: () => onEdit(p.id) },
-                      { label: 'Delete', danger: true, onClick: () => onDelete(p.id) },
+                      { label: 'View', onClick: () => onView(p.id) },
+                      { label: 'Edit', onClick: () => onEdit(p.id) },
+                      {
+                        label: 'Delete',
+                        danger: true,
+                        onClick: () => onDelete(p.id),
+                      },
                     ]}
                   />
                 </td>

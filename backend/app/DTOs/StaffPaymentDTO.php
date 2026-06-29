@@ -58,7 +58,7 @@ class StaffPaymentDTO
             payment_date: $data['payment_date'],
             status: $data['status'],
             created_by: auth()->id(),
-            released_by : $data['status'] == 'released' ? auth()->id() : '',
+            released_by : $data['status'] == 'released' ? auth()->id() : null,
 
         );
     }

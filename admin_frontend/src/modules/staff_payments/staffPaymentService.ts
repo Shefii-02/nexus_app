@@ -12,8 +12,9 @@ export interface StaffPayment {
   total_classes: number
   salary_amount: number
   deduction_amount: number
+  bonus_amount : number
   deduction_reason?: string
-  finalamount: number
+  final_amount: number
   payment_method: string
   payment_reference?: string
   transaction_no?: string
@@ -30,6 +31,7 @@ export interface StaffPaymentFormPayload {
   salary_month: string
   total_classes: number
   salary_amount: number
+  bonus_amount : number
   deduction_amount: number
   deduction_reason?: string
   final_amount: number

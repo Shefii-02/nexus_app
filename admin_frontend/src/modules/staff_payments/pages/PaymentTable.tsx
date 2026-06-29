@@ -60,9 +60,12 @@ const PaymentTable = ({ data, loading, onView, onEdit, onDelete }: Props) => {
                 <td className="p-3">₹{p.salary_amount?.toLocaleString()}</td>
                 <td className="p-3 text-red-500">
                   -₹{p.deduction_amount?.toLocaleString()}
+                </td><td className="p-3 text-green-500">
+                  +₹{p.bonus_amount?.toLocaleString()}
                 </td>
+                
                 <td className="p-3 font-medium text-green-600">
-                  ₹{p.finalamount?.toLocaleString()}
+                  ₹{p.final_amount?.toLocaleString()}
                 </td>
                 <td className="p-3">{p.payment_date || '-'}</td>
                 <td className="p-3 capitalize">{p.payment_method || '-'}</td>

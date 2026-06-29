@@ -15,32 +15,31 @@ extends JsonResource
 
             'staff' => [
                 'id' =>
-                    $this->staff?->id,
+                $this->staff?->id,
 
                 'name' =>
-                    $this->staff?->name,
+                $this->staff?->name,
             ],
 
             'salary_month' =>
-                date('Y-m',strtotime($this->salary_month)),
+            date('Y-m', strtotime($this->salary_month)),
 
             'salary_amount' =>
-                $this->salary_amount,
+            $this->salary_amount,
 
             'bonus_amount' =>
-                $this->bonus_amount,
+            $this->bonus_amount,
 
-            'deduction_amount' =>
-                $this->deduction_amount,
+            'deduction_amount' =>  $this->deduction_amount,
 
-            'final_amount' =>
-                $this->final_amount,
+            'final_amount' =>  $this->final_amount,
 
-            'status' =>
-                $this->status,
+            'status' =>  $this->status,
 
-            'payment_date' =>
-                $this->payment_date,
+            'payment_method'    => $this->payment_method,
+            'payment_reference' => $this->payment_reference,
+            'transaction_no'    => $this->transaction_no,
+            'payment_date'      => date('Y-m-d', strtotime($this->payment_date)),
             'created_by' => $this->created_by,
             'released_by' => $this->released_by,
         ];

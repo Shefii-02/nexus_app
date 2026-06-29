@@ -8,13 +8,12 @@ export interface StaffPayment {
     name: string
     email: string
   }
-  period_start: string
-  period_end: string
+  salary_month: string
   total_classes: number
-  gross_amount: number
+  salary_amount: number
   deduction_amount: number
   deduction_reason?: string
-  amount: number
+  finalamount: number
   payment_method: string
   payment_reference?: string
   transaction_no?: string
@@ -28,13 +27,12 @@ export interface StaffPayment {
 
 export interface StaffPaymentFormPayload {
   staff_id: number
-  period_start: string
-  period_end: string
+  salary_month: string
   total_classes: number
-  gross_amount: number
+  salary_amount: number
   deduction_amount: number
   deduction_reason?: string
-  amount: number
+  final_amount: number
   payment_method?: string
   payment_reference?: string
   transaction_no?: string

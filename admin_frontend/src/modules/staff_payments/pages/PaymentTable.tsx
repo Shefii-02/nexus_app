@@ -16,10 +16,11 @@ const PaymentTable = ({ data, loading, onView, onEdit, onDelete }: Props) => {
       <table className="w-full text-sm">
         <thead className="bg-gray-50">
           <tr>
-            <th className="p-3 text-left">Teacher</th>
-            <th className="p-3 text-left">Period</th>
+            <th className="p-3 text-left">Staff</th>
+            <th className="p-3 text-left">Month</th>
             <th className="p-3 text-left">Gross Amount</th>
             <th className="p-3 text-left">Deduction</th>
+            <th className="p-3 text-left">Bouns</th>
             <th className="p-3 text-left">Transfer Amount</th>
             <th className="p-3 text-left">Payment Date</th>
             <th className="p-3 text-left">Method</th>
@@ -48,13 +49,13 @@ const PaymentTable = ({ data, loading, onView, onEdit, onDelete }: Props) => {
                 className="border-t hover:bg-gray-50 transition-colors"
               >
                 <td className="p-3">
-                  <div className="font-medium">{p.teacher?.name || '-'}</div>
+                  <div className="font-medium">{p.staff?.name || '-'}</div>
                   <div className="text-gray-400 text-xs">
-                    {p.teacher?.email || '-'}
+                    {p.staff?.email || '-'}
                   </div>
                 </td>
                 <td className="p-3">
-                  <div>{p.period_start}</div>
+                  <div>{p.salary_month}</div>
                   <div className="text-gray-400 text-xs">to {p.period_end}</div>
                 </td>
                 <td className="p-3">₹{p.gross_amount?.toLocaleString()}</td>

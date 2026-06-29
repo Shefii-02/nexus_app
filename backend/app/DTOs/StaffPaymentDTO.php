@@ -27,6 +27,7 @@ class StaffPaymentDTO
         public readonly ?string $remarks,
         public readonly string  $status,
         public int $created_by,
+        public ?int $released_by,
 
     ) {}
 
@@ -57,6 +58,7 @@ class StaffPaymentDTO
             payment_date: $data['payment_date'],
             status: $data['status'],
             created_by: auth()->id(),
+            released_by : $data['status'] == 'released' ? auth()->id() : '',
 
         );
     }
@@ -100,6 +102,8 @@ class StaffPaymentDTO
             'payment_date' =>
             $this->payment_date,
             'created_by' => auth()->id(),
+
+            'released_by' => $this->released_by,
 
         ];
     }

@@ -43,7 +43,7 @@ export const teacherPaymentFormConfig = [
   },
   {
     section: 'Amount Details',
-    name: 'transfer_amount',
+    name: 'amount',
     label: 'Transfer Amount',
     type: 'number',
     required: true,

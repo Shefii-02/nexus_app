@@ -57,8 +57,9 @@ import CreateAdmissionPage from '../modules/admissions/pages/CreateAdmissionPage
 import AdmissionListPage from '../modules/admissions/pages/AdmissionListPage'
 import ViewAdmissionPage from '../modules/admissions/pages/ViewAdmissionPage'
 import EditAdmissionPage from '../modules/admissions/pages/EditAdmissionPage'
-// import RenewalDuePage from '../modules/renewal/RenewalDuePage'
-// import RenewalHistoryPage from '../modules/renewal/RenewalHistoryPage'
+import RenewalDuePage from '../modules/admission_renewal/pages/RenewalDuePage'
+import RenewalHistoryPage from '../modules/admission_renewal/pages/RenewalHistoryPage'
+import CreateTeacherPaymentPage from '../modules/teacher_payments/pages/CreateTeacherPaymentPage'
 
 const AppRoutes = () => (
   <Routes>
@@ -101,20 +102,14 @@ const AppRoutes = () => (
         <Route path="/chats/:id/edit" element={<EditGroupPage />} />
         <Route path="/chats/:id" element={<EditGroupPage />} />
 
-        {/*
-        <Route path="/conversation/groups" element={<GroupListPage />} />
-        <Route path="/conversation/groups/create" element={<CreateGroupPage />} />
-        <Route path="/conversation/groups/:id/edit" element={<EditGroupPage />} />
-        <Route path="/conversation/groups/:id" element={<EditGroupPage />} /> */}
-
 
         <Route path="/admissions/create" element={<CreateAdmissionPage />} />
         <Route path="/admissions" element={<AdmissionListPage />} />
         <Route path="/admissions/:id/show" element={<ViewAdmissionPage />} />
         <Route path="/admissions/:id/edit" element={<EditAdmissionPage />} />
         
-        {/* <Route path="/renewals/due" element={<RenewalDuePage />} />
-        <Route path="/renewals" element={<RenewalHistoryPage />} /> */}
+        <Route path="/renewals/due" element={<RenewalDuePage />} />
+        <Route path="/renewals" element={<RenewalHistoryPage />} />
 
 
         <Route path="/payments" element={<PaymentListPage />} />
@@ -125,6 +120,16 @@ const AppRoutes = () => (
         <Route path="/announcements" element={<AnnouncementListPage />} />
         <Route path="/announcements/create" element={<CreateAnnouncementPage />} />
         <Route path="/announcements/:id/edit" element={<EditAnnouncementPage />} />
+
+
+        <Route path="/teacher-payments" element={< CreateTeacherPaymentPage/>} />
+        <Route path="/teacher-teachers/create" element={<CreateTeacherPaymentPage />} />
+
+
+        <Route path="/staff-payments" element={<TransactionListPage />} />
+        <Route path="/staff-payments/create" element={<TransactionListPage />} />
+
+        <Route path="/payments/transactions" element={<TransactionListPage />} />
 
         <Route path="/notifications" element={<NotificationListPage />} />
         <Route path="/notifications/create" element={<CreateNotificationPage />} />

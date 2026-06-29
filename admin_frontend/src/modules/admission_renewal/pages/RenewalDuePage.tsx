@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import PageHeader from '../../components/PageHeader'
+import PageHeader from '../../../components/PageHeader'
 import RenewalTable from './RenewalTable'
-import RenewalPaymentDrawer from './renewalPaymentDrawer'
-import { useRenewalDueList } from './RenewalHooks'
+import RenewalPaymentDrawer from './RenewalPaymentDrawer'
+import { useRenewalDueList } from '../RenewalHooks'
 
 
 const RenewalDuePage = () => {

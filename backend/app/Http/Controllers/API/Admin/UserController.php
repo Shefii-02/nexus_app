@@ -127,4 +127,47 @@ class UserController extends Controller
 
         return response()->json(['status' => true, 'data' => $users]);
     }
+
+
+
+    public function teacherSearch(Request $request): JsonResponse
+    {
+        $filters = request()->query('filters', []);
+        $users = User::get();
+        $q = $request->q;
+
+        $users = User::query()
+            ->where('acc_type','teacher')
+            ->when($q, function ($query) use ($q) {
+                $query->where('name', 'like', "%{$q}%")
+                    ->orWhere('email', 'like', "%{$q}%")
+                    ->orWhere('phone', 'like', "%{$q}%");
+            })
+            ->limit(20)
+            ->get();
+
+        return response()->json([
+            'data' => UserResource::collection($users)
+        ]);
+    }
+    public function staffSearch(Request $request): JsonResponse
+    {
+        $filters = request()->query('filters', []);
+        $users = User::get();
+        $q = $request->q;
+
+        $users = User::query()
+            ->where('acc_type','staff')
+            ->when($q, function ($query) use ($q) {
+                $query->where('name', 'like', "%{$q}%")
+                    ->orWhere('email', 'like', "%{$q}%")
+                    ->orWhere('phone', 'like', "%{$q}%");
+            })
+            ->limit(20)
+            ->get();
+
+        return response()->json([
+            'data' => UserResource::collection($users)
+        ]);
+    }
 }

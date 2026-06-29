@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useRenewalPayment } from './renewalHooks'
-import { handleMutationWithToast } from '../../utils/handleMutationWithToast'
+import { useRenewalPayment } from '../RenewalHooks'
+import { handleMutationWithToast } from '../../../utils/handleMutationWithToast'
 
 
 interface Props {

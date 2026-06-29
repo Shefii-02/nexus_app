@@ -135,11 +135,11 @@ export const navSections: NavSection[] = [
       },
       {
         label: 'Teacher Payments',
-        path: '/',
+        path: '/teacher-payments',
       },
       {
         label: 'Staff Payments',
-        path: '/',
+        path: '/staff-payments',
       },
 
       // {

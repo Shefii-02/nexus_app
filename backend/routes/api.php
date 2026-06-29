@@ -88,6 +88,8 @@ Route::middleware(['auth:api'])->group(function () {
 
 
     Route::get('users/search', [UserController::class, 'allUsers']);
+    Route::get('teacher/search', [UserController::class, 'teacherSearch']);
+    Route::get('staff/search', [UserController::class, 'staffSearch']);
     Route::get('all-users', [UserController::class, 'allUsers']);
 
     // Teacher Management

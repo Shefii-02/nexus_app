@@ -26,6 +26,7 @@ class StaffPaymentDTO
         public readonly ?string $payment_date,
         public readonly ?string $remarks,
         public readonly string  $status,
+        public int $created_by,
 
     ) {}
 
@@ -54,7 +55,8 @@ class StaffPaymentDTO
             payment_reference: $data['payment_reference'],
             transaction_no: $data['transaction_no'],
             payment_date: $data['payment_date'],
-            status: $data['status']
+            status: $data['status'],
+            created_by: auth()->id,
 
         );
     }
@@ -97,6 +99,7 @@ class StaffPaymentDTO
             $this->transaction_no,
             'payment_date' =>
             $this->payment_date,
+            'created_by' => $this->created_by,
 
         ];
     }

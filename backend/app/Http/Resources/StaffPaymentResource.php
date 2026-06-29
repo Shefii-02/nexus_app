@@ -21,7 +21,7 @@ extends JsonResource
                     $this->staff?->name,
             ],
 
-            'month' =>
+            'salary_month' =>
                 $this->month,
 
             'salary_amount' =>
@@ -41,6 +41,8 @@ extends JsonResource
 
             'payment_date' =>
                 $this->payment_date,
+            'created_by' => $this->created_by,
+            'released_by' => $this->released_by,
         ];
     }
 }

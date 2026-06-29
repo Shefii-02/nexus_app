@@ -13,13 +13,11 @@ extends JsonResource
 
             'id' => $this->id,
 
-            'staff' => [
-                'id' =>
-                $this->staff?->id,
-
-                'name' =>
-                $this->staff?->name,
-            ],
+            'staff'           => $this->whenLoaded('staff', fn() => [
+                'id'    => $this->staff->id,
+                'name'  => $this->staff->name,
+                'email' => $this->staff->email,
+            ]),
 
             'salary_month' =>
             date('Y-m', strtotime($this->salary_month)),

@@ -21,7 +21,7 @@ export const staffPaymentFormConfig = [
   // ── Amount Details ────────────────────────────────────────
   {
     section: 'Amount Details',
-    name: 'gross_amount',
+    name: 'salary_amount',
     label: 'Gross Amount',
     type: 'number',
     required: true,

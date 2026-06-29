@@ -47,7 +47,15 @@ extends BaseRequest
 
             'remarks' => [
                 'nullable'
-            ]
+            ],
+
+            'deduction_reason' => ['nullable'],
+            'payment_method' => ['nullable'],
+            'payment_reference' => ['nullable'],
+            'transaction_no' => ['nullable'],
+            'payment_date' => ['nullable'],
+
+            'status' => ['nullable'],
         ];
     }
 }

@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import DynamicForm from '../../../components/DynamicForm'
 import PageHeader from '../../../components/PageHeader'
 import { handleMutationWithToast } from '../../../utils/handleMutationWithToast'
+import Button from '../../../components/Button'
 
 import {
   useTeacherPayment,
@@ -64,7 +65,13 @@ const EditTeacherPaymentPage = () => {
 
   return (
     <div>
-      <PageHeader title="Edit Teacher Payment" />
+      <PageHeader title="Edit Teacher Payment" 
+       actions={
+          <Button onClick={() => navigate('/teacher-payments')}>
+             Back Payments
+          </Button>
+        }
+      />
 
       <DynamicForm
         config={teacherPaymentFormConfig}

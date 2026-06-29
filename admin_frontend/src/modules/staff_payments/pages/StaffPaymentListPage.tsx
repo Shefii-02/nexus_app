@@ -1,137 +1,69 @@
 import { useState } from 'react'
-
 import { useNavigate } from 'react-router-dom'
 
 import PageHeader from '../../../components/PageHeader'
-
 import Button from '../../../components/Button'
-
 import ConfirmModal from '../../../components/ConfirmModal'
-
-import {
-  useAdmissions,
-  useDeleteAdmission,
-} from '../staffPaymentHooks'
-
-import AdmissionTable from '../components/AdmissionTable'
-
 import { handleMutationWithToast } from '../../../utils/handleMutationWithToast'
 
-const AdmissionListPage = () => {
+import {
+  useStaffPayments,
+  useDeleteStaffPayment,
+} from '../staffPaymentHooks'
 
-  const navigate =
-    useNavigate()
+import PaymentTable from './PaymentTable'
 
-  const [search, setSearch] =
-    useState('')
+const StaffPaymentListPage = () => {
+  const navigate = useNavigate()
 
-  const [page, setPage] =
-    useState(1)
+  const [search, setSearch] = useState('')
+  const [page, setPage] = useState(1)
+  const [confirmId, setConfirmId] = useState<number | null>(null)
 
-  const [confirmId, setConfirmId] =
-    useState<number | null>(
-      null
-    )
-
-  const { data, isLoading } =
-    useAdmissions({
-      page,
-      search,
-    })
-
-  const remove =
-    useDeleteAdmission()
+  const { data, isLoading } = useStaffPayments({ page, search })
+  const remove = useDeleteStaffPayment()
 
   return (
     <div className="space-y-6">
-
       <PageHeader
-        title="Admissions"
-        subtitle="Manage admissions"
-
+        title="Staff Payments"
+        subtitle="Manage Staff salary and payment records"
         actions={
-          <Button
-            onClick={() =>
-              navigate(
-                '/admissions/create'
-              )
-            }
-          >
-            + New Admission
+          <Button onClick={() => navigate('/staff-payments/create')}>
+            + New Payment
           </Button>
         }
       />
 
       <div className="bg-white p-4 rounded-xl shadow-sm">
-
         <input
           value={search}
-          onChange={(e) =>
-            setSearch(
-              e.target.value
-            )
-          }
-
-          placeholder="Search admission..."
-
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search by staff name or period..."
           className="w-full md:w-80 border rounded p-2"
         />
       </div>
 
-      <AdmissionTable
-        data={
-          data?.data || []
-        }
-
-        loading={
-          isLoading
-        }
-
-        onView={(id) =>
-          navigate(
-            `/admissions/${id}/show`
-          )
-        }
-
-        // onEdit={(id) =>
-        //   navigate(
-        //     `/admissions/${id}/edit`
-        //   )
-        // }
-
+      <PaymentTable
+        data={data?.data || []}
+        loading={isLoading}
+        onView={(id) => navigate(`/staff-payments/${id}/show`)}
+        onEdit={(id) => navigate(`/staff-payments/${id}/edit`)}
         onDelete={setConfirmId}
       />
 
       <ConfirmModal
-        open={
-          confirmId !== null
-        }
-
-        title="Delete Admission?"
-
+        open={confirmId !== null}
+        title="Delete Payment?"
         message="This action cannot be undone."
-
         confirmText="Delete"
-
-        onCancel={() =>
-          setConfirmId(null)
-        }
-
+        onCancel={() => setConfirmId(null)}
         onConfirm={() =>
           handleMutationWithToast({
-            action: () =>
-              remove.mutateAsync(
-                confirmId as number
-              ),
-
-            loadingMessage:
-              'Deleting admission...',
-
-            successMessage:
-              'Admission deleted',
-
-            onSuccess: () =>
-              setConfirmId(null),
+            action: () => remove.mutateAsync(confirmId as number),
+            loadingMessage: 'Deleting payment...',
+            successMessage: 'Payment deleted successfully',
+            onSuccess: () => setConfirmId(null),
           })
         }
       />
@@ -139,4 +71,4 @@ const AdmissionListPage = () => {
   )
 }
 
-export default AdmissionListPage
+export default StaffPaymentListPage

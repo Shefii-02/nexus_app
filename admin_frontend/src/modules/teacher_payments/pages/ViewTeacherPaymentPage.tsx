@@ -1,17 +1,25 @@
 import { useParams } from 'react-router-dom'
-
+import { useNavigate } from 'react-router-dom'
 import PageHeader from '../../../components/PageHeader'
 import { useTeacherPayment } from '../teacherPaymentHooks'
+import Button from '../../../components/Button'
 
 const ViewTeacherPaymentPage = () => {
   const { id } = useParams()
   const { data } = useTeacherPayment(Number(id))
+  const navigate = useNavigate()
 
   if (!data) return null
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Teacher Payment Details" />
+      <PageHeader title="Teacher Payment Details"
+        actions={
+          <Button onClick={() => navigate('/teacher-payments')}>
+            Back Payments
+          </Button>
+        }
+      />
 
       <div className="bg-white rounded-xl p-5 shadow space-y-3">
         <div>
@@ -74,11 +82,10 @@ const ViewTeacherPaymentPage = () => {
         <div>
           <span className="text-gray-500 text-sm">Status:</span>{' '}
           <span
-            className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-              data.status === 'released'
+            className={`px-2 py-0.5 rounded-full text-xs font-medium ${data.status === 'released'
                 ? 'bg-green-100 text-green-700'
                 : 'bg-yellow-100 text-yellow-700'
-            }`}
+              }`}
           >
             {data.status}
           </span>

@@ -62,6 +62,11 @@ import RenewalHistoryPage from '../modules/admission_renewal/pages/RenewalHistor
 import CreateTeacherPaymentPage from '../modules/teacher_payments/pages/CreateTeacherPaymentPage'
 import TeacherPaymentListPage from '../modules/teacher_payments/pages/TeacherPaymentListPage'
 import EditTeacherPaymentPage from '../modules/teacher_payments/pages/EditTeacherPaymentPage'
+import ViewTeacherPaymentPage from '../modules/teacher_payments/pages/ViewTeacherPaymentPage'
+import StaffPaymentListPage from '../modules/staff_payments/pages/StaffPaymentListPage'
+import CreateStaffPaymentPage from '../modules/staff_payments/pages/CreateStaffPaymentPage'
+import ViewStaffPaymentPage from '../modules/staff_payments/pages/ViewStaffPaymentPage'
+import EditStaffPaymentPage from '../modules/staff_payments/pages/EditStaffPaymentPage'
 
 const AppRoutes = () => (
   <Routes>
@@ -125,15 +130,19 @@ const AppRoutes = () => (
 
         <Route path="/teacher-payments" element={<TeacherPaymentListPage/>} />
         <Route path="/teacher-payments/create" element={<CreateTeacherPaymentPage />} />
-        <Route path="/teacher-payments/:id/show" element={<ViewAdmissionPage />} />
+        <Route path="/teacher-payments/:id/show" element={<ViewTeacherPaymentPage />} />
         <Route path="/teacher-payments/:id/edit" element={<EditTeacherPaymentPage />} />
 
 
-        <Route path="/staff-payments" element={<TransactionListPage />} />
-        <Route path="/staff-payments/create" element={<TransactionListPage />} />
+
+        <Route path="/staff-payments" element={<StaffPaymentListPage/>} />
+        <Route path="/staff-payments/create" element={<CreateStaffPaymentPage />} />
+        <Route path="/staff-payments/:id/show" element={<ViewStaffPaymentPage />} />
+        <Route path="/staff-payments/:id/edit" element={<EditStaffPaymentPage />} />
+        
+
 
         <Route path="/payments/transactions" element={<TransactionListPage />} />
-
         <Route path="/notifications" element={<NotificationListPage />} />
         <Route path="/notifications/create" element={<CreateNotificationPage />} />
         <Route path="/notifications/:id" element={<ViewNotificationPage />} />

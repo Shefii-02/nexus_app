@@ -21,6 +21,8 @@ class StaffPayment extends Model
 
         'deduction_amount',
 
+        'deduction_reason',
+
         'final_amount',
 
         'status',

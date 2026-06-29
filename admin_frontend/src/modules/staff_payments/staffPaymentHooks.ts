@@ -1,122 +1,56 @@
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { staffPaymentService, type StaffPaymentFormPayload } from './staffPaymentService'
 
-import { admissionService } from './pages/admissionService'
-
-export const useAdmissions = (
-  params?: any
-) =>
+export const useStaffPayments = (params?: any) =>
   useQuery({
-    queryKey: [
-      'admissions',
-      params,
-    ],
-
+    queryKey: ['staff-payments', params],
     queryFn: () =>
-      admissionService
-        .getAll(params)
-        .then(
-          (res) => res.data
-        ),
+      staffPaymentService.getAll(params).then((res) => res.data),
   })
 
-export const useAdmission = (
-  id: number
-) =>
+export const useStaffPayment = (id: number) =>
   useQuery({
-    queryKey: [
-      'admission',
-      id,
-    ],
-
+    queryKey: ['staff-payment', id],
     queryFn: () =>
-      admissionService
-        .getById(id)
-        .then(
-          (res) =>
-            res.data.data
-        ),
-
+      staffPaymentService.getById(id).then((res) => res.data.data),
     enabled: !!id,
   })
 
-export const useCreateAdmission =
-  () => {
+export const useCreateStaffPayment = () => {
+  const qc = useQueryClient()
 
-    const qc =
-      useQueryClient()
+  return useMutation({
+    mutationFn: (payload: StaffPaymentFormPayload) =>
+      staffPaymentService.create(payload).then((r) => r.data),
 
-    return useMutation({
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['staff-payments'] })
+    },
+  })
+}
 
-      mutationFn: (
-        payload: any
-      ) =>
-        admissionService
-          .create(payload)
-          .then(
-            (r) => r.data
-          ),
+export const useUpdateStaffPayment = () => {
+  const qc = useQueryClient()
 
-      onSuccess: () => {
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: StaffPaymentFormPayload }) =>
+      staffPaymentService.update(id, data),
 
-        qc.invalidateQueries({
-          queryKey: [
-            'admissions',
-          ],
-        })
-      },
-    })
-  }
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['staff-payments'] })
+      qc.invalidateQueries({ queryKey: ['staff-payment'] })
+    },
+  })
+}
 
-export const useUpdateAdmission =
-  () => {
-    const qc =
-      useQueryClient()
+export const useDeleteStaffPayment = () => {
+  const qc = useQueryClient()
 
-    return useMutation({
-      mutationFn: ({
-        id,
-        data,
-      }: any) =>
-        admissionService.update(
-          id,
-          data
-        ),
+  return useMutation({
+    mutationFn: (id: number) => staffPaymentService.remove(id),
 
-      onSuccess: () => {
-        qc.invalidateQueries({
-          queryKey: [
-            'admissions',
-          ],
-        })
-
-        qc.invalidateQueries({
-          queryKey: [
-            'admission',
-          ],
-        })
-      },
-    })
-  }
-
-export const useDeleteAdmission =
-  () => {
-    const qc =
-      useQueryClient()
-
-    return useMutation({
-      mutationFn:
-        admissionService.remove,
-
-      onSuccess: () => {
-        qc.invalidateQueries({
-          queryKey: [
-            'admissions',
-          ],
-        })
-      },
-    })
-  }
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['staff-payments'] })
+    },
+  })
+}

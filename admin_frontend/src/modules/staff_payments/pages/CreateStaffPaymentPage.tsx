@@ -3,76 +3,54 @@ import { useNavigate } from 'react-router-dom'
 import DynamicForm from '../../../components/DynamicForm'
 import PageHeader from '../../../components/PageHeader'
 
-import { admissionFormConfig } from '../admissionFormConfig'
-
-import { useCreateAdmission } from '../staffPaymentHooks'
-
+import { staffPaymentFormConfig } from '../staffPaymentFormConfig'
+import { useCreateStaffPayment } from '../staffPaymentHooks'
 import { handleMutationWithToast } from '../../../utils/handleMutationWithToast'
+import Button from '../../../components/Button'
 
-const CreateAdmissionPage = () => {
-
-  const navigate =
-    useNavigate()
-
-  const createAdmission =
-    useCreateAdmission()
+const CreateStaffPaymentPage = () => {
+  const navigate = useNavigate()
+  const createPayment = useCreateStaffPayment()
 
   const handleSubmit = async (data: any) => {
-
     return handleMutationWithToast({
-
       action: () =>
-        createAdmission.mutateAsync({
+        createPayment.mutateAsync({
           ...data,
-
-          actual_fee:
-            Number(data.actual_fee),
-
-          discount_amount:
-            Number(
-              data.discount_amount || 0
-            ),
-
-          net_fee:
-            Number(data.net_fee),
-
-          paid_amount:
-            Number(
-              data.paid_amount || 0
-            ),
+          total_classes:    Number(data.total_classes    || 0),
+          gross_amount:     Number(data.gross_amount     || 0),
+          deduction_amount: Number(data.deduction_amount || 0),
+          amount:           Number(data.amount           || 0),
         }),
 
-      loadingMessage:
-        'Creating admission...',
-
-      successMessage:
-        'Admission created successfully',
+      loadingMessage: 'Creating payment...',
+      successMessage: 'Staff payment created successfully',
 
       navigate,
-
-      redirect:
-        '/admissions',
+      redirect: '/staff-payments',
     })
   }
 
   return (
     <div>
       <PageHeader
-        title="Create Admission"
+        title="Create Staff Payment"
+        subtitle="Record a new salary or payment entry for a staff"
+        actions={
+          <Button onClick={() => navigate('/staff-payments')}>
+             Back Payments
+          </Button>
+        }
       />
 
       <div className="pt-4">
         <DynamicForm
-          config={
-            admissionFormConfig
-          }
-          onSubmit={
-            handleSubmit
-          }
+          config={staffPaymentFormConfig}
+          onSubmit={handleSubmit}
         />
       </div>
     </div>
   )
 }
 
-export default CreateAdmissionPage
+export default CreateStaffPaymentPage

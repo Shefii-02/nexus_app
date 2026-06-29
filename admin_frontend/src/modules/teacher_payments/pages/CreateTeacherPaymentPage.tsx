@@ -6,6 +6,7 @@ import PageHeader from '../../../components/PageHeader'
 import { teacherPaymentFormConfig } from '../teacherPaymentFormConfig'
 import { useCreateTeacherPayment } from '../teacherPaymentHooks'
 import { handleMutationWithToast } from '../../../utils/handleMutationWithToast'
+import Button from '../../../components/Button'
 
 const CreateTeacherPaymentPage = () => {
   const navigate = useNavigate()
@@ -35,6 +36,11 @@ const CreateTeacherPaymentPage = () => {
       <PageHeader
         title="Create Teacher Payment"
         subtitle="Record a new salary or payment entry for a teacher"
+        actions={
+          <Button onClick={() => navigate('/teacher-payments')}>
+             Back Payments
+          </Button>
+        }
       />
 
       <div className="pt-4">

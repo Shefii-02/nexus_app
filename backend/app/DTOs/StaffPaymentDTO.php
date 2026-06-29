@@ -13,12 +13,20 @@ class StaffPaymentDTO
         public float $salary_amount,
 
         public float $bonus_amount = 0,
+        public float $final_amount = 0,
 
         public float $deduction_amount = 0,
 
-        public float $final_amount = 0,
+        public ?string $deduction_reason,
 
-        public ?string $remarks = null
+
+        public readonly ?string $payment_method,
+        public readonly ?string $payment_reference,
+        public readonly ?string $transaction_no,
+        public readonly ?string $payment_date,
+        public readonly ?string $remarks,
+        public readonly string  $status,
+
     ) {}
 
     public static function fromArray(
@@ -27,26 +35,27 @@ class StaffPaymentDTO
 
         return new self(
 
-            staff_id:
-                $data['staff_id'],
+            staff_id: $data['staff_id'],
 
-            month:
-                $data['month'],
+            month: $data['month'],
 
-            salary_amount:
-                $data['salary_amount'],
+            salary_amount: $data['salary_amount'],
 
-            bonus_amount:
-                $data['bonus_amount'] ?? 0,
+            bonus_amount: $data['bonus_amount'] ?? 0,
 
-            deduction_amount:
-                $data['deduction_amount'] ?? 0,
+            deduction_amount: $data['deduction_amount'] ?? 0,
+            deduction_reason: $data['deduction_reason'],
 
-            final_amount:
-                $data['final_amount'],
+            final_amount: $data['final_amount'],
 
-            remarks:
-                $data['remarks'] ?? null,
+            remarks: $data['remarks'] ?? null,
+
+            payment_method: $data['payment_method'],
+            payment_reference: $data['payment_reference'],
+            transaction_no: $data['transaction_no'],
+            payment_date: $data['payment_date'],
+            status: $data['status']
+
         );
     }
 
@@ -55,28 +64,40 @@ class StaffPaymentDTO
         return [
 
             'staff_id' =>
-                $this->staff_id,
+            $this->staff_id,
 
             'month' =>
-                $this->month,
+            $this->month,
 
             'salary_amount' =>
-                $this->salary_amount,
+            $this->salary_amount,
 
             'bonus_amount' =>
-                $this->bonus_amount,
+            $this->bonus_amount,
 
             'deduction_amount' =>
-                $this->deduction_amount,
+            $this->deduction_amount,
 
             'final_amount' =>
-                $this->final_amount,
+            $this->final_amount,
 
             'remarks' =>
-                $this->remarks,
+            $this->remarks,
 
             'status' =>
-                'pending',
+            $this->status,
+
+            'deduction_reason' =>
+            $this->deduction_reason,
+            'payment_method' =>
+            $this->payment_method,
+            'payment_reference' =>
+            $this->payment_reference,
+            'transaction_no' =>
+            $this->transaction_no,
+            'payment_date' =>
+            $this->payment_date,
+
         ];
     }
 }

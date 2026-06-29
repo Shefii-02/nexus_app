@@ -37,7 +37,7 @@ extends JsonResource
             'payment_method'    => $this->payment_method,
             'payment_reference' => $this->payment_reference,
             'transaction_no'    => $this->transaction_no,
-            'payment_date'      => date('Y-m-d', strtotime($this->payment_date)),
+            'payment_date'      => $this->payment_date != null ? date('Y-m-d', strtotime($this->payment_date)) : "",
             'created_by' => $this->created_by,
             'released_by' => $this->released_by,
         ];

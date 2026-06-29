@@ -35,9 +35,8 @@ const EditStaffPaymentPage = () => {
         ...data,
         // Pass the nested teacher object; AsyncSelectField will extract .id
         // for the form value and show .name as the label.
-        teacher_id: data.teacher ?? data.teacher_id,
-        started_at: formatDate(data.period_start),
-        ended_at: formatDate(data.period_end),
+        staff_id: data.staff ?? data.staff_id,
+        salary_month: data.salary_month,
       }
     : undefined
 
@@ -48,15 +47,14 @@ const EditStaffPaymentPage = () => {
           id: Number(id),
           data: {
             ...values,
-            total_classes:    Number(values.total_classes    || 0),
-            gross_amount:     Number(values.gross_amount     || 0),
+            salary_amount:     Number(values.salary_amount     || 0),
             deduction_amount: Number(values.deduction_amount || 0),
-            amount:           Number(values.amount           || 0),
+            final_amount:           Number(values.final_amount           || 0),
           },
         }),
 
       loadingMessage: 'Saving payment...',
-      successMessage: 'Teacher payment updated successfully',
+      successMessage: 'Staff payment updated successfully',
 
       navigate,
       redirect: '/staff-payments',

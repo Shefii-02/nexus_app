@@ -27,7 +27,7 @@ class TeacherPaymentResource extends JsonResource
             'payment_method'    => $this->payment_method,
             'payment_reference' => $this->payment_reference,
             'transaction_no'    => $this->transaction_no,
-            'payment_date'      => $this->payment_date,
+            'payment_date'      => date('Y-m-d', strtotime($this->payment_date)),
             'remarks'           => $this->remarks,
             'status'            => $this->status,
             'paid_at'           => $this->paid_at,

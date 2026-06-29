@@ -113,7 +113,6 @@ const AppRoutes = () => (
         <Route path="/renewals/due" element={<RenewalDuePage />} />
         <Route path="/renewals" element={<RenewalHistoryPage />} />
 
-
         <Route path="/payments" element={<PaymentListPage />} />
         {/* <Route path="/payments/create" element={<CreatePaymentPage />} /> */}
         <Route path="/payments/:id/edit" element={<EditPaymentPage />} />
@@ -125,9 +124,9 @@ const AppRoutes = () => (
 
 
         <Route path="/teacher-payments" element={<TeacherPaymentListPage/>} />
-        <Route path="/teacher-teachers/create" element={<CreateTeacherPaymentPage />} />
-        <Route path="/teacher-teachers/:id/show" element={<ViewAdmissionPage />} />
-        <Route path="/teacher-teachers/:id/edit" element={<EditTeacherPaymentPage />} />
+        <Route path="/teacher-payments/create" element={<CreateTeacherPaymentPage />} />
+        <Route path="/teacher-payments/:id/show" element={<ViewAdmissionPage />} />
+        <Route path="/teacher-payments/:id/edit" element={<EditTeacherPaymentPage />} />
 
 
         <Route path="/staff-payments" element={<TransactionListPage />} />

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import apiClient from '../../services/apiClient'
 
 interface Props {
@@ -8,7 +8,7 @@ interface Props {
   valueKey?: string
   labelKey?: string
   placeholder?: string
-  onChange: (item: any) => void
+  onChange: (id: any) => void
 }
 
 const AsyncSelectField = ({
@@ -26,25 +26,40 @@ const AsyncSelectField = ({
   const [open, setOpen] = useState(false)
   const [selected, setSelected] = useState<any>(null)
 
-  // Sync selected when value prop changes (handles async defaultValues on edit)
-  // value can be either a full object { id, name, ... } or just an id number
+  // Track the last id we synced so we don't re-fire when the parent
+  // re-renders with the same value after we already called onChange.
+  const syncedIdRef = useRef<any>(undefined)
+
   useEffect(() => {
     if (value == null) return
 
     if (typeof value === 'object') {
+      const id = value[valueKey]
+
+      // Already synced this id — nothing to do
+      if (syncedIdRef.current === id) return
+
+      syncedIdRef.current = id
       setSelected(value)
+
+      // Tell the form to store the id, not the full object
+      onChange(id)
     } else {
-      // value is a raw id — fetch the record so we can show the label
+      // value is already a plain id — just make sure the label is shown
+      if (syncedIdRef.current === value) return
+      syncedIdRef.current = value
+
+      // selected is already set (user picked from dropdown) — skip fetch
+      if (selected && selected[valueKey] === value) return
+
       apiClient
-        .get(endpoint, { params: { id: value } })
+        .get(endpoint, { params: { search: value } })
         .then((res) => {
           const list: any[] = res.data.data || res.data || []
           const match = list.find((item) => item[valueKey] === value)
           if (match) setSelected(match)
         })
-        .catch(() => {
-          // fallback: show nothing rather than crash
-        })
+        .catch(() => {})
     }
   }, [value])
 
@@ -98,10 +113,12 @@ const AsyncSelectField = ({
               key={item[valueKey]}
               className="p-3 hover:bg-gray-100 cursor-pointer border-b"
               onClick={() => {
+                const id = item[valueKey]
+                syncedIdRef.current = id
                 setSelected(item)
                 setSearch('')
                 setOpen(false)
-                onChange(item[valueKey])
+                onChange(id)
               }}
             >
               <div className="font-medium">{item[labelKey]}</div>

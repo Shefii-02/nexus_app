@@ -29,4 +29,9 @@ class TeacherPaymentItem extends Model
             'teacher_payment_item_payment'
         );
     }
+
+    public function teacherPayment()
+    {
+        return $this->belongsTo(TeacherPayment::class);
+    }
 }

@@ -54,4 +54,9 @@ class TeacherPayment extends Model
     {
         return $this->belongsTo(User::class, 'released_by');
     }
+
+    public function items()
+    {
+        return $this->hasMany(TeacherPaymentItem::class);
+    }
 }

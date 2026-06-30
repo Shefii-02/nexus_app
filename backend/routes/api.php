@@ -541,6 +541,8 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('teacher', [TransactionPaymentController::class, 'teacher']);
         Route::get('staff',   [TransactionPaymentController::class, 'staff']);
         Route::get('admin',   [TransactionPaymentController::class, 'admin']);
+        Route::get('admin',   [TransactionPaymentController::class, 'admin']);
+        Route::get('receipt/{type}/{id}', [TransactionPaymentController::class, 'studentReceipt']);
 
 
         // Route::get('admin', [AppPaymentController::class, 'adminPayments'])
@@ -550,18 +552,18 @@ Route::middleware(['auth:api'])->group(function () {
         // ── Receipt generation ────────────────────────────────────────────────────
         // GET /api/payments/receipt/{type}/{id}
         // type: admission | renewal | teacher | staff
-        Route::get('receipt/{type}/{id}', function () {
-            $receiptResponse = [
-                'success' => true,
-                'data' => [
-                    'receipt_url'    => 'https://yourdomain.com/storage/receipts/receipt_admission_1001_abc123.pdf',
-                    'filename'       => 'receipt_admission_1001_abc123.pdf',
-                    'whatsapp_url'   => 'https://wa.me/?text=YourApp%20Payment%20Receipt%0AAmount%20Paid%3A%20%E2%82%B94500%20%7C%20Flutter%20%26%20Dart%20Bootcamp%0ADownload%3A%20https%3A%2F%2Fyourdomain.com%2Fstorage%2Freceipts%2Freceipt.pdf',
-                    'preview_base64' => null, // optional PNG thumbnail
-                ],
-            ];
-            return response()->json([$receiptResponse]);
-        });
+        // Route::get('receipt/{type}/{id}', function () {
+        //     $receiptResponse = [
+        //         'success' => true,
+        //         'data' => [
+        //             'receipt_url'    => 'https://yourdomain.com/storage/receipts/receipt_admission_1001_abc123.pdf',
+        //             'filename'       => 'receipt_admission_1001_abc123.pdf',
+        //             'whatsapp_url'   => 'https://wa.me/?text=YourApp%20Payment%20Receipt%0AAmount%20Paid%3A%20%E2%82%B94500%20%7C%20Flutter%20%26%20Dart%20Bootcamp%0ADownload%3A%20https%3A%2F%2Fyourdomain.com%2Fstorage%2Freceipts%2Freceipt.pdf',
+        //             'preview_base64' => null, // optional PNG thumbnail
+        //         ],
+        //     ];
+        //     return response()->json([$receiptResponse]);
+        // });
         // Route::get('receipt/{type}/{id}', [AppPaymentController::class, 'receipt'])
         //     ->name('payments.receipt');
 

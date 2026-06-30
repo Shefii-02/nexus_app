@@ -96,7 +96,7 @@ class TransactionPaymentController extends Controller
             'course:id,name',
             'admission:id',
         ])
-            ->when($studentId, fn ($query) => $query->where('student_id', $studentId))
+            ->when($studentId, fn($query) => $query->where('student_id', $studentId))
             ->orderByDesc('paid_at')
             ->get()
             ->map(function ($payment) {
@@ -130,7 +130,7 @@ class TransactionPaymentController extends Controller
             'admission:id',
         ])
             ->where('status', 'pending')
-            ->when($studentId, fn ($query) => $query->where('student_id', $studentId))
+            ->when($studentId, fn($query) => $query->where('student_id', $studentId))
             ->latest()
             ->get()
             ->map(function ($renewal) {
@@ -168,7 +168,7 @@ class TransactionPaymentController extends Controller
             'items.course:id,name',
         ])
             ->where('status', $status)
-            ->when($teacherId, fn ($q) => $q->where('teacher_id', $teacherId));
+            ->when($teacherId, fn($q) => $q->where('teacher_id', $teacherId));
 
         $query = $status === 'released'
             ? $query->latest('payment_date')
@@ -232,7 +232,7 @@ class TransactionPaymentController extends Controller
             'releasedBy:id,name',
         ])
             ->where('status', $status)
-            ->when($staffId, fn ($q) => $q->where('staff_id', $staffId));
+            ->when($staffId, fn($q) => $q->where('staff_id', $staffId));
 
         $query = $status === 'released'
             ? $query->latest('payment_date')
@@ -265,5 +265,21 @@ class TransactionPaymentController extends Controller
                 'created_at' => $payment->created_at,
             ];
         })->values();
+    }
+
+
+    public function studentReceipt(Request $request): JsonResponse
+    {
+
+        $receiptResponse = [
+            'success' => true,
+            'data' => [
+                'receipt_url'    => 'https://yourdomain.com/storage/receipts/receipt_admission_1001_abc123.pdf',
+                'filename'       => 'receipt_admission_1001_abc123.pdf',
+                'whatsapp_url'   => 'https://wa.me/?text=YourApp%20Payment%20Receipt%0AAmount%20Paid%3A%20%E2%82%B94500%20%7C%20Flutter%20%26%20Dart%20Bootcamp%0ADownload%3A%20https%3A%2F%2Fyourdomain.com%2Fstorage%2Freceipts%2Freceipt.pdf',
+                'preview_base64' => null, // optional PNG thumbnail
+            ],
+        ];
+        return response()->json([$receiptResponse]);
     }
 }

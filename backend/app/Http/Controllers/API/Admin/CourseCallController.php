@@ -5,6 +5,9 @@ namespace App\Http\Controllers\API\Admin;
 use App\Models\Conversation;
 use App\Models\User;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\AdmissionStudentResource;
+use App\Http\Resources\CallStudentResource;
+use App\Models\Admission;
 use App\Services\Notification\PushNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -14,19 +17,38 @@ class CourseCallController extends Controller
     // ── GET /course/{id}/students ────────────────────────────────────────
     public function getStudents($id)
     {
+
+        $students = Admission::query()
+            ->where('course_id', $id)
+            // ->where('status', 'active')
+            ->with([
+                'student',
+                'course'
+            ])
+            ->get();
+
+
+        return response()->json([
+            'status'   => 200,
+            'students' =>
+            CallStudentResource::collection($students),
+        ]);
+
+
+
         // Get all students enrolled in this course/module
         // $students = User::whereHas('enrollments', fn($q) => $q->where('course_id', $id))
         //     ->where('role', 'student')
         //     ->select('id', 'name', 'email', 'avatar')
         //     ->get();
-        $students = [
-            [
-                'id' => 1,
-                'name' => 'Rahul Kumar',
-                'email' => 'rahul@example.com',
-                'mobile' => '43534534534545',
-                'avatar' => 'https://i.pravatar.cc/150?img=1',
-            ],
+        // $students = [
+        //     [
+        //         'id' => 1,
+        //         'name' => 'Rahul Kumar',
+        //         'email' => 'rahul@example.com',
+        //         'mobile' => '43534534534545',
+        //         'avatar' => 'https://i.pravatar.cc/150?img=1',
+        //     ],
             // [
             //     'id' => 2,
             //     'name' => 'Anjali Nair',
@@ -55,7 +77,7 @@ class CourseCallController extends Controller
             //     'mobile' => '94848957344',
             //     'avatar' => 'https://i.pravatar.cc/150?img=5',
             // ],
-        ];
+        // ];
 
         return response()->json([
             'status'   => 200,

@@ -220,7 +220,7 @@ class CourseController extends Controller
             ->with('teacher')
             ->get();
 
-        Log::info($teachers);
+
 
         return $this->successResponse(
             TeacherResource::collection($teachers),

@@ -51,7 +51,8 @@ return new class extends Migration
 
             $table->enum('status', [
                 'pending',
-                'released'
+                'released',
+                'cancelled'
             ])->default('pending');
 
             $table->foreignId('created_by')
@@ -74,20 +75,19 @@ return new class extends Migration
             $table->date('period_end');
 
             $table->integer('total_classes')
-                ->default(0);
+                ->default(0)->nullable();
 
             $table->decimal('gross_amount', 12, 2);
 
             $table->decimal('deduction_amount', 12, 2)
                 ->default(0);
 
-            $table->decimal('deduction_reason', 12, 2)
-                ->default(0);
+            $table->text('deduction_reason')->nullable();
 
 
             $table->decimal('amount', 12, 2);
 
-            $table->string('payment_method');
+            $table->string('payment_method')->nullable();
 
             $table->string('payment_reference')
                 ->nullable();
@@ -95,20 +95,21 @@ return new class extends Migration
             $table->string('transaction_no')
                 ->nullable();
 
-            $table->date('payment_date');
+            $table->date('payment_date')->nullable();
 
             $table->text('remarks')
                 ->nullable();
 
-            $table->foreignId('created_by')
+            $table->foreignId('created_by')->nullable()
                 ->constrained('users');
 
-            $table->foreignId('released_by')
+            $table->foreignId('released_by')->nullable()
                 ->constrained('users');
 
             $table->enum('status', [
                 'pending',
-                'released'
+                'released',
+                'cancelled'
             ])->default('pending');
 
             $table->timestamp('paid_at')

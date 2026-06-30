@@ -19,7 +19,6 @@ return new class extends Migration
             $table->foreignId('staff_id')
                 ->constrained('users');
 
-            $table->string('month');
             $table->date('salary_month');
             $table->decimal('salary_amount', 12, 2);
 
@@ -28,14 +27,15 @@ return new class extends Migration
 
             $table->decimal('deduction_amount', 12, 2)
                 ->default(0);
-            $table->decimal('deduction_reason', 12, 2)
-                ->default(0);
+
+            $table->text('deduction_reason')->nullable();
 
             $table->decimal('final_amount', 12, 2);
 
             $table->enum('status', [
                 'pending',
-                'released'
+                'released',
+                'cancelled'
             ])->default('pending');
 
             $table->timestamp('paid_at')
@@ -57,7 +57,7 @@ return new class extends Migration
                 ->nullable()
                 ->constrained('users');
 
-            $table->foreignId('created_by')
+            $table->foreignId('created_by')->nullable()
                 ->constrained('users');
 
             $table->timestamps();
@@ -65,8 +65,7 @@ return new class extends Migration
             $table->softDeletes();
 
             $table->unique([
-                'staff_id',
-                'month'
+                'staff_id'
             ]);
         });
     }

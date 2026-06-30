@@ -12,6 +12,7 @@ use App\Services\Course\CourseMaterialService;
 use App\Services\Media\MediaService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class MyCourseController extends Controller
 {
@@ -329,5 +330,10 @@ class MyCourseController extends Controller
             'success' => true,
             'message' => 'Material deleted successfully.',
         ]);
+    }
+
+
+    public function teacherCall(Request $request){
+        Log::info($request->all());
     }
 }

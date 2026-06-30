@@ -14,6 +14,7 @@ use App\Http\Controllers\API\Admin\CourseController;
 use App\Http\Controllers\API\Admin\CourseClassController;
 use App\Http\Controllers\API\Admin\PaymentController;
 use App\Http\Controllers\API\Admin\AnnouncementController;
+use App\Http\Controllers\API\Admin\CallController;
 use App\Http\Controllers\API\Admin\ConversationController;
 use App\Http\Controllers\API\Admin\CouponController;
 use App\Http\Controllers\API\Admin\CourseCallController;
@@ -109,6 +110,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/courses/{course}/addon-teachers', [CourseController::class, 'addonTeachersStore']);
 
     Route::get('/courses/{course}/teachers', [CourseController::class, 'courseTeachers']);
+
+
     Route::get('/courses/{course}/students', [CourseController::class, 'students']);
 
     Route::put('/courses/students/{admission}', [CourseController::class, 'updateStudent']);
@@ -180,6 +183,13 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/my_courses', [MyCourseController::class, 'index']);
 
     Route::get('/my_courses/{id}', [MyCourseController::class, 'single']);
+
+
+    // Route::get('/courses/{course}/teacher-call', [MyCourseController::class, 'teacherCall']);
+    Route::post('/courses/{course}/call', [CallController::class, 'store']);
+    Route::post('/calls/{call}/answer', [CallController::class, 'answer']);
+    Route::post('/calls/{call}/reject', [CallController::class, 'reject']);
+    Route::post('/calls/{call}/end', [CallController::class, 'end']);
 
 
 

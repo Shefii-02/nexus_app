@@ -11,10 +11,10 @@ class CallStudentResource extends JsonResource
     {
         return [
             'id' => $this->student?->id,
-            'name' => $this->student?->name,
-            'email' => $this->student?->email,
-            'mobile' => $this->student?->phone,
-            'avatar' => $this->student?->avatar_url,
+            'name' => $this->student?->name ?? '',
+            'email' => $this->student?->email ?? '',
+            'mobile' => $this->student?->phone ?? '',
+            'avatar' => $this->student?->avatar_url ?? '',
         ];
     }
 }

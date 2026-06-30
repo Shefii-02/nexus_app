@@ -429,7 +429,7 @@ class TransactionPaymentController extends Controller
                     'transaction_no' => $payment->transaction_no,
                     'remarks'        => $payment->remarks,
                     'paid_at'        => optional($payment->paid_at)->toDateTimeString(),
-                    'received_by'    => $payment->received_by,
+                    'received_by'    => $payment->receiver?->name ?? "",
                     'created_at'     => optional($payment->created_at)->toDateTimeString(),
                 ];
             })

@@ -543,6 +543,22 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('admin',   [TransactionPaymentController::class, 'admin']);
         Route::get('admin',   [TransactionPaymentController::class, 'admin']);
         Route::get('receipt/{type}/{id}', [TransactionPaymentController::class, 'studentReceipt']);
+        // Student
+        Route::get('/student/receipt', [TransactionPaymentController::class, 'studentReceipt']);          // ?payment_id=
+        Route::get('/student/pending-invoice', [TransactionPaymentController::class, 'studentPendingInvoice']); // ?renewal_id=
+
+        // Teacher
+        Route::get('/teacher/receipt', [TransactionPaymentController::class, 'teacherReceipt']);          // ?payment_id=
+        Route::get('/teacher/pending-invoice', [TransactionPaymentController::class, 'teacherPendingInvoice']); // ?payment_id=
+
+        // Staff
+        Route::get('/staff/receipt', [TransactionPaymentController::class, 'staffReceipt']);              // ?payment_id=
+        Route::get('/staff/pending-invoice', [TransactionPaymentController::class, 'staffPendingInvoice']); // ?payment_id=
+
+        // Admin (should additionally be gated by an `is_admin` / role middleware)
+
+        Route::get('/admin', [TransactionPaymentController::class, 'admin']);
+        Route::get('/admin/receipt', [TransactionPaymentController::class, 'adminReceipt']); // ?type=&id=
 
 
         // Route::get('admin', [AppPaymentController::class, 'adminPayments'])

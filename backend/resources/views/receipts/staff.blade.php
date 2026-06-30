@@ -12,32 +12,20 @@
     </style>
 </head>
 <body>
-    <h1>{{ config('app.name') }} - Teacher Payment Receipt</h1>
-    <p class="muted">Batch #{{ $payment->id }} &middot; {{ $payment->period_start }} to {{ $payment->period_end }}</p>
+    <h1>{{ config('app.name') }} - Salary Receipt</h1>
+    <p class="muted">Salary Month: {{ $payment->salary_month }}</p>
 
     <table>
-        <tr><th>Teacher</th><td>{{ optional($payment->teacher)->name }}</td></tr>
-        <tr><th>Total Classes</th><td>{{ $payment->total_classes }}</td></tr>
-        <tr><th>Gross Amount</th><td>&#8377;{{ number_format((float) $payment->gross_amount, 2) }}</td></tr>
+        <tr><th>Staff</th><td>{{ optional($payment->staff)->name }}</td></tr>
+        <tr><th>Salary Amount</th><td>&#8377;{{ number_format((float) $payment->salary_amount, 2) }}</td></tr>
+        <tr><th>Bonus</th><td>&#8377;{{ number_format((float) $payment->bonus_amount, 2) }}</td></tr>
         <tr><th>Deduction</th><td>&#8377;{{ number_format((float) $payment->deduction_amount, 2) }} ({{ $payment->deduction_reason ?? '—' }})</td></tr>
         <tr><th>Payment Method</th><td>{{ $payment->payment_method ?? '—' }}</td></tr>
         <tr><th>Transaction No.</th><td>{{ $payment->transaction_no ?? '—' }}</td></tr>
         <tr><th>Released By</th><td>{{ optional($payment->releasedBy)->name ?? '—' }}</td></tr>
     </table>
 
-    <table style="margin-top: 20px;">
-        <tr><th>Course</th><th>Month</th><th>Type</th><th>Amount</th></tr>
-        @foreach ($payment->items as $item)
-            <tr>
-                <td>{{ optional($item->course)->name }}</td>
-                <td>{{ $item->month }}</td>
-                <td>{{ ucfirst($item->calculation_type) }}</td>
-                <td>&#8377;{{ number_format((float) $item->amount, 2) }}</td>
-            </tr>
-        @endforeach
-    </table>
-
     <p style="margin-top: 30px;">Net Amount Paid</p>
-    <p class="amount">&#8377;{{ number_format((float) $payment->amount, 2) }}</p>
+    <p class="amount">&#8377;{{ number_format((float) $payment->final_amount, 2) }}</p>
 </body>
 </html>

@@ -34,13 +34,13 @@ class TransactionPaymentController extends Controller
     /**
      * Download/share link for a PAID admission receipt (student's own).
      */
-    public function studentReceipt(Request $request): JsonResponse
+    public function studentReceipt(Request $request,$paymentId): JsonResponse
     {
-        $request->validate(['payment_id' => ['required', 'integer']]);
+        // $request->validate(['payment_id' => ['required', 'integer']]);
 
         $payment = AdmissionPayment::with(['student:id,name', 'course:id,name'])
             ->where('student_id', $request->user()->id)
-            ->find($request->integer('payment_id'));
+            ->find($paymentId);
 
         if (! $payment) {
             return $this->notFound('Receipt not found.');
@@ -110,14 +110,14 @@ class TransactionPaymentController extends Controller
     /**
      * Download/share link for a RELEASED teacher payment receipt (own).
      */
-    public function teacherReceipt(Request $request): JsonResponse
+    public function teacherReceipt(Request $request,$paymentId): JsonResponse
     {
-        $request->validate(['payment_id' => ['required', 'integer']]);
+        // $request->validate(['payment_id' => ['required', 'integer']]);
 
         $payment = TeacherPayment::with(['teacher:id,name', 'releasedBy:id,name', 'items.course:id,name'])
             ->where('teacher_id', $request->user()->id)
             ->where('status', 'released')
-            ->find($request->integer('payment_id'));
+            ->find($paymentId);
 
         if (! $payment) {
             return $this->notFound('Receipt not found.');
@@ -141,14 +141,14 @@ class TransactionPaymentController extends Controller
     /**
      * Download link for a PENDING teacher payment invoice (own).
      */
-    public function teacherPendingInvoice(Request $request): JsonResponse
+    public function teacherPendingInvoice(Request $request,$paymentId): JsonResponse
     {
-        $request->validate(['payment_id' => ['required', 'integer']]);
+        // $request->validate(['payment_id' => ['required', 'integer']]);
 
         $payment = TeacherPayment::with(['teacher:id,name', 'items.course:id,name'])
             ->where('teacher_id', $request->user()->id)
             ->where('status', 'pending')
-            ->find($request->integer('payment_id'));
+            ->find($paymentId);
 
         if (! $payment) {
             return $this->notFound('Pending invoice not found.');
@@ -188,14 +188,14 @@ class TransactionPaymentController extends Controller
     /**
      * Download/share link for a RELEASED staff salary receipt (own).
      */
-    public function staffReceipt(Request $request): JsonResponse
+    public function staffReceipt(Request $request,$paymentId): JsonResponse
     {
-        $request->validate(['payment_id' => ['required', 'integer']]);
+        // $request->validate(['payment_id' => ['required', 'integer']]);
 
         $payment = StaffPayment::with(['staff:id,name', 'releasedBy:id,name'])
             ->where('staff_id', $request->user()->id)
             ->where('status', 'released')
-            ->find($request->integer('payment_id'));
+            ->find($paymentId);
 
         if (! $payment) {
             return $this->notFound('Receipt not found.');
@@ -218,14 +218,14 @@ class TransactionPaymentController extends Controller
     /**
      * Download link for a PENDING staff salary invoice (own).
      */
-    public function staffPendingInvoice(Request $request): JsonResponse
+    public function staffPendingInvoice(Request $request,$paymentId): JsonResponse
     {
-        $request->validate(['payment_id' => ['required', 'integer']]);
+        // $request->validate(['payment_id' => ['required', 'integer']]);
 
         $payment = StaffPayment::with(['staff:id,name'])
             ->where('staff_id', $request->user()->id)
             ->where('status', 'pending')
-            ->find($request->integer('payment_id'));
+            ->find($paymentId);
 
         if (! $payment) {
             return $this->notFound('Pending invoice not found.');

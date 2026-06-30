@@ -52,6 +52,14 @@ Broadcast::channel('user.{userId}', function ($user, $userId) {
     return (int) $user->id === (int) $userId;
 });
 
+Broadcast::channel('calls.{callId}', function ($user, $callId) {
+    $call = \App\Models\Call::find($callId);
+    if (!$call) return false;
+    return $user->id === $call->teacher_id
+        || \App\Models\CallRecipient::where('call_id', $callId)
+        ->where('student_id', $user->id)->exists();
+});
+
 // Private channel — matches Flutter's 'private-conversation.{id}'
 // Broadcast::channel('private-conversation.{conversationId}', function ($user, $conversationId) {
 //     return ConversationParticipant::where('conversation_id', $conversationId)

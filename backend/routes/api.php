@@ -14,6 +14,7 @@ use App\Http\Controllers\API\Admin\CourseController;
 use App\Http\Controllers\API\Admin\CourseClassController;
 use App\Http\Controllers\API\Admin\PaymentController;
 use App\Http\Controllers\API\Admin\AnnouncementController;
+use App\Http\Controllers\API\Admin\BroadcastCallController;
 use App\Http\Controllers\API\Admin\CallController;
 use App\Http\Controllers\API\Admin\ConversationController;
 use App\Http\Controllers\API\Admin\CouponController;
@@ -192,6 +193,10 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/calls/{call}/end', [CallController::class, 'end']);
 
 
+     Route::post('/course/{course}/call', [BroadcastCallController::class, 'store']);
+    Route::post('/calls/{call}/recipients/{studentId}/answer', [BroadcastCallController::class, 'answer']);
+    Route::post('/calls/{call}/recipients/{studentId}/reject', [BroadcastCallController::class, 'reject']);
+    Route::post('/calls/{call}/end', [BroadcastCallController::class, 'end']);
 
     // Route::get('/my_courses/{id}', function () {
     //     $getCourseDetail = [

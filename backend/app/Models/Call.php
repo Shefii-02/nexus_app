@@ -11,8 +11,15 @@ class Call extends Model
     use HasFactory;
 
     protected $fillable = [
-        'course_id', 'teacher_id', 'student_id', 'conversation_id',
-        'status', 'type', 'started_at', 'answered_at', 'ended_at',
+        'course_id',
+        'teacher_id',
+        'student_id',
+        'conversation_id',
+        'status',
+        'type',
+        'started_at',
+        'answered_at',
+        'ended_at',
     ];
 
     protected $casts = [
@@ -37,5 +44,10 @@ class Call extends Model
     public function student()
     {
         return $this->belongsTo(User::class, 'student_id');
+    }
+
+    public function recipients()
+    {
+        return $this->hasMany(CallRecipient::class);
     }
 }

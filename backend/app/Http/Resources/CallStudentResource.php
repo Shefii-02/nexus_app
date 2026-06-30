@@ -13,7 +13,7 @@ class CallStudentResource extends JsonResource
             'id' => $this->student?->id,
             'name' => $this->student?->name,
             'email' => $this->student?->email,
-            'mobile' => $this->student?->mobile,
+            'mobile' => $this->student?->phone,
             'avatar' => $this->student?->avatar_url,
         ];
     }

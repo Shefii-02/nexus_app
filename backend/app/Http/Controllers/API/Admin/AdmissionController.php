@@ -131,7 +131,7 @@ class AdmissionController extends Controller
         try {
 
             if (
-                !$this->admissionService->exists($id)
+                !$this->admissionService->find($id)
             ) {
 
                 return $this->errorResponse(

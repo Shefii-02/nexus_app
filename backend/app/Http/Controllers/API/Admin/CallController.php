@@ -8,6 +8,7 @@ use App\Models\Course;
 use App\Services\Notification\CallNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class CallController extends Controller
@@ -16,6 +17,7 @@ class CallController extends Controller
 
     public function store(Request $request, Course $course)
     {
+        Log::info($request->all());
         $data = $request->validate([
             'teacher_id'      => ['required', 'exists:users,id'],
             'type'            => ['sometimes', Rule::in(['audio', 'video'])],

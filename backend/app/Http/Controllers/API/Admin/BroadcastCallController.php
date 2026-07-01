@@ -78,6 +78,7 @@ class BroadcastCallController extends Controller
             'course_name'  => $course->name ?? '',
             'call_type'    => $result['call']->type,
             'caller_role'  => 'teacher',
+            'voice_msg'    => 'assets/sounds/teacher_waiting_for_you.mp3',
         ]);
 
         return response()->json([

@@ -81,6 +81,8 @@ class CallController extends Controller
             'course_id'    => (string) $course->id,
             'course_name'  => $course->name ?? '',
             'call_type'    => $call->type,
+            'caller_role'  => 'student',
+            'voice_msg'    => 'assets/sounds/students_are_waiting_forteacher.mp3',
         ]);
 
         return response()->json([

@@ -7,6 +7,7 @@ use App\Http\Controllers\API\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\NotificationRequest;
 use App\Http\Resources\NotificationResource;
+use App\Services\Notification\FcmNotificationService;
 use App\Services\Notification\NotificationService;
 use Illuminate\Http\JsonResponse;
 
@@ -42,9 +43,23 @@ class NotificationController extends Controller
 
         $notification =
             $this->notificationService
-                ->create(
-                    $dto
-                );
+            ->create(
+                $dto
+            );
+
+
+        $targetUserId = $notification->user_id ?? null;
+        if ($targetUserId) {
+            (new FcmNotificationService())->sendCustom(
+                [$targetUserId],
+                $notification->title ?? 'New Notification',
+                $notification->message ?? $notification->body ?? '',
+                [
+                    'type'            => 'notification',
+                    'notification_id' => (string) $notification->id,
+                ]
+            );
+        }
 
         return $this->successResponse(
             NotificationResource::make(
@@ -61,9 +76,9 @@ class NotificationController extends Controller
 
         $notification =
             $this->notificationService
-                ->find(
-                    $id
-                );
+            ->find(
+                $id
+            );
 
         return $this->successResponse(
             NotificationResource::make(
@@ -127,10 +142,10 @@ class NotificationController extends Controller
     {
         return $this->successResponse([
             'count' =>
-                $this->notificationService
-                    ->getUnreadCount(
-                        auth()->id()
-                    )
+            $this->notificationService
+                ->getUnreadCount(
+                    auth()->id()
+                )
         ]);
     }
 

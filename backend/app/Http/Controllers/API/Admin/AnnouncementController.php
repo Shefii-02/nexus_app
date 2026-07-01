@@ -11,6 +11,7 @@ use App\Models\Announcement;
 use App\Models\AnnouncementUser;
 use App\Services\Announcement\AnnouncementService;
 use App\Services\Media\MediaService;
+use App\Services\Notification\FcmNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -35,9 +36,27 @@ class AnnouncementController extends Controller
 
         $dto = AnnouncementDTO::fromArray($data);
 
-        return response()->json([
-            'data' => $this->service->create($dto)
-        ]);
+        $announcement = $this->service->create($dto);
+
+        // Fetch the users this announcement targets
+        $targetUserIds = AnnouncementUser::where('announcement_id', $announcement->id)
+            ->pluck('user_id')
+            ->all();
+
+        if (!empty($targetUserIds)) {
+            (new FcmNotificationService())->sendAnnouncement($targetUserIds, [
+                'title'           => $announcement->title,
+                'body'            => \Illuminate\Support\Str::limit(strip_tags($announcement->content ?? ''), 100),
+                'announcement_id' => $announcement->id,
+                'course_name'     => '',
+            ]);
+        }
+
+        return response()->json(['data' => $announcement]);
+
+        // return response()->json([
+        //     'data' => $this->service->create($dto)
+        // ]);
     }
 
     public function index(Request $request)

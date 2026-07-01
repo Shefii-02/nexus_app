@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Chat\Models\Conversation;
 use App\Models\ConversationParticipant;
 use App\Models\User;
+use App\Services\Notification\FcmNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ConversationController extends Controller
 {
@@ -97,6 +99,13 @@ class ConversationController extends Controller
                     'user_id'         => $uid,
                     'created_by'      => $authId,
                 ]);
+
+                (new FcmNotificationService())->sendNewMessage($uid, [
+                    'conversation_id'   => $conversation->id,
+                    'sender_name'       => $request->user()->name,
+                    'preview'           => Str::limit("New Conversation Created..", 80),
+                    'conversation_name' => $conv?->title ?? $request->user()->name,
+                ]);
             }
 
             DB::commit();
@@ -140,6 +149,13 @@ class ConversationController extends Controller
                     'conversation_id' => $conversation->id,
                     'user_id'         => $uid,
                     'created_by'      => $authId,
+                ]);
+
+                (new FcmNotificationService())->sendNewMessage($uid, [
+                    'conversation_id'   => $conversation->id,
+                    'sender_name'       => $request->user()->name,
+                    'preview'           => Str::limit("New Conversation Created..", 80),
+                    'conversation_name' => $conv?->title ?? $request->user()->name,
                 ]);
             }
 
@@ -227,6 +243,13 @@ class ConversationController extends Controller
                 ['conversation_id' => $id, 'user_id' => $uid],
                 ['status' => 'active', 'left_at' => null, 'created_by' => $request->user()->id, 'deleted_at' => null]
             );
+
+            (new FcmNotificationService())->sendNewMessage($uid, [
+                'conversation_id'   => $conversation->id,
+                'sender_name'       => $request->user()->name,
+                'preview'           => Str::limit("New Member Added..", 80),
+                'conversation_name' => $conv?->title ?? $request->user()->name,
+            ]);
         }
 
         return response()->json([

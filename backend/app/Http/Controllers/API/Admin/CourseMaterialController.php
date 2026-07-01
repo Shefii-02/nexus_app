@@ -6,8 +6,10 @@ use App\Http\Controllers\API\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CourseMaterialRequest;
 use App\Http\Resources\CourseMaterialResource;
+use App\Models\Admission;
 use App\Models\CourseMaterial;
 use App\Services\Media\MediaService;
+use App\Services\Notification\FcmNotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -42,7 +44,7 @@ class CourseMaterialController extends Controller
         return $this->paginatedResponse(CourseMaterialResource::collection($materials), 'Course materials retrieved successfully');
     }
 
-    public function show(int $courseId,int $courseMaterial): JsonResponse
+    public function show(int $courseId, int $courseMaterial): JsonResponse
     {
         $material = CourseMaterial::with('course')->find($courseMaterial);
 
@@ -65,8 +67,19 @@ class CourseMaterialController extends Controller
         }
 
         $material = CourseMaterial::create(array_merge($data, [
-            'status' => $validated['status'] ?? 'active',
+            'status' => $data['status'] ?? 'active',
         ]));
+
+        $studentIds = $this->enrolledStudentIds($courseId);
+        if (!empty($studentIds)) {
+            (new FcmNotificationService())->sendMaterialUploaded($studentIds, [
+                'course_name'    => $material->course->name ?? '',
+                'material_title' => $material->title ?? $material->name ?? 'New material',
+                'material_type'  => $material->type ?? 'file',
+                'material_id'    => $material->id,
+                'course_id'      => $courseId,
+            ]);
+        }
 
         return $this->successResponse(CourseMaterialResource::make($material->load('course')), 'Course material created successfully', 201);
     }
@@ -95,6 +108,19 @@ class CourseMaterialController extends Controller
 
         $material->update($data);
 
+        if ($request->hasFile('file_url')) {
+            $studentIds = $this->enrolledStudentIds($courseId);
+            if (!empty($studentIds)) {
+                (new FcmNotificationService())->sendMaterialUploaded($studentIds, [
+                    'course_name'    => $material->course->name ?? '',
+                    'material_title' => $material->title ?? $material->name ?? 'Updated material',
+                    'material_type'  => $material->type ?? 'file',
+                    'material_id'    => $material->id,
+                    'course_id'      => $courseId,
+                ]);
+            }
+        }
+
         return $this->successResponse(CourseMaterialResource::make($material->load('course')), 'Course material updated successfully');
     }
 
@@ -114,5 +140,13 @@ class CourseMaterialController extends Controller
         $material->delete();
 
         return $this->successResponse(null, 'Course material deleted successfully');
+    }
+
+    private function enrolledStudentIds(int $courseId): array
+    {
+        return Admission::where('course_id', $courseId)
+            ->where('status', 'active')
+            ->pluck('student_id')
+            ->all();
     }
 }

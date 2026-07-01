@@ -9,6 +9,7 @@ use App\Http\Resources\TeacherPaymentResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Services\Notification\FcmNotificationService;
 use App\Services\TeacherPayment\TeacherPaymentService;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -39,6 +40,20 @@ class TeacherPaymentController extends Controller
         $payment = $this->service->create($dto);
 
 
+        $payment->loadMissing('teacher'); // adjust relation name
+        $teacherUserId = $payment->teacher?->user_id ?? $payment->teacher_id ?? null;
+        if ($teacherUserId) {
+            (new FcmNotificationService())->sendCustom(
+                [$teacherUserId],
+                '💰 Payment Entry Created',
+                'A payment entry of ' . ($payment->amount ?? '') . ' has been recorded.',
+                [
+                    'type'       => 'payment_entry',
+                    'payment_id' => (string) $payment->id,
+                ]
+            );
+        }
+
         return new TeacherPaymentResource($payment);
     }
 
@@ -61,8 +76,26 @@ class TeacherPaymentController extends Controller
 
     public function release(int $id): TeacherPaymentResource
     {
+
+        $this->service->release($id);
+
+        $payment = $this->service->find($id); // reload after release
+        $payment->loadMissing('teacher');
+        $teacherUserId = $payment->teacher?->user_id ?? $payment->teacher_id ?? null;
+        if ($teacherUserId) {
+            (new FcmNotificationService())->sendCustom(
+                [$teacherUserId],
+                '✅ Payment Released',
+                'Your payment of ' . ($payment->amount ?? '') . ' has been released.',
+                [
+                    'type'       => 'payment_released',
+                    'payment_id' => (string) $payment->id,
+                ]
+            );
+        }
+
         return new TeacherPaymentResource(
-            $this->service->release($id)
+            $payment
         );
     }
 

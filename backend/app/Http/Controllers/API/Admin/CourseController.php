@@ -19,6 +19,7 @@ use App\Models\User;
 use App\Services\Course\CourseService;
 use Illuminate\Http\JsonResponse;
 use App\Services\Media\MediaService;
+use App\Services\Notification\FcmNotificationService;
 use Beste\Json;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -80,6 +81,19 @@ class CourseController extends Controller
             $course->teachers()->syncWithoutDetaching([
                 $request->teacher_id
             ]);
+
+
+            // Notify assigned teacher
+            (new FcmNotificationService())->sendCustom(
+                [$request->teacher_id],
+                '📚 New Course Assigned',
+                'You have been assigned to teach ' . $course->name,
+                [
+                    'type'      => 'course_assigned',
+                    'course_id' => (string) $course->id,
+                ]
+            );
+
 
 
             return $this->successResponse(
@@ -325,6 +339,24 @@ class CourseController extends Controller
             $courseModel->save();
         }
 
+
+        // ── addonTeachersStore() — after $courseModel->teachers()->sync($teacherIds) ─
+        // Notify newly added teachers only (not already assigned ones)
+        $previousIds = $courseModel->teachers()->pluck('users.id')->toArray(); // fetch before sync
+        // NOTE: move this line BEFORE the sync call above, then after sync:
+        $newTeacherIds = array_diff($teacherIds, $previousIds);
+        if (!empty($newTeacherIds)) {
+            (new FcmNotificationService())->sendCustom(
+                array_values($newTeacherIds),
+                '📚 Course Assignment',
+                'You have been added as a teacher for ' . $courseModel->name,
+                [
+                    'type'      => 'course_assigned',
+                    'course_id' => (string) $courseModel->id,
+                ]
+            );
+        }
+
         return $this->successResponse(
             null,
             'Teachers assigned successfully'
@@ -376,6 +408,26 @@ class CourseController extends Controller
                 'expiry_date' => $request->expiry_date,
             ]);
 
+
+        if ($request->status) {
+            $courseModel = Course::find($course);
+            $affected = Admission::where('course_id', $course)
+                ->whereIn('id', $request->admission_ids)
+                ->pluck('student_id')
+                ->all();
+
+            foreach ($affected as $studentId) {
+                (new FcmNotificationService())->sendAdmissionNotification(
+                    $studentId,
+                    [
+                        'course_name'  => $courseModel?->name ?? '',
+                        'status'       => $request->status,
+                        'admission_id' => 0, // bulk — no single id
+                    ]
+                );
+            }
+        }
+
         return $this->successResponse(
             null,
             'Students updated successfully'
@@ -420,6 +472,19 @@ class CourseController extends Controller
             'status' => $request->status,
             'expiry_date' => $request->expiry_date,
         ]);
+
+
+        $record->loadMissing(['student']);
+        $courseModel = Course::find($course);
+        (new FcmNotificationService())->sendAdmissionNotification(
+            $record->student_id,
+            [
+                'course_name'  => $courseModel?->name ?? '',
+                'status'       => $request->status,
+                'admission_id' => $record->id,
+            ]
+        );
+
 
         return $this->successResponse(
             null,

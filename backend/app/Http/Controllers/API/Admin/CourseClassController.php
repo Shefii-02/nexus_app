@@ -9,8 +9,10 @@ use App\Http\Requests\CourseClassRequest;
 use App\Http\Requests\StoreCourseClassRequest;
 use App\Http\Requests\UpdateCourseClassRequest;
 use App\Http\Resources\CourseClassResource;
+use App\Models\Admission;
 use App\Models\CourseClass;
 use App\Services\CourseClass\CourseClassService;
+use App\Services\Notification\FcmNotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -71,6 +73,21 @@ class CourseClassController extends Controller
             $dto = CourseClassDTO::fromArray($data);
             $class = $this->courseClassService->create($dto);
 
+
+            $studentIds = $this->enrolledStudentIds($courseId);
+            if (!empty($studentIds)) {
+                $classLoaded = $class->load(['course', 'teacher.user']);
+                (new FcmNotificationService())->sendClassScheduleReminder($studentIds, [
+                    'course_name'    => $classLoaded->course->name ?? '',
+                    'teacher_name'   => $classLoaded->teacher?->user?->name ?? '',
+                    'start_time'     => $classLoaded->start_time
+                        ? \Carbon\Carbon::parse($classLoaded->start_time)->format('h:i A')
+                        : '',
+                    'class_id'       => $classLoaded->id,
+                    'minutes_before' => 0, // 0 = "class just scheduled" rather than a reminder
+                ]);
+            }
+
             return $this->successResponse(
                 CourseClassResource::make($class->load(['course', 'teacher.user'])),
                 'Course class created successfully',
@@ -106,7 +123,20 @@ class CourseClassController extends Controller
 
             $this->courseClassService->update($courseClass, $dto);
             $updated = $this->courseClassService->findWithRelations($courseClass, ['course', 'teacher.user']);
+            // $updated = $this->courseClassService->findWithRelations($courseClass, ['course', 'teacher.user']);
 
+            $wasRecordLinkAdded = empty($current->record_link) && !empty($request->record_link);
+            if ($wasRecordLinkAdded) {
+                $studentIds = $this->enrolledStudentIds($courseId);
+                if (!empty($studentIds)) {
+                    (new FcmNotificationService())->sendRecordedClassUploaded($studentIds, [
+                        'course_name' => $updated->course->name ?? '',
+                        'class_title' => $updated->title ?? '',
+                        'record_id'   => $updated->id,
+                        'course_id'   => $courseId,
+                    ]);
+                }
+            }
             return $this->successResponse(CourseClassResource::make($updated), 'Course class updated successfully');
         } catch (\Exception $e) {
             return $this->errorResponse('Failed to update course class', ['error' => $e->getMessage()], 500);
@@ -203,5 +233,15 @@ class CourseClassController extends Controller
             });
 
         return response()->json(['data' => $classes]);
+    }
+
+
+    // Shared helper — add as private method at bottom of class
+    private function enrolledStudentIds(int $courseId): array
+    {
+        return Admission::where('course_id', $courseId)
+            ->where('status', 'active')
+            ->pluck('student_id')
+            ->all();
     }
 }

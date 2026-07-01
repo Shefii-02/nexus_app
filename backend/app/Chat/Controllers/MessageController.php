@@ -19,14 +19,18 @@ use App\Chat\Events\ReactionRemoved;
 use App\Chat\Events\UserNewMessage;
 use App\Chat\Resources\MessageResource;
 use App\Http\Controllers\API\ApiResponse;
+use App\Services\Notification\FcmNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+
 
 class MessageController extends Controller
 {
     use ApiResponse;
+
     /**
      * Paginated messages for a conversation (cursor-based).
      */
@@ -163,10 +167,11 @@ class MessageController extends Controller
 
         $participants = ConversationParticipant::where('conversation_id', $conversationId)
             ->where('user_id', '!=', $userId)
-            ->where('status', 'active')
-            ->pluck('user_id');
+            ->where('status', 'active')->get();
+        // ->pluck('user_id');
 
-        foreach ($participants as $recipientId) {
+        foreach ($participants as $recipient) {
+            $recipientId = $recipient->user_id;
             $unread = Message::where('conversation_id', $conversationId)
                 ->where('sender_id', '!=', $recipientId)
                 ->whereDoesntHave('reads', fn($q) => $q->where('user_id', $recipientId))
@@ -179,6 +184,22 @@ class MessageController extends Controller
                 $request->message ?? '📎 Media',
                 $unread
             ));
+
+            // New chat message
+            // FCM push — only if participant hasn't muted this conversation
+            $isMuted = $recipient->is_muted;
+            // ConversationParticipant::where('conversation_id', $conversationId)
+            // ->where('user_id', $recipientId)
+            // ->value('is_muted');
+
+            if (!$isMuted) {
+                (new FcmNotificationService())->sendNewMessage($recipientId, [
+                    'conversation_id'   => $conversationId,
+                    'sender_name'       => $request->user()->name,
+                    'preview'           => Str::limit($message->message ?? '📎 Media', 80),
+                    'conversation_name' => $conv?->title ?? $request->user()->name,
+                ]);
+            }
         }
 
         return response()->json([
@@ -257,6 +278,8 @@ class MessageController extends Controller
             ['reaction'   => $request->reaction]
         );
 
+
+
         broadcast(new ReactionAdded($conversationId, $messageId, $userId, $request->reaction))->toOthers();
 
         return response()->json(['status' => 'ok']);
@@ -311,7 +334,7 @@ class MessageController extends Controller
             ->where('is_pinned', true)
             ->where('is_deleted', false)
             ->get();
-        broadcast(new MessageUpdated($messages))->toOthers();
+        // broadcast(new MessageUpdated($messages))->toOthers();
         return response()->json(['messages' => $messages]);
     }
 

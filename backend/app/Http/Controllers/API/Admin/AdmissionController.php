@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\AdmissionResource;
 use App\Http\Requests\AdmissionRequest;
 use App\Services\Admission\AdmissionService;
+use App\Services\Notification\FcmNotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -34,7 +35,6 @@ class AdmissionController extends Controller
                 AdmissionResource::collection($admissions),
                 'Admissions retrieved successfully'
             );
-
         } catch (\Exception $e) {
 
             return $this->errorResponse(
@@ -61,12 +61,24 @@ class AdmissionController extends Controller
             $admission = $this->admissionService
                 ->create($dto);
 
+
+            $admission->loadMissing(['student', 'course']);
+            if ($admission->student_id && $admission->course) {
+                (new FcmNotificationService())->sendAdmissionNotification(
+                    $admission->student_id,
+                    [
+                        'course_name'  => $admission->course->name ?? 'your course',
+                        'status'       => $admission->status ?? 'pending',
+                        'admission_id' => $admission->id,
+                    ]
+                );
+            }
+
             return $this->successResponse(
                 AdmissionResource::make($admission),
                 'Admission created successfully',
                 201
             );
-
         } catch (\Exception $e) {
 
             return $this->errorResponse(
@@ -109,7 +121,6 @@ class AdmissionController extends Controller
                 AdmissionResource::make($admission),
                 'Admission retrieved successfully'
             );
-
         } catch (\Exception $e) {
 
             return $this->errorResponse(
@@ -141,41 +152,63 @@ class AdmissionController extends Controller
                 );
             }
 
-            $current =
-                $this->admissionService
-                    ->find($id);
+            // $current =
+            //     $this->admissionService
+            //     ->find($id);
 
-            $data = array_merge(
-                $current->toArray(),
-                $request->validated()
-            );
+            // $data = array_merge(
+            //     $current->toArray(),
+            //     $request->validated()
+            // );
 
-            $dto = AdmissionDTO::fromArray(
-                $data
-            );
+            // $dto = AdmissionDTO::fromArray(
+            //     $data
+            // );
 
-            $this->admissionService
-                ->update(
-                    $id,
-                    $dto
-                );
+            // $this->admissionService
+            //     ->update(
+            //         $id,
+            //         $dto
+            //     );
 
-            $updated =
-                $this->admissionService
-                    ->findWithRelations(
-                        $id,
+            // $updated =
+            //     $this->admissionService
+            //     ->findWithRelations(
+            //         $id,
+            //         [
+            //             'student',
+            //             'course',
+            //             'teacher'
+            //         ]
+            //     );
+
+            $current = $this->admissionService->find($id);
+            $oldStatus = $current->status;
+
+            $data = array_merge($current->toArray(), $request->validated());
+            $dto  = AdmissionDTO::fromArray($data);
+            $this->admissionService->update($id, $dto);
+
+            $updated = $this->admissionService->findWithRelations($id, ['student', 'course', 'teacher']);
+
+            // Notify only when status changes
+            if (isset($request->validated()['status']) && $request->validated()['status'] !== $oldStatus) {
+                if ($updated->student_id && $updated->course) {
+                    (new FcmNotificationService())->sendAdmissionNotification(
+                        $updated->student_id,
                         [
-                            'student',
-                            'course',
-                            'teacher'
+                            'course_name'  => $updated->course->name ?? 'your course',
+                            'status'       => $updated->status,
+                            'admission_id' => $updated->id,
                         ]
                     );
+                }
+            }
 
             return $this->successResponse(
                 AdmissionResource::make($updated),
                 'Admission updated successfully'
             );
-
         } catch (\Exception $e) {
 
             return $this->errorResponse(
@@ -214,7 +247,6 @@ class AdmissionController extends Controller
                 null,
                 'Admission deleted successfully'
             );
-
         } catch (\Exception $e) {
 
             return $this->errorResponse(
@@ -236,13 +268,12 @@ class AdmissionController extends Controller
 
             $payments =
                 $this->admissionService
-                    ->payments($id);
+                ->payments($id);
 
             return $this->successResponse(
                 $payments,
                 'Admission payments retrieved successfully'
             );
-
         } catch (\Exception $e) {
 
             return $this->errorResponse(

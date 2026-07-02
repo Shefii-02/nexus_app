@@ -28,7 +28,7 @@ Route::get('/delete-account', function () {
 
 
 Route::get('/child-safety', function () {
-    return view('my_nikah_csae_policy');
+    return view('my_nikah_child_safety');
 });
 
 

@@ -114,7 +114,7 @@
             <strong>Child Safety Contact</strong><br><br>
 
             Email:
-            <a href="mailto:support@mynikah.com">support@mynikah.com</a>
+            <a href="mailto:univexatechnologies@gmail.com">univexatechnologies@gmail.com</a>
         </div>
 
         <h2>Enforcement</h2>

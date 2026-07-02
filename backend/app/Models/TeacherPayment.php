@@ -57,6 +57,6 @@ class TeacherPayment extends Model
 
     public function items()
     {
-        return $this->hasMany(TeacherPaymentItem::class,'teacher_id');
+        return $this->hasMany(TeacherPaymentItem::class,'teacher_id','teacher_id');
     }
 }

@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class TeacherPaymentItem extends Model
 {
     //
+
+
+        protected $table = 'teacher_payment_items';
+
     public function teacher()
     {
         return $this->belongsTo(

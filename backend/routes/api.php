@@ -38,6 +38,9 @@ use App\Http\Controllers\API\AppPaymentController;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Log;
 
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Response;
+
 
 // routes/api.php
 Route::get('/ping', fn() => response()->json(['status' => 'ok']));
@@ -71,22 +74,32 @@ Route::middleware('auth:api')->group(function () {
 Route::middleware(['auth:api'])->group(function () {
 
 
-    Route::get('/log-file', function () {
+
+
+Route::get('/log-file', function () {
+    $logPath = storage_path('logs/laravel.log');
+
+    if (!File::exists($logPath)) {
+        return Response::make('Log file not found.', 404);
+    }
+
+    $logContent = File::get($logPath);
+
+    $url = url('/api/clear-log');
+
+    $clearButton = '<a href="' . $url . '"
+        style="position:fixed;top:10px;right:10px;padding:10px 15px;background:red;color:white;text-decoration:none;border-radius:5px;">
+        Clear Log File
+    </a>';
+
+    $responseContent = $clearButton . '<pre>' . e($logContent) . '</pre>';
+
+    return Response::make($responseContent, 200);
+});
+    Route::get('/clear-log', function () {
         $logPath = storage_path('logs/laravel.log');
-
-        if (!File::exists($logPath)) {
-            return Response::make('Log file not found.', 404);
-        }
-
-        $logContent = File::get($logPath);
-
-        // Button to clear the log
-        $clearButton = '<a href="/company/clear-log" style="position: fixed; top: 10px; right: 10px; padding: 10px; background: red; color: white; text-decoration: none; border-radius: 5px;">Clear Log File</a>';
-
-        // Combine button and log content
-        $responseContent = $clearButton . '<pre>' . e($logContent) . '</pre>';
-
-        return Response::make($responseContent, 200);
+        File::put($logPath, ''); // Overwrites the file with empty content
+        return redirect('/company/log-file')->with('status', 'Log file cleared!');
     });
 
     Route::post('/device/register', [UserController::class, 'RegisterDevice']);

@@ -67,6 +67,7 @@ import StaffPaymentListPage from '../modules/staff_payments/pages/StaffPaymentLi
 import CreateStaffPaymentPage from '../modules/staff_payments/pages/CreateStaffPaymentPage'
 import ViewStaffPaymentPage from '../modules/staff_payments/pages/ViewStaffPaymentPage'
 import EditStaffPaymentPage from '../modules/staff_payments/pages/EditStaffPaymentPage'
+import LogViewer from '../modules/LogViewer'
 
 const AppRoutes = () => (
   <Routes>
@@ -74,6 +75,10 @@ const AppRoutes = () => (
     <Route element={<ProtectedRoute />}>
       <Route element={<ProtectedLayout><Outlet /></ProtectedLayout>}>
         {/* <Route element={<DashboardLayout><Outlet /></DashboardLayout>}> */}
+
+    
+          <Route path="/logs" element={<LogViewer />} />
+
         <Route path="/" element={<DashboardPage />} />
         <Route path="/teachers" element={<TeacherListPage />} />
         <Route path="/teachers/create" element={<CreateTeacherPage />} />

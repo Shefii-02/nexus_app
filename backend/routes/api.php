@@ -75,32 +75,35 @@ Route::middleware(['auth:api'])->group(function () {
 
 
 
-
-Route::get('/log-file', function () {
-    $logPath = storage_path('logs/laravel.log');
-
-    if (!File::exists($logPath)) {
-        return Response::make('Log file not found.', 404);
-    }
-
-    $logContent = File::get($logPath);
-
-    $url = url('/api/clear-log');
-
-    $clearButton = '<a href="' . $url . '"
-        style="position:fixed;top:10px;right:10px;padding:10px 15px;background:red;color:white;text-decoration:none;border-radius:5px;">
-        Clear Log File
-    </a>';
-
-    $responseContent = $clearButton . '<pre>' . e($logContent) . '</pre>';
-
-    return Response::make($responseContent, 200);
-});
-    Route::get('/clear-log', function () {
+    Route::get('/log-file', function () {
         $logPath = storage_path('logs/laravel.log');
-        File::put($logPath, ''); // Overwrites the file with empty content
-        return redirect('/company/log-file')->with('status', 'Log file cleared!');
+
+        if (!File::exists($logPath)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Log file not found.',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'logs' => File::get($logPath),
+        ]);
     });
+
+    Route::post('/clear-log', function () {
+        $logPath = storage_path('logs/laravel.log');
+
+        if (File::exists($logPath)) {
+            File::put($logPath, '');
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Log file cleared successfully.',
+        ]);
+    });
+
 
     Route::post('/device/register', [UserController::class, 'RegisterDevice']);
     Route::post('/visitor/store', [UserController::class, 'visitorStore']);

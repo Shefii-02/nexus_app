@@ -14,7 +14,7 @@ const LogViewer = () => {
     setLoading(true);
 
     try {
-      const { data } = await apiClient.get("/api/log-file");
+      const { data } = await apiClient.get("/log-file");
 
       if (data.success) {
         setLogs(data.logs);
@@ -37,7 +37,7 @@ const LogViewer = () => {
     setClearing(true);
 
     try {
-      await apiClient.post("/api/clear-log");
+      await apiClient.post("/clear-log");
 
       setLogs("");
 

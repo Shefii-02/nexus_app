@@ -33,6 +33,7 @@ use App\Http\Controllers\API\Admin\ReportController;
 use App\Http\Controllers\API\Admin\MyCourseController;
 use App\Http\Controllers\API\Admin\TransactionPaymentController;
 use App\Http\Controllers\API\AppPaymentController;
+use Illuminate\Http\Response;
 // routes/api.php
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Log;
@@ -48,6 +49,8 @@ Route::post('/broadcasting/auth', function () {
 
 Route::post('send-otp', [AuthController::class, 'sendOtp']);
 Route::post('verify-otp', [AuthController::class, 'verifyOtp']);
+
+
 
 
 // Public Auth Routes
@@ -67,6 +70,24 @@ Route::middleware('auth:api')->group(function () {
 // Admin Routes - CRUD Operations
 Route::middleware(['auth:api'])->group(function () {
 
+
+    Route::get('/log-file', function () {
+        $logPath = storage_path('logs/laravel.log');
+
+        if (!File::exists($logPath)) {
+            return Response::make('Log file not found.', 404);
+        }
+
+        $logContent = File::get($logPath);
+
+        // Button to clear the log
+        $clearButton = '<a href="/company/clear-log" style="position: fixed; top: 10px; right: 10px; padding: 10px; background: red; color: white; text-decoration: none; border-radius: 5px;">Clear Log File</a>';
+
+        // Combine button and log content
+        $responseContent = $clearButton . '<pre>' . e($logContent) . '</pre>';
+
+        return Response::make($responseContent, 200);
+    });
 
     Route::post('/device/register', [UserController::class, 'RegisterDevice']);
     Route::post('/visitor/store', [UserController::class, 'visitorStore']);
@@ -193,7 +214,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/calls/{call}/end', [CallController::class, 'end']);
 
 
-     Route::post('/course/{course}/call', [BroadcastCallController::class, 'store']);
+    Route::post('/course/{course}/call', [BroadcastCallController::class, 'store']);
     Route::post('/calls/{call}/recipients/{studentId}/answer', [BroadcastCallController::class, 'answer']);
     Route::post('/calls/{call}/recipients/{studentId}/reject', [BroadcastCallController::class, 'reject']);
     Route::post('/calls/{call}/end', [BroadcastCallController::class, 'end']);

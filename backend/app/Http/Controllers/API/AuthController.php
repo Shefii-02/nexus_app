@@ -11,6 +11,7 @@ use App\Models\Student;
 use App\Models\User;
 use App\Services\Auth\OtpService;
 use App\Services\Media\MediaService;
+use App\Services\Notification\FcmNotificationService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -113,7 +114,7 @@ class AuthController extends Controller
     public function setupProfile(Request $request)
     {
         try {
-            Log::info($request->all());
+
             $user = $request->user();
 
             $data = $request->only([
@@ -148,11 +149,11 @@ class AuthController extends Controller
             $user->update($data);
             $user->refresh();
 
-            $student = Student::where('user_id',$user->id)->first();
-            if(!$student){
+            $student = Student::where('user_id', $user->id)->first();
+            if (!$student) {
                 $student = new Student();
                 $student->user_id = $user->id;
-                $student-> roll_number = rand(11111,99999);
+                $student->roll_number = rand(11111, 99999);
             }
 
             $student->guardian_name = $request->parent_name;
@@ -322,7 +323,7 @@ class AuthController extends Controller
 
     public function sendOtp(Request $request)
     {
-        Log::info('Received OTP request', ['phone' => $request->phone, 'device_id' => $request->device_id]);
+        // Log::info('Received OTP request', ['phone' => $request->phone, 'device_id' => $request->device_id]);
         $request->validate([
             'phone' => 'required|string|min:10|max:15',
             'device_id' => 'required|string',
@@ -365,7 +366,7 @@ class AuthController extends Controller
                 Log::info('Failed');
                 return response()->json($result, 422);
             }
-                  Log::info('Received OTP Subimt', ['phone' => $request->phone,'otp' => $request->otp, 'device_id' => $request->device_id]);
+            //   Log::info('Received OTP Subimt', ['phone' => $request->phone,'otp' => $request->otp, 'device_id' => $request->device_id]);
 
             $dummyName = 'User_' . substr($request->phone, -4);
             // Find or create user
@@ -401,6 +402,7 @@ class AuthController extends Controller
                 'access_token_expires_at' => now()->addDays(30),
             ]);
 
+            (new FcmNotificationService())->welcomeMessage($user->id);
 
             $resposne = [
                 'status' => true,

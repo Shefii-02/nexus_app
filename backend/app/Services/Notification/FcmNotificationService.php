@@ -22,6 +22,17 @@ class FcmNotificationService
     //  PUBLIC — typed notification senders
     // =========================================================================
 
+    public function welcomeMessage(int $userId): void
+    {
+        $this->toUser($userId, [
+            'title' => 'Thanks for Joining!',
+            'body'  => 'Explore features, personalize your experience, and enjoy using the app.',
+        ], [
+            'type'              => 'general'
+        ]);
+    }
+
+
     /** New chat message arrived in a conversation */
     public function sendNewMessage(int $userId, array $data): void
     {

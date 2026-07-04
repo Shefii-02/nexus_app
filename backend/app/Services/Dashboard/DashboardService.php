@@ -44,7 +44,7 @@ class DashboardService
             'total_students' => [
                 'value' => $current['students'],
                 'growth' => $this->growthPercent($previous['students'], $current['students']),
-                'trend' => $this->repository->getDailyTrend('users', 'created_at', 7, null, ['role' => 'student']),
+                'trend' => $this->repository->getDailyTrend('users', 'created_at', 7, null, ['acc_type' => 'student']),
             ],
             'enrollments' => [
                 'value' => $current['enrollments'],

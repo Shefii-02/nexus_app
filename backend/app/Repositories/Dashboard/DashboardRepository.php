@@ -2,6 +2,7 @@
 namespace App\Repositories\Dashboard;
 
 use App\Models\Admission;
+use App\Models\AdmissionPayment;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Payment;
@@ -17,7 +18,7 @@ class DashboardRepository
         $coursesQuery = Course::query();
         $studentsQuery = User::query()->where('acc_type', 'student');
         $admissionsQuery = Admission::query();
-        $revenueQuery = Payment::query()->where('status', 'success');
+        $revenueQuery = AdmissionPayment::query()->where('status', 'success');
 
         if ($from && $to) {
             $coursesQuery->whereBetween('created_at', [$from, $to]);
@@ -84,13 +85,13 @@ class DashboardRepository
 
     public function getRevenueByCategory(Carbon $start): Collection
     {
-        return Payment::query()
+        return AdmissionPayment::query()
             ->join('courses', 'payments.course_id', '=', 'courses.id')
-            ->join('categories', 'courses.category_id', '=', 'categories.id')
+            // ->join('categories', 'courses.category_id', '=', 'categories.id')
             ->selectRaw('categories.name as category, SUM(payments.amount) as total')
             ->where('payments.status', 'success')
             ->where('payments.created_at', '>=', $start)
-            ->groupBy('categories.name')
+            // ->groupBy('categories.name')
             ->orderByDesc('total')
             ->get();
     }

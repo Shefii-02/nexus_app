@@ -32,6 +32,7 @@ use App\Services\Payment\PaymentService;
 
 use App\Repositories\Announcement\AnnouncementRepositoryInterface as AnnouncementRepositoryInterfaceContract;
 use App\Repositories\Announcement\AnnouncementRepository as AnnouncementRepositoryImplementation;
+use App\Repositories\Dashboard\DashboardRepository;
 use App\Services\Announcement\AnnouncementService;
 
 use App\Repositories\Notification\NotificationRepositoryInterface as NotificationRepositoryInterfaceContract;
@@ -39,6 +40,7 @@ use App\Repositories\Notification\NotificationRepository as NotificationReposito
 use App\Repositories\StaffPayment\StaffPaymentRepository;
 use App\Repositories\TeacherPayment\TeacherPaymentRepository;
 use App\Services\Auth\OtpService;
+use App\Services\Dashboard\DashboardService;
 use App\Services\Notification\NotificationService;
 use App\Services\StaffPayment\StaffPaymentService;
 use App\Services\TeacherPayment\TeacherPaymentService;
@@ -127,6 +129,9 @@ class AppServiceProvider extends ServiceProvider
             return new StaffPaymentService(new StaffPaymentRepository());
         });
 
+        $this->app->bind(DashboardService::class, function () {
+            return new DashboardService(new DashboardRepository());
+        });
     }
 
     /**

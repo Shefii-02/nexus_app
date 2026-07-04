@@ -1,19 +1,13 @@
-// import { defineConfig } from 'vite'
-// import react from '@vitejs/plugin-react'
-
-// // https://vite.dev/config/
-// export default defineConfig({
-//   plugins: [react()],
-// })
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-  plugins: [react(),
-      VitePWA({
-      registerType: 'autoUpdate',
+  plugins: [
+    react(),
+    VitePWA({
+      registerType: 'autoUpdate', // Automatically updates without manual prompt
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
       manifest: {
         name: 'Nexus Learning · Admin',
@@ -32,16 +26,15 @@ export default defineConfig({
         ],
       },
       workbox: {
-        // Cache the dashboard API so the last-known data still renders
-        // offline or on a flaky connection, but always try the network first.
+        // Targets API paths specifically to keep static assets separate
         runtimeCaching: [
           {
-            urlPattern: ({ url }) => url.pathname.includes('/dashboard-status'),
+            urlPattern: ({ url }) => url.pathname.includes('/api/'), 
             handler: 'NetworkFirst',
             options: {
               cacheName: 'dashboard-status-cache',
               networkTimeoutSeconds: 5,
-              expiration: { maxEntries: 5, maxAgeSeconds: 60 * 60 * 24 },
+              expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 },
             },
           },
         ],

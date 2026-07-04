@@ -40,7 +40,7 @@ const AppContent = () => {
     <>
       <BrowserRouter>
         <AppRoutes />
-        <PWAManager />
+        {/* <PWAManager /> */}
       </BrowserRouter>
       <NoNetworkPage />
       <ToastContainer

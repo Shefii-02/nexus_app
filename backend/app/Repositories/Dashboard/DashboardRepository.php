@@ -109,14 +109,15 @@ class DashboardRepository
     public function getRecentActivity(int $limit): Collection
     {
         // Swap this for your actual activity/notifications source.
-        return DB::table('activity_log')
-            ->select('id', 'description as message', 'log_name as type', 'created_at')
-            ->orderByDesc('created_at')
-            ->limit($limit)
-            ->get()
-            ->map(function ($item) {
-                $item->created_at = Carbon::parse($item->created_at);
-                return $item;
-            });
+        // return DB::table('activity_log')
+        //     ->select('id', 'description as message', 'log_name as type', 'created_at')
+        //     ->orderByDesc('created_at')
+        //     ->limit($limit)
+        //     ->get()
+        //     ->map(function ($item) {
+        //         $item->created_at = Carbon::parse($item->created_at);
+        //         return $item;
+        //     });
+        return collect();
     }
 }

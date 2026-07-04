@@ -15,7 +15,7 @@ class DashboardRepository
     public function getCoreCounts(?Carbon $from = null, ?Carbon $to = null): array
     {
         $coursesQuery = Course::query();
-        $studentsQuery = User::query()->where('role', 'student');
+        $studentsQuery = User::query()->where('acc_type', 'student');
         $enrollmentsQuery = Admission::query();
         $revenueQuery = Payment::query()->where('status', 'success');
 

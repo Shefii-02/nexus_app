@@ -20,6 +20,7 @@ use App\Http\Controllers\API\Admin\ConversationController;
 use App\Http\Controllers\API\Admin\CouponController;
 use App\Http\Controllers\API\Admin\CourseCallController;
 use App\Http\Controllers\API\Admin\CourseMaterialController;
+use App\Http\Controllers\API\Admin\DashboardController;
 use App\Http\Controllers\API\Admin\LeaveRequestController;
 use App\Http\Controllers\API\Admin\MessageController;
 use App\Http\Controllers\API\Admin\NotificationController;
@@ -72,6 +73,8 @@ Route::middleware('auth:api')->group(function () {
 
 // Admin Routes - CRUD Operations
 Route::middleware(['auth:api'])->group(function () {
+
+    Route::get('dashboard-status', [DashboardController::class, 'status']);
 
 
 

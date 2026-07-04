@@ -20,7 +20,7 @@ const RevenueChart = ({ data }: RevenueChartProps) => {
         <p className="text-sm text-[var(--muted)] py-10 text-center">No revenue recorded for this period yet.</p>
       ) : (
         <>
-          <ResponsiveContainer width="100%" height={200}>
+          {/* <ResponsiveContainer width="100%" height={200}>
             <PieChart>
               <Pie data={chartData} dataKey="value" nameKey="name" innerRadius={55} outerRadius={80} paddingAngle={2}>
                 {chartData.map((_, index) => (
@@ -32,7 +32,7 @@ const RevenueChart = ({ data }: RevenueChartProps) => {
                 contentStyle={{ borderRadius: 12, border: '1px solid #E7E3DA', fontFamily: 'Inter', fontSize: 12 }}
               />
             </PieChart>
-          </ResponsiveContainer>
+          </ResponsiveContainer> */}
 
           <ul className="mt-2 space-y-2">
             {chartData.map((item, index) => (

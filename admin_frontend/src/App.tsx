@@ -10,8 +10,8 @@ import { useAppDispatch, useAppSelector } from './store/hooks'
 import { fetchProfile, logout } from './modules/auth/authSlice'
 import NoNetworkPage from './components/NoNetworkPage'
 import ErrorBoundary from './components/ErrorBoundary'
-import { OfflineBanner } from './components/OfflineBanner'
-import { PWAManager } from './components/PWAManager'
+// import { OfflineBanner } from './components/OfflineBanner'
+// import { PWAManager } from './components/PWAManager'
 
 const AppContent = () => {
   const dispatch = useAppDispatch()

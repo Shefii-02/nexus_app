@@ -93,7 +93,7 @@ class DashboardRepository
             // ->where('payments.status', 'success')
             ->where('admission_payments.created_at', '>=', $start)
             // ->groupBy('categories.name')
-            ->orderByDesc('total')
+            ->orderByDesc('amount')
             ->get();
     }
 

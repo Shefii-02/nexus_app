@@ -116,6 +116,15 @@ class Course extends Model
             ->withTimestamps();
     }
 
+
+    public function admissions(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'admissions', 'course_id', 'student_id')
+            ->withTimestamps();
+    }
+
+
+
     /**
      * Scope: Active courses
      */

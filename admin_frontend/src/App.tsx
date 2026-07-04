@@ -39,7 +39,6 @@ const AppContent = () => {
   return (
     <>
       <BrowserRouter>
-        <OfflineBanner />
         <AppRoutes />
         <PWAManager />
       </BrowserRouter>

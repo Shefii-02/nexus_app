@@ -4,9 +4,9 @@ import { useSelector } from 'react-redux'
 import type { RootState } from '../store'
 
 export const OfflineBanner: React.FC = () => {
-  const isOnline = useSelector((state: RootState) => state.network.isOnline)
+//   const isOnline = useSelector((state: RootState) => state.network.isOnline)
 
-  if (isOnline) return null
+//   if (isOnline) return null
 
   return (
     <div style={{

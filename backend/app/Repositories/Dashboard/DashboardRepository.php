@@ -87,11 +87,11 @@ class DashboardRepository
     public function getRevenueByCategory(Carbon $start): Collection
     {
         return AdmissionPayment::query()
-            ->join('courses', 'payments.course_id', '=', 'courses.id')
-            // ->join('categories', 'courses.category_id', '=', 'categories.id')
-            ->selectRaw('categories.name as category, SUM(payments.amount) as total')
+            ->join('courses', 'admission_payments.course_id', '=', 'courses.id')
+            // ->join('categories', 'admission_payments.category_id', '=', 'categories.id')
+            // ->selectRaw('categories.name as category, SUM(payments.amount) as total')
             // ->where('payments.status', 'success')
-            ->where('payments.created_at', '>=', $start)
+            ->where('admission_payments.created_at', '>=', $start)
             // ->groupBy('categories.name')
             ->orderByDesc('total')
             ->get();

@@ -28,7 +28,7 @@ const RevenueChart = ({ data }: RevenueChartProps) => {
                 ))}
               </Pie>
               <Tooltip
-                // formatter={(value: number) => `₹${value.toLocaleString('en-IN')}`}
+                formatter={(value: number) => `₹${value.toLocaleString('en-IN')}`}
                 contentStyle={{ borderRadius: 12, border: '1px solid #E7E3DA', fontFamily: 'Inter', fontSize: 12 }}
               />
             </PieChart>

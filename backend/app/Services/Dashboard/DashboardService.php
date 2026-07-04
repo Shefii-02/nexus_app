@@ -19,7 +19,7 @@ class DashboardService
         return Cache::remember('admin:dashboard:status', now()->addMinutes(3), function () {
             return [
                 'stats' => $this->getStats(),
-                'enrollments_chart' => $this->getEnrollmentsChart('30d'),
+                'admissions_chart' => $this->getadmissionsChart('30d'),
                 'revenue_chart' => $this->getRevenueBreakdown('30d'),
                 'top_courses' => $this->getTopCourses(5),
                 'notifications' => $this->getRecentNotifications(8),
@@ -46,10 +46,10 @@ class DashboardService
                 'growth' => $this->growthPercent($previous['students'], $current['students']),
                 'trend' => $this->repository->getDailyTrend('users', 'created_at', 7, null, ['acc_type' => 'student']),
             ],
-            'enrollments' => [
-                'value' => $current['enrollments'],
-                'growth' => $this->growthPercent($previous['enrollments'], $current['enrollments']),
-                'trend' => $this->repository->getDailyTrend('enrollments', 'created_at', 7),
+            'admissions' => [
+                'value' => $current['admissions'],
+                'growth' => $this->growthPercent($previous['admissions'], $current['admissions']),
+                'trend' => $this->repository->getDailyTrend('admissions', 'created_at', 7),
             ],
             'revenue' => [
                 'value' => $current['revenue'],
@@ -60,10 +60,10 @@ class DashboardService
         ];
     }
 
-    protected function getEnrollmentsChart(string $range): array
+    protected function getadmissionsChart(string $range): array
     {
         [$start, $groupBy] = $this->resolveRange($range);
-        $rows = $this->repository->getEnrollmentsSeries($start, $groupBy);
+        $rows = $this->repository->getadmissionsSeries($start, $groupBy);
 
         return [
             'range' => $range,
@@ -91,7 +91,7 @@ class DashboardService
                 'id' => $course->id,
                 'name' => $course->name,
                 'price' => '₹' . number_format($course->price),
-                'sales_count' => $course->enrollments_count,
+                'sales_count' => $course->admissions_count,
             ])
             ->toArray();
     }

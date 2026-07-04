@@ -16,20 +16,20 @@ class DashboardRepository
     {
         $coursesQuery = Course::query();
         $studentsQuery = User::query()->where('acc_type', 'student');
-        $enrollmentsQuery = Admission::query();
+        $admissionsQuery = Admission::query();
         $revenueQuery = Payment::query()->where('status', 'success');
 
         if ($from && $to) {
             $coursesQuery->whereBetween('created_at', [$from, $to]);
             $studentsQuery->whereBetween('created_at', [$from, $to]);
-            $enrollmentsQuery->whereBetween('created_at', [$from, $to]);
+            $admissionsQuery->whereBetween('created_at', [$from, $to]);
             $revenueQuery->whereBetween('created_at', [$from, $to]);
         }
 
         return [
             'courses' => $coursesQuery->count(),
             'students' => $studentsQuery->count(),
-            'enrollments' => $enrollmentsQuery->count(),
+            'admissions' => $admissionsQuery->count(),
             'revenue' => (float) $revenueQuery->sum('amount'),
         ];
     }
@@ -66,7 +66,7 @@ class DashboardRepository
         return $trend;
     }
 
-    public function getEnrollmentsSeries(Carbon $start, string $groupBy): Collection
+    public function getadmissionsSeries(Carbon $start, string $groupBy): Collection
     {
         $format = match ($groupBy) {
             'week' => '%x-W%v',
@@ -98,8 +98,8 @@ class DashboardRepository
     public function getTopSellingCourses(int $limit): Collection
     {
         return Course::query()
-            ->withCount('enrollments')
-            ->orderByDesc('enrollments_count')
+            ->withCount('admissions')
+            ->orderByDesc('admissions_count')
             ->limit($limit)
             ->get();
     }

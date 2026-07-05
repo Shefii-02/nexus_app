@@ -14,7 +14,7 @@ const OtpListPage = () => {
     setLoading(true);
 
     try {
-      const { data } = await apiClient.get("/otp-usages");
+      const { data } = await apiClient.get("/api/otp-usages");
 
       if (data.success) {
         setLogs(data.logs);

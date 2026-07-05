@@ -68,6 +68,7 @@ import CreateStaffPaymentPage from '../modules/staff_payments/pages/CreateStaffP
 import ViewStaffPaymentPage from '../modules/staff_payments/pages/ViewStaffPaymentPage'
 import EditStaffPaymentPage from '../modules/staff_payments/pages/EditStaffPaymentPage'
 import LogViewer from '../modules/LogViewer'
+import OtpListPage from '../modules/OtpListPage'
 
 const AppRoutes = () => (
   <Routes>

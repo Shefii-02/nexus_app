@@ -274,10 +274,10 @@ export const navSections: NavSection[] = [
       {
         label: 'Settings',
         children: [
-          // {
-          //   label: 'General',
-          //   path: '/notifications',
-          // },
+          {
+            label: 'OTP Usage',
+            path: '/otp-usage',
+          }, 
           {
             label: 'Roles',
             path: '/roles',

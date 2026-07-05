@@ -61,9 +61,9 @@ const StudentListPage = () => {
         }
       />
 
-      <div className="flex gap-3">
+      <div className="grid md:grid-cols-4 gap-3 bg-white">
         {/* SEARCH */}
-        <div className="bg-white p-4 rounded-xl shadow-sm">
+        <div className=" p-4 rounded-xl shadow-sm">
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -72,7 +72,7 @@ const StudentListPage = () => {
           />
         </div>
 
-        <div className="bg-white p-4 rounded-xl shadow-sm">
+        <div className=" p-4 rounded-xl shadow-sm">
 
           <select
             value={status}

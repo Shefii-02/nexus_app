@@ -75,6 +75,7 @@ Route::middleware('auth:api')->group(function () {
 Route::middleware(['auth:api'])->group(function () {
 
     Route::get('dashboard-status', [DashboardController::class, 'status']);
+    Route::get('otp-usages', [DashboardController::class, 'otpUsages']);
 
 
 

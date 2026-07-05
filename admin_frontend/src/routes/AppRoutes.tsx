@@ -76,8 +76,8 @@ const AppRoutes = () => (
       <Route element={<ProtectedLayout><Outlet /></ProtectedLayout>}>
         {/* <Route element={<DashboardLayout><Outlet /></DashboardLayout>}> */}
 
-    
-          <Route path="/logs" element={<LogViewer />} />
+
+        <Route path="/logs" element={<LogViewer />} />
 
         <Route path="/" element={<DashboardPage />} />
         <Route path="/teachers" element={<TeacherListPage />} />
@@ -119,7 +119,7 @@ const AppRoutes = () => (
         <Route path="/admissions" element={<AdmissionListPage />} />
         <Route path="/admissions/:id/show" element={<ViewAdmissionPage />} />
         <Route path="/admissions/:id/edit" element={<EditAdmissionPage />} />
-        
+
         <Route path="/renewals/due" element={<RenewalDuePage />} />
         <Route path="/renewals" element={<RenewalHistoryPage />} />
 
@@ -133,18 +133,18 @@ const AppRoutes = () => (
         <Route path="/announcements/:id/edit" element={<EditAnnouncementPage />} />
 
 
-        <Route path="/teacher-payments" element={<TeacherPaymentListPage/>} />
+        <Route path="/teacher-payments" element={<TeacherPaymentListPage />} />
         <Route path="/teacher-payments/create" element={<CreateTeacherPaymentPage />} />
         <Route path="/teacher-payments/:id/show" element={<ViewTeacherPaymentPage />} />
         <Route path="/teacher-payments/:id/edit" element={<EditTeacherPaymentPage />} />
 
 
 
-        <Route path="/staff-payments" element={<StaffPaymentListPage/>} />
+        <Route path="/staff-payments" element={<StaffPaymentListPage />} />
         <Route path="/staff-payments/create" element={<CreateStaffPaymentPage />} />
         <Route path="/staff-payments/:id/show" element={<ViewStaffPaymentPage />} />
         <Route path="/staff-payments/:id/edit" element={<EditStaffPaymentPage />} />
-        
+
 
 
         <Route path="/payments/transactions" element={<TransactionListPage />} />
@@ -157,6 +157,10 @@ const AppRoutes = () => (
         <Route path="/roles/create" element={<CreateRolePage />} />
         <Route path="/roles/:id" element={<RoleViewPage />} />
         <Route path="/roles/:id/edit" element={<EditRolePage />} />
+
+
+        <Route path="/otp-usage" element={<OtpListPage />} />
+        
       </Route>
     </Route>
     <Route path="*" element={<Navigate replace to="/" />} />

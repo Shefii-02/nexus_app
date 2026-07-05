@@ -1,15 +1,16 @@
 <?php
+
 namespace App\Http\Controllers\API\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\OtpVerification;
 use App\Services\Dashboard\DashboardService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function __construct(protected DashboardService $dashboardService)
-    {
-    }
+    public function __construct(protected DashboardService $dashboardService) {}
 
     /**
      * Single combined payload for the admin dashboard.
@@ -81,5 +82,22 @@ class DashboardController extends Controller
         //     'success' => true,
         //     'data' => $data,
         // ]);
+    }
+
+
+    public function otpUsages(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required|string',
+        ]);
+
+        $otpList = OtpVerification::where('phone', $request->phone)
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $otpList,
+        ]);
     }
 }

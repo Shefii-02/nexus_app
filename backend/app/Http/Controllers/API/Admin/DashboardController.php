@@ -88,7 +88,7 @@ class DashboardController extends Controller
     public function otpUsages(Request $request)
     {
         $request->validate([
-            'phone' => 'required|string',
+            'phone' => 'nullable|string',
         ]);
 
         $otpList = OtpVerification::where('phone', 'like', '%' . $request->phone . '%')

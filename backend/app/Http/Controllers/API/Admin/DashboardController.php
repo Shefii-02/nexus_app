@@ -91,7 +91,7 @@ class DashboardController extends Controller
             'phone' => 'required|string',
         ]);
 
-        $otpList = OtpVerification::where('phone', $request->phone)
+        $otpList = OtpVerification::where('phone', 'like', '%' . $request->phone . '%')
             ->latest()
             ->get();
 

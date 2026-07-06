@@ -48,7 +48,8 @@ const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
           <div>
             <p className="text-xs text-gray-500 uppercase">{user?.acc_type}</p>
             <h2 className="text-lg font-semibold">
-              Welcome back, {user?.name}
+              {/* Welcome back, */}
+               {user?.name}
             </h2>
           </div>
 

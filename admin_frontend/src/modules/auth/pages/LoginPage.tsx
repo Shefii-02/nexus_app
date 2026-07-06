@@ -41,17 +41,17 @@ const LoginPage = () => {
             <p className="mb-3 text-sm uppercase tracking-[0.24em] text-slate-300">Welcome back</p>
             <h2 className="text-4xl font-semibold leading-tight text-white">Nexus Learning Platform Admin</h2>
             <p className="mt-4 max-w-md text-sm text-slate-200">
-              Secure staff and administrator access to manage users, courses, payments, notifications and announcements.
+              {/* Secure staff and administrator access to manage users, courses, payments, notifications and announcements. */}
             </p>
             <div className="mt-10 grid gap-4 text-sm text-slate-300">
-              <div className="rounded-3xl bg-slate-800/70 p-4">
+              {/* <div className="rounded-3xl bg-slate-800/70 p-4">
                 <p className="font-semibold">Role-based access</p>
                 <p className="mt-1 text-slate-300">Admin gets full access; Staff sees a reduced action set.</p>
               </div>
               <div className="rounded-3xl bg-slate-800/70 p-4">
                 <p className="font-semibold">JWT authentication</p>
                 <p className="mt-1 text-slate-300">Your session is handled securely through the backend API.</p>
-              </div>
+              </div> */}
             </div>
           </div>
           <LoginForm

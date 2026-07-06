@@ -402,7 +402,7 @@ class AuthController extends Controller
                 'access_token_expires_at' => now()->addDays(30),
             ]);
 
-            (new FcmNotificationService())->welcomeMessage($user->id);
+            // (new FcmNotificationService())->welcomeMessage($user->id);
 
             $resposne = [
                 'status' => true,

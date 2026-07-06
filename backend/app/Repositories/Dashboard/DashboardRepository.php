@@ -93,7 +93,7 @@ class DashboardRepository
             ->whereNotNull('admission_payments.paid_at')
             ->where('admission_payments.created_at', '>=', $start)
             ->groupBy('admission_payments.type')
-            ->orderByDesc('amount')
+             ->orderByDesc('total')
             ->get();
     }
 

@@ -59,6 +59,11 @@ class StaffPayment extends Model
         );
     }
 
+    public function releasedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'released_by');
+    }
+
      public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');

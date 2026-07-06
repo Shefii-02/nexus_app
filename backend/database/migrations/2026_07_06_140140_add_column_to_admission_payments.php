@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-          Schema::table('otp_verifications', function (Blueprint $table) {
-            $table->string('device_id')->nullable()->after('type');
-            $table->boolean('is_used')->default(0)->nullable()->after('device_id');
+          Schema::table('admission_payments', function (Blueprint $table) {
+            $table->string('type')->default('admission')->nullable()->after('course_id');
         });
     }
 
@@ -22,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('otp_verifications', function (Blueprint $table) {
+        Schema::table('admission_payments', function (Blueprint $table) {
             //
         });
     }

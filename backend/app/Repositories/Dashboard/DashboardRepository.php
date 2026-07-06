@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repositories\Dashboard;
 
 use App\Models\Admission;
@@ -88,11 +89,10 @@ class DashboardRepository
     {
         return AdmissionPayment::query()
             ->join('courses', 'admission_payments.course_id', '=', 'courses.id')
-            // ->join('categories', 'admission_payments.category_id', '=', 'categories.id')
-            // ->selectRaw('categories.name as category, SUM(payments.amount) as total')
-            // ->where('payments.status', 'success')
+            ->selectRaw('admission_payments.type as category, SUM(paymeadmission_paymentsnts.amount) as total')
+            ->whereNotNull('admission_payments.paid_at')
             ->where('admission_payments.created_at', '>=', $start)
-            // ->groupBy('categories.name')
+            ->groupBy('admission_payments.type')
             ->orderByDesc('amount')
             ->get();
     }
@@ -109,15 +109,21 @@ class DashboardRepository
     public function getRecentActivity(int $limit): Collection
     {
         // Swap this for your actual activity/notifications source.
-        // return DB::table('activity_log')
-        //     ->select('id', 'description as message', 'log_name as type', 'created_at')
-        //     ->orderByDesc('created_at')
-        //     ->limit($limit)
-        //     ->get()
-        //     ->map(function ($item) {
-        //         $item->created_at = Carbon::parse($item->created_at);
-        //         return $item;
-        //     });
-        return collect();
+        return DB::table('activity_logs')
+            ->select(
+                'id',
+                'description as message',
+                'module as type',
+                'action',
+                'created_at'
+            )
+            ->latest()
+            ->limit($limit)
+            ->get()
+            ->map(function ($item) {
+                $item->created_at = Carbon::parse($item->created_at);
+                return $item;
+            });
+
     }
 }

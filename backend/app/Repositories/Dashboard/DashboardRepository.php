@@ -89,7 +89,7 @@ class DashboardRepository
     {
         return AdmissionPayment::query()
             ->join('courses', 'admission_payments.course_id', '=', 'courses.id')
-            ->selectRaw('admission_payments.type as category, SUM(paymeadmission_paymentsnts.amount) as total')
+            ->selectRaw('admission_payments.type as category, SUM(admission_payments.amount) as total')
             ->whereNotNull('admission_payments.paid_at')
             ->where('admission_payments.created_at', '>=', $start)
             ->groupBy('admission_payments.type')

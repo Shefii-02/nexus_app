@@ -8,7 +8,7 @@ interface RevenueChartProps {
 const COLORS = ['#14213D', '#0F6B67', '#C9A227', '#E4572E', '#8894A8']
 
 const RevenueChart = ({ data }: RevenueChartProps) => {
-  const chartData = data.labels?.map((label, i) => ({ name: label, value: data.values[i] }))
+  const chartData = data.labels.map((label, i) => ({ name: label, value: data.values[i] }))
   const total = chartData.reduce((sum, item) => sum + item.value, 0)
 
   return (

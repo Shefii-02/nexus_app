@@ -19,7 +19,7 @@ class DashboardService
         return Cache::remember('admin:dashboard:status', now()->addMinutes(3), function () {
             return [
                 'stats' => $this->getStats(),
-                'admissions_chart' => $this->getadmissionsChart('30d'),
+                'enrollments_chart' => $this->getadmissionsChart('30d'),
                 'revenue_chart' => $this->getRevenueBreakdown('30d'),
                 'top_courses' => $this->getTopCourses(5),
                 'notifications' => $this->getRecentNotifications(8),
@@ -46,7 +46,7 @@ class DashboardService
                 'growth' => $this->growthPercent($previous['students'], $current['students']),
                 'trend' => $this->repository->getDailyTrend('users', 'created_at', 7, null, ['acc_type' => 'student']),
             ],
-            'admissions' => [
+            'enrollments' => [
                 'value' => $current['admissions'],
                 'growth' => $this->growthPercent($previous['admissions'], $current['admissions']),
                 'trend' => $this->repository->getDailyTrend('admissions', 'created_at', 7),

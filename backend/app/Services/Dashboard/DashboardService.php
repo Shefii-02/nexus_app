@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services\Dashboard;
 
 use App\Repositories\Dashboard\DashboardRepository;
@@ -7,9 +8,7 @@ use Illuminate\Support\Facades\Cache;
 
 class DashboardService
 {
-    public function __construct(protected DashboardRepository $repository)
-    {
-    }
+    public function __construct(protected DashboardRepository $repository) {}
 
     /**
      * Everything the dashboard page needs, in one payload.
@@ -66,9 +65,9 @@ class DashboardService
         $rows = $this->repository->getadmissionsSeries($start, $groupBy);
 
         return [
-            'range' => $range,
-            'labels' => $rows->pluck('label'),
-            'values' => $rows->pluck('total'),
+            'range'  => $range,
+            'labels' => $rows->pluck('label')->values()->all(),
+            'values' => $rows->pluck('total')->map(fn($v) => (int) $v)->values()->all(),
         ];
     }
 
@@ -78,16 +77,16 @@ class DashboardService
         $rows = $this->repository->getRevenueByCategory($start);
 
         return [
-            'range' => $range,
-            'labels' => $rows->pluck('category'),
-            'values' => $rows->pluck('total'),
+            'range'  => $range,
+            'labels' => $rows->pluck('category')->values()->all(),
+            'values' => $rows->pluck('total')->map(fn($v) => (float) $v)->values()->all(),
         ];
     }
 
     protected function getTopCourses(int $limit): array
     {
         return $this->repository->getTopSellingCourses($limit)
-            ->map(fn ($course) => [
+            ->map(fn($course) => [
                 'id' => $course->id,
                 'name' => $course->name,
                 'price' => '₹' . number_format($course->price),
@@ -99,7 +98,7 @@ class DashboardService
     protected function getRecentNotifications(int $limit): array
     {
         return $this->repository->getRecentActivity($limit)
-            ->map(fn ($item) => [
+            ->map(fn($item) => [
                 'id' => $item->id,
                 'message' => $item->message,
                 'type' => $item->type,

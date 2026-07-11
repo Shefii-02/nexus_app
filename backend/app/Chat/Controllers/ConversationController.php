@@ -47,8 +47,8 @@ class ConversationController extends Controller
             $conv->is_pinned     = $participant?->is_pinned ?? false;
             $conv->last_message  = $conv->messages->first();
 
-            // For individual chats, expose the other user as the "title"
-            if ($conv->type === 'individual') {
+            // For single chats, expose the other user as the "title"
+            if ($conv->type === 'single') {
                 $other = $conv->participants->firstWhere('user_id', '!=', $userId);
                 $conv->other_user = $other?->user;
             }
@@ -60,7 +60,7 @@ class ConversationController extends Controller
     }
 
     /**
-     * Create an individual chat — prevents duplicates per module.
+     * Create an single chat — prevents duplicates per module.
      */
     public function createIndividual(Request $request): JsonResponse
     {
@@ -180,7 +180,7 @@ class ConversationController extends Controller
             ->with('participants.user:id,name,avatar,email')
             ->findOrFail($id);
 
-        if ($conversation->type === 'individual') {
+        if ($conversation->type === 'single') {
             $other = $conversation->participants
                 ->firstWhere('user_id', '!=', $userId);
             $conversation->other_user = $other?->user;

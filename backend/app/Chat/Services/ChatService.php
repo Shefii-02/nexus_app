@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 class ChatService
 {
     /**
-     * Find or create an individual conversation between two users.
+     * Find or create an single conversation between two users.
      * Scoped by module_id to allow teacher-student chats per course.
      */
     public function findOrCreateIndividual(int $userA, int $userB, ?int $moduleId = null): Conversation
@@ -21,7 +21,7 @@ class ChatService
 
         return DB::transaction(function () use ($userA, $userB, $moduleId) {
             $conversation = Conversation::create([
-                'type'       => 'individual',
+                'type'       => 'single',
                 'created_by' => $userA,
                 'module_id'  => $moduleId,
             ]);

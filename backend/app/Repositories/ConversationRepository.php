@@ -56,7 +56,7 @@ class ConversationRepository
 
     public function findIndividual(array $userIds)
     {
-        return Conversation::where('type', 'individual')
+        return Conversation::where('type', 'single')
             ->whereHas('participants', fn($q) => $q->whereIn('user_id', $userIds))
             ->has('participants', '=', count($userIds))
             ->first();

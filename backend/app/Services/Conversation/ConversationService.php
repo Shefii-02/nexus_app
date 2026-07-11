@@ -21,8 +21,8 @@ class ConversationService
             $authId = auth()->id();
             $participants = array_unique(array_merge($dto->participants, [$authId]));
 
-            // 🔥 Prevent duplicate individual chat
-            if ($dto->type === 'individual' && count($participants) === 2) {
+            // 🔥 Prevent duplicate single chat
+            if ($dto->type === 'single' && count($participants) === 2) {
                 $existing = $this->repo->findIndividual($participants);
                 if ($existing) return $existing;
             }
@@ -82,7 +82,7 @@ class ConversationService
 
         } else {
 
-            // 🔥 Individual → soft delete for user
+            // 🔥 single → soft delete for user
             $participant->delete();
         }
     }

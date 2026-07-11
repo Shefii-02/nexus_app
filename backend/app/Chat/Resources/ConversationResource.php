@@ -31,8 +31,8 @@ class ConversationResource extends JsonResource
             'is_pinned'     => $participant?->is_pinned ?? false,
             'unread_count'  => $this->unread_count ?? 0,
 
-            // Other user (individual only)
-            'other_user'    => $this->type === 'individual'
+            // Other user (single only)
+            'other_user'    => $this->type === 'single'
                 ? $this->whenLoaded('participants', fn() => collect($this->participants)
                     ->firstWhere('user_id', '!=', $this->currentUserId ?? $request->user()?->id)
                     ?->user ? [

@@ -81,12 +81,12 @@ class Conversation extends Model
     // ─── Helpers ──────────────────────────────────────────────────────────
 
     /**
-     * For individual chats: find existing conversation between two users
+     * For single chats: find existing conversation between two users
      * scoped to a module to avoid duplicates.
      */
     public static function findIndividual(int $userA, int $userB, ?int $moduleId = null): ?self
     {
-        return self::where('type', 'individual')
+        return self::where('type', 'single')
             ->when($moduleId, fn($q) => $q->where('module_id', $moduleId))
             ->whereHas('participants', fn($q) => $q->where('user_id', $userA))
             ->whereHas('participants', fn($q) => $q->where('user_id', $userB))

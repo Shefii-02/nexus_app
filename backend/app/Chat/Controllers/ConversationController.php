@@ -46,7 +46,7 @@ class ConversationController extends Controller
             $conv->is_muted      = $participant?->is_muted ?? false;
             $conv->is_pinned     = $participant?->is_pinned ?? false;
             $conv->last_message  = $conv->messages->first();
-
+        Log::info($conv->type);
             // For single chats, expose the other user as the "title"
             if ($conv->type === 'single') {
                 $other = $conv->participants->firstWhere('user_id', '!=', $userId);

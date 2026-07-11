@@ -11,10 +11,10 @@ interface Props {
   onClose: () => void;
 }
 
-type Tab = 'individual' | 'group';
+type Tab = 'single' | 'group';
 
 export function ForwardModal({ message, conversations, currentUserId, onClose }: Props) {
-  const [tab, setTab]         = useState<Tab>('individual');
+  const [tab, setTab]         = useState<Tab>('single');
   const [search, setSearch]   = useState('');
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [sending, setSending]  = useState(false);
@@ -22,7 +22,7 @@ export function ForwardModal({ message, conversations, currentUserId, onClose }:
 
   const filtered = useMemo(() => {
     const byType = conversations.filter(c =>
-      tab === 'individual' ? c.type === 'single' : c.type === 'group',
+      tab === 'single' ? c.type === 'single' : c.type === 'group',
     );
     const q = search.toLowerCase().trim();
     if (!q) return byType;
@@ -81,13 +81,13 @@ export function ForwardModal({ message, conversations, currentUserId, onClose }:
 
         {/* Tabs */}
         <div className="conv-tabs">
-          {(['individual', 'group'] as Tab[]).map(t => (
+          {(['single', 'group'] as Tab[]).map(t => (
             <button
               key={t}
               className={`conv-tab ${tab === t ? 'active' : ''}`}
               onClick={() => setTab(t)}
             >
-              {t === 'individual' ? 'Chats' : 'Groups'}
+              {t === 'single' ? 'Chats' : 'Groups'}
             </button>
           ))}
         </div>

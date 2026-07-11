@@ -26,7 +26,7 @@ export function ConversationSidebar(props: Props) {
   const [showNewGroup, setShowNewGroup] = useState(false);
 
   const filtered = props.conversations.filter(conv => {
-    const name = conv.type === 'individual'
+    const name = conv.type === 'single'
       ? conv.other_user?.name ?? ''
       : conv.title ?? '';
 

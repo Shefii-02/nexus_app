@@ -123,7 +123,7 @@ export function ChatWindow({
           onClose={() => setShowInfo(false)}
         />
       )}
-      {showInfo && conversation.type === 'individual' && (
+      {showInfo && conversation.type === 'single' && (
         <UserInfoDrawer
           user={conversation.other_user!}
           onClose={() => setShowInfo(false)}

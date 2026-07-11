@@ -1,5 +1,6 @@
 #!/bin/bash
-cd /var/www/univexa.in/nexus_app/admin_frontend
+# cd /var/www/univexa.in/nexus_app/admin_frontend
+cd /var/www/nexus/nexus_app/admin_frontend
 git pull
 npm install
 npm run build

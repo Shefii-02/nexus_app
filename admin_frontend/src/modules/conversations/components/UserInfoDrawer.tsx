@@ -22,7 +22,7 @@ export function UserInfoDrawer({ user, onClose }: Props) {
             {user.avatar ? (
               <img src={user.avatar} alt={user.name} />
             ) : (
-              <span className="avatar-initials lg">{getInitials(user.name)}</span>
+              <span className="avatar-initials lg">{getInitials(user.name ?? '?')}</span>
             )}
           </div>
           <h2>{user.name}</h2>

@@ -50,20 +50,25 @@ export function MessageBubble({
   const isPrivileged = currentUserRole === 'admin' || currentUserRole === 'staff';
 
   const canDeleteForEveryone = isMine || isPrivileged;
+  const reactions = msg.reactions ?? [];
+  // const myReaction = msg.reactions.find(r => r.user_id === currentUserId);
 
-  const myReaction = msg.reactions.find(r => r.user_id === currentUserId);
+  const myReaction = reactions.find(
+    r => r.user_id === currentUserId
+  );
+
 
   // Group reactions: emoji → { count, names[] }
   const reactionGroups: Record<string, { count: number; names: string[] }> = {};
-  msg.reactions.forEach(r => {
+  reactions.forEach(r => {
     if (!reactionGroups[r.reaction])
       reactionGroups[r.reaction] = { count: 0, names: [] };
     reactionGroups[r.reaction].count++;
     if (r.user?.name) reactionGroups[r.reaction].names.push(r.user.name);
   });
 
-  
-  // msg.reactions.forEach(r => {
+
+  // reactions.forEach(r => {
   //   if (!reactionGroups[r.reaction]) {
   //     reactionGroups[r.reaction] = { count: 0, users: [] };
   //   }
@@ -71,8 +76,8 @@ export function MessageBubble({
   //   if (r.user?.name) reactionGroups[r.reaction].users.push(r.user.name);
   // });
 
-  const isRead = msg.reads.length > 0;
-  const hasReacts = Object.keys(reactionGroups).length > 0;
+  const isRead = msg.reads?.length > 0;
+  const hasReacts = Object.keys(reactionGroups)?.length > 0;
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -129,9 +134,9 @@ export function MessageBubble({
         {!isMine && (
           <div className="msg-avatar">
             {showAvatar ? (
-              msg.sender.avatar
-                ? <img src={msg.sender.avatar} alt={msg.sender.name} />
-                : <span className="avatar-initials sm">{getInitials(msg.sender.name)}</span>
+              msg.sender?.avatar
+                ? <img src={msg.sender?.avatar} alt={msg.sender?.name} />
+                : <span className="avatar-initials sm">{getInitials(msg.sender?.name)}</span>
             ) : (
               <div className="avatar-placeholder" />
             )}
@@ -233,7 +238,7 @@ export function MessageBubble({
 
           {/* Sender name (groups, first in run) */}
           {!isMine && showAvatar && (
-            <span className="msg-sender-name">{msg.sender.name}</span>
+            <span className="msg-sender-name">{msg.sender?.name}</span>
           )}
 
           {/* ── WhatsApp-style reply quote ── */}
@@ -357,7 +362,7 @@ export function MessageBubble({
                   key={emoji}
                   className={`reaction-chip ${myReaction?.reaction === emoji ? 'mine' : ''}`}
                   onClick={() => myReaction?.reaction === emoji ? onRemoveReact() : onReact(emoji)}
-                  // title={users.join(', ')}
+                // title={users.join(', ')}
                 >
                   <span className="reaction-emoji">{emoji}</span>
                   {count > 1 && <span className="reaction-count">{count}</span>}

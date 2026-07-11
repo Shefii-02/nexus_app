@@ -1,11 +1,14 @@
 // src/modules/conversations/utils.ts
 
-export function getInitials(name: string): string {
+export function getInitials(name?: string | null): string {
+  if (!name) return "?";
+
   return name
-    .split(' ')
+    .trim()
+    .split(/\s+/)
     .slice(0, 2)
-    .map(w => w[0]?.toUpperCase() ?? '')
-    .join('');
+    .map(word => word.charAt(0).toUpperCase())
+    .join("");
 }
 
 export function formatTime(isoString: string): string {

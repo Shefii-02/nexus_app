@@ -27,6 +27,19 @@ return Application::configure(basePath: dirname(__DIR__))
             'middleware' => ['auth:api'], // ← JWT guard
         ]
     )
+    // ->withSchedule(function ($schedule) {
+    //     $schedule->command('renewal:create')
+    //         ->dailyAt('00:30');
+
+    //     $schedule->command('renewal:expire')
+    //         ->everyTenMinutes();
+
+    //     $schedule->command('admission:suspend')
+    //         ->everyFiveMinutes();
+
+    //     $schedule->command('class:reminder')
+    //         ->everyMinute();
+    // })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (AuthenticationException $e, $request) {
             return response()->json([
@@ -35,3 +48,6 @@ return Application::configure(basePath: dirname(__DIR__))
             ], 401);
         });
     })->create();
+
+
+

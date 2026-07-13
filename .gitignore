@@ -37,7 +37,7 @@ dist-ssr
 /admin_frontend/dist
 /admin_frontend/dist-ssr
 /admin_frontend/*.local
-
+/admin_frontend/deploy.sh
 
 
 

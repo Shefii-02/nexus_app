@@ -8,6 +8,7 @@ use App\Models\Conversation;
 use App\Models\ConversationParticipant;
 use App\Models\RefreshToken;
 use App\Models\Student;
+use App\Models\Teacher;
 use App\Models\User;
 use App\Services\Auth\OtpService;
 use App\Services\Media\MediaService;
@@ -122,6 +123,7 @@ class AuthController extends Controller
                 'email',
                 'parent_name',
                 'password',
+                'role',
             ]);
 
             // Hash password if provided
@@ -144,20 +146,32 @@ class AuthController extends Controller
 
             // Mark profile completed
             $data['profile_completed'] = 1;
-
+            $data['acc_type'] = $data['role'] == 'teacher' ? 'teacher' : 'student';
             // Update user
             $user->update($data);
             $user->refresh();
 
-            $student = Student::where('user_id', $user->id)->first();
-            if (!$student) {
-                $student = new Student();
-                $student->user_id = $user->id;
-                $student->roll_number = rand(11111, 99999);
-            }
+            if ($user->acc_type == 'student') {
+                $student = Student::where('user_id', $user->id)->first();
+                if (!$student) {
+                    $student = new Student();
+                    $student->user_id = $user->id;
+                    $student->roll_number = rand(11111, 99999);
+                }
 
-            $student->guardian_name = $request->parent_name;
-            $student->save();
+                $student->guardian_name = $request->parent_name;
+                $student->save();
+            } else if ($user->acc_type == 'teacher') {
+                $teacher = Teacher::where('user_id', $user->id)->first();
+                if (!$teacher) {
+                    $teacher = new Teacher();
+                    $teacher->user_id = $user->id;
+                    $teacher->phone   = $user->phone ?? null;
+                    $teacher->address = null;
+                    $teacher->status  = 'active';
+                    $teacher->save();
+                }
+            }
 
             /*
         |--------------------------------------------------------------------------
@@ -419,6 +433,7 @@ class AuthController extends Controller
                 'is_new_user' => $user->email == '' || $user->email == null ? true : false,
 
                 'user' => new UserResource($user),
+
                 // 'user' => [
                 //     ...$user->toArray(),
                 //     'role'  => $user->acc_type,

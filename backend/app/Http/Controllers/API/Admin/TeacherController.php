@@ -99,7 +99,7 @@ class TeacherController extends Controller
             $updated = $this->teacherService->update($teacher, $dto);
 
             return $this->successResponse(
-                TeacherResource::make($updated->load('teacher')),
+                TeacherResource::make($updated->load('user')),
                 'Teacher updated successfully'
             );
         } catch (\Exception $e) {

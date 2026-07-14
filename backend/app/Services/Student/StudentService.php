@@ -3,6 +3,7 @@
 namespace App\Services\Student;
 
 use App\DTOs\StudentDTO;
+use App\Models\Student;
 use App\Models\User;
 use App\Repositories\Student\StudentRepositoryInterface;
 use App\Services\BaseService;
@@ -18,19 +19,17 @@ class StudentService extends BaseService
 
     public function create(StudentDTO $dto): object
     {
-        Log::info($dto->toUserArray());
+        // Log::info($dto->toUserArray());
         return DB::transaction(function () use ($dto) {
             // ✅ 1. Create User
-            // $user = User::create($dto->toUserArray());
-            $user = new User();
-            $user->forceFill($dto->toUserArray());
-            $user->save();
+            $user = User::create($dto->toUserArray());
+
 
             // ✅ 2. Assign Role (if using spatie)
             $user->assignRole('student');
 
             // ✅ 3. Create Student
-            $student = $this->repository->create(
+            $student = Student::create(
                 $dto->toStudentArray($user->id)
             );
             return $student;

@@ -3,6 +3,7 @@
 namespace App\Services\Teacher;
 
 use App\DTOs\TeacherDTO;
+use App\Models\Teacher;
 use App\Models\User;
 use App\Repositories\Teacher\TeacherRepositoryInterface;
 use App\Services\BaseService;
@@ -35,7 +36,7 @@ class TeacherService extends BaseService
             $user->assignRole('teacher');
 
             // ✅ 3. Create Teacher
-            $teacher = $this->repository->create(
+            $teacher = Teacher::create(
                 $dto->toTeacherArray($user->id)
             );
 

@@ -61,7 +61,7 @@ const StudentListPage = () => {
         }
       />
 
-      <div className="grid md:grid-cols-4 gap-3 bg-white">
+      <div className="grid md:grid-cols-3 gap-3 bg-white">
         {/* SEARCH */}
         <div className=" p-4 rounded-xl shadow-sm">
           <input

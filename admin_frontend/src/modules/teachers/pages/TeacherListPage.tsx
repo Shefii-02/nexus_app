@@ -56,7 +56,7 @@ const TeacherListPage = () => {
         }
       />
 
-      <div className="grid md:grid-cols-4 gap-3 bg-white">
+      <div className="grid md:grid-cols-3 gap-3 bg-white">
         {/* SEARCH */}
         <div className=" p-4 w-full rounded-xl shadow-sm">
           <input

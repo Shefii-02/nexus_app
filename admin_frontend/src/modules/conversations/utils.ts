@@ -44,3 +44,12 @@ export function formatFileSize(bytes: number): string {
   if (bytes < 1048576)    return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / 1048576).toFixed(1)} MB`;
 }
+
+
+const ROLE_RANK: Record<string, number> = { admin: 3, staff: 2, teacher: 1, student: 0 };
+
+export function canUserSend(userRole: string | undefined, replyPermission: string): boolean {
+  const userRank = ROLE_RANK[userRole ?? 'student'] ?? 0;
+  const requiredRank = ROLE_RANK[replyPermission] ?? 0;
+  return userRank >= requiredRank;
+}

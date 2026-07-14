@@ -96,19 +96,37 @@ class MessageController extends Controller
         Request $request,
         int $conversationId
     ): JsonResponse {
+        $user = $request->user();
 
-        $userId = $request->user()->id;
+        $userId = $user->id;
+        $conversation = Conversation::findOrFail($conversationId);
 
-        abort_unless(
-            ConversationParticipant::where(
-                'conversation_id',
-                $conversationId
-            )
-                ->where('user_id', $userId)
-                ->where('status', 'active')
-                ->exists(),
-            403
-        );
+        // ── Membership check (you likely already have this, keep it) ──
+        $isMember = ConversationParticipant::where('conversation_id', $conversationId)
+            ->where('user_id', $user->id)
+            ->where('status', 'active')
+            ->exists();
+
+        if (!$isMember) {
+            return response()->json(['message' => 'Not a participant in this conversation.'], 403);
+        }
+        // abort_unless(
+        //     ConversationParticipant::where(
+        //         'conversation_id',
+        //         $conversationId
+        //     )
+        //         ->where('user_id', $userId)
+        //         ->where('status', 'active')
+        //         ->exists(),
+        //     403
+        // );
+        // ── Reply-permission gate ──────────────────────────────────────────────
+        if (!$conversation->canUserSend($user)) {
+            return response()->json([
+                'message' => 'You do not have permission to send messages in this conversation.',
+                'reply_permission' => $conversation->reply_permission,
+            ], 403);
+        }
 
         $request->validate([
             'message'  => 'nullable|string|max:5000',

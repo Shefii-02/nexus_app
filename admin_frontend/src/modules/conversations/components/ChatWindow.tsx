@@ -9,6 +9,8 @@ import { UserInfoDrawer } from './UserInfoDrawer';
 import { ForwardModal } from './ForwardModal';
 import { PinnedMessageBar } from './PinnedMessageBar';
 import type { Conversation, Message } from '../services/chatService';
+import { canUserSend } from '../utils';
+
 
 interface Props {
   conversation: Conversation;
@@ -29,9 +31,9 @@ export function ChatWindow({
   onBack,
   onNewMessage,
 }: Props) {
-  const [replyTo,      setReplyTo]    = useState<Message | null>(null);
-  const [forwardMsg,   setForwardMsg] = useState<Message | null>(null);
-  const [showInfo,     setShowInfo]   = useState(false);
+  const [replyTo, setReplyTo] = useState<Message | null>(null);
+  const [forwardMsg, setForwardMsg] = useState<Message | null>(null);
+  const [showInfo, setShowInfo] = useState(false);
   const [showPinnedBar, setShowPinnedBar] = useState(true);
 
   const msgListRef = useRef<MessageListHandle>(null);
@@ -51,8 +53,9 @@ export function ChatWindow({
     pinMsg,
     reportMsg,
     sendTypingSignal,
-  } = useMessages(conversation.id, currentUserId, onNewMessage); 
+  } = useMessages(conversation.id, currentUserId, onNewMessage);
   //  = useMessages(conversation.id, onNewMessage);
+  const canSend = canUserSend(currentUserRole, conversation.reply_permission);
 
   const handleSend = async (params: {
     message?: string;
@@ -89,7 +92,7 @@ export function ChatWindow({
           pinnedMsgs={pinnedMsgs}
           onScrollTo={handleScrollToPin}
           onClose={() => setShowPinnedBar(false)}
-          onUnpin={pinMsg} 
+          onUnpin={pinMsg}
         />
       )}
 
@@ -100,6 +103,7 @@ export function ChatWindow({
         hasMore={hasMore}
         currentUserId={currentUserId}
         currentUserRole={currentUserRole}
+        canSend={canSend}
         onLoadMore={loadMore}
         onReply={setReplyTo}
         onEdit={editMsg}
@@ -110,6 +114,21 @@ export function ChatWindow({
         onPin={pinMsg}
         onReport={reportMsg}
       />
+
+      {canSend ? (
+        <MessageComposer
+          replyTo={replyTo}
+          onCancelReply={() => setReplyTo(null)}
+          onSend={handleSend}
+          onTyping={sendTypingSignal}
+        />
+      ) : (
+        <div className="composer-locked">
+          🔒 Only {conversation.reply_permission === 'admin' ? 'admins'
+            : conversation.reply_permission === 'staff' ? 'admins and staff'
+              : 'admins, staff and teachers'} can send messages here. You can still react to messages.
+        </div>
+      )}
 
       <MessageComposer
         replyTo={replyTo}

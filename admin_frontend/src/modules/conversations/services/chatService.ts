@@ -70,6 +70,7 @@ export interface Conversation {
   avatar: string | null;
   module_id: number | null;
   status: 'active' | 'archived' | 'blocked';
+  reply_permission: 'admin' | 'staff' | 'teacher' | 'all'; 
   participants: Participant[];
   other_user?: User;
   last_message?: Message;
@@ -99,7 +100,7 @@ export const createGroupChat = (title: string, userIds: number[], moduleId?: num
     title, user_ids: userIds, module_id: moduleId, avatar,
   }).then(r => r.data.conversation);
 
-export const updateGroup = (id: number, data: Partial<{ title: string; avatar: string; status: string }>) =>
+export const updateGroup = (id: number, data: Partial<{ title: string; avatar: string; status: string,reply_permission: string  }>) =>
   apiClient.put<{ conversation: Conversation }>(`${BASE}/conversations/${id}`, data).then(r => r.data.conversation);
 
 export const leaveGroup = (id: number) =>

@@ -17,8 +17,26 @@ class Conversation extends Model
         'module_id',
         'status',
         'created_by',
+        'reply_permission',
     ];
 
+    public const ROLE_RANK = [
+        'admin'   => 3,
+        'staff'   => 2,
+        'teacher' => 1,
+        'student' => 0,
+    ];
+    /**
+     * Can this user send a message (text/image/voice/etc — anything
+     * that isn't a reaction) in this conversation?
+     */
+    public function canUserSend(\App\Models\User $user): bool
+    {
+        $userRank = self::ROLE_RANK[$user->role] ?? 0;
+        $requiredRank = self::ROLE_RANK[$this->reply_permission] ?? 0;
+
+        return $userRank >= $requiredRank;
+    }
     // public function participants(): BelongsToMany
     // {
     //     return $this->belongsToMany(User::class, 'conversation_participants', 'conversation_id', 'user_id')

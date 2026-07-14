@@ -8,7 +8,7 @@ interface Props {
   isMine: boolean;
   showAvatar: boolean;
   currentUserId: number;
-  currentUserRole: string,
+  currentUserRole: string;
   onReply: () => void;
   onEdit: (text: string) => void;
   onDelete: (forEveryone: boolean) => void;
@@ -18,6 +18,7 @@ interface Props {
   onForward: () => void;
   onReport: (reason: string) => void;
   onJumpToReply?: (messageId: number) => void;
+  canSend?: boolean;
 }
 
 const EMOJI_REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
@@ -37,6 +38,7 @@ export function MessageBubble({
   onPin,
   onReport,
   onJumpToReply,
+  canSend = true,
 }: Props) {
   const [showActions, setShowActions] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
@@ -51,33 +53,18 @@ export function MessageBubble({
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const isPrivileged = currentUserRole === 'admin' || currentUserRole === 'staff';
-
   const canDeleteForEveryone = isMine || isPrivileged;
+
   const reactions = msg.reactions ?? [];
-  // const myReaction = msg.reactions.find(r => r.user_id === currentUserId);
-
-  const myReaction = reactions.find(
-    r => r.user_id === currentUserId
-  );
-
+  const myReaction = reactions.find(r => r.user_id === currentUserId);
 
   // Group reactions: emoji → { count, names[] }
   const reactionGroups: Record<string, { count: number; names: string[] }> = {};
   reactions.forEach(r => {
-    if (!reactionGroups[r.reaction])
-      reactionGroups[r.reaction] = { count: 0, names: [] };
+    if (!reactionGroups[r.reaction]) reactionGroups[r.reaction] = { count: 0, names: [] };
     reactionGroups[r.reaction].count++;
     if (r.user?.name) reactionGroups[r.reaction].names.push(r.user.name);
   });
-
-
-  // reactions.forEach(r => {
-  //   if (!reactionGroups[r.reaction]) {
-  //     reactionGroups[r.reaction] = { count: 0, users: [] };
-  //   }
-  //   reactionGroups[r.reaction].count++;
-  //   if (r.user?.name) reactionGroups[r.reaction].users.push(r.user.name);
-  // });
 
   const isRead = msg.reads?.length > 0;
   const hasReacts = Object.keys(reactionGroups)?.length > 0;
@@ -93,7 +80,6 @@ export function MessageBubble({
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, [showDropdown]);
-
 
   const handleReport = async () => {
     if (!reportReason.trim()) return;
@@ -149,7 +135,7 @@ export function MessageBubble({
         {/* ── Hover action bar ── */}
         {showActions && (
           <div className={`msg-action-bar ${isMine ? 'mine' : 'theirs'}`}>
-            {/* Emoji */}
+            {/* Emoji — always available, regardless of send permission */}
             <div className="action-bar-item">
               <button
                 className="action-bar-btn"
@@ -158,6 +144,7 @@ export function MessageBubble({
               >
                 😊
               </button>
+
               {showEmoji && (
                 <div className={`emoji-picker floating ${isMine ? 'right' : 'left'}`}>
                   {EMOJI_REACTIONS.map(e => (
@@ -177,14 +164,7 @@ export function MessageBubble({
               )}
             </div>
 
-            {/* Reply */}
-            {/* <button className="action-bar-btn" onClick={onReply} title="Reply">
-              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <polyline points="9 17 4 12 9 7" /><path d="M20 18v-2a4 4 0 0 0-4-4H4" />
-              </svg>
-            </button> */}
-
-            {/* More */}
+            {/* More — dropdown itself always available; individual items gated below */}
             <div className="ab-item" ref={dropdownRef}>
               <button
                 className="ab-btn"
@@ -200,17 +180,22 @@ export function MessageBubble({
 
               {showDropdown && (
                 <ul className={`msg-menu ${isMine ? 'right' : 'left'}`}>
-                  <li onClick={() => { onReply(); closeAll(); }}>
-                    <span className="mm-icon">↩</span> Reply
-                  </li>
-                  <li onClick={() => { onForward(); closeAll(); }}>
-                    <span className="mm-icon">↪</span> Forward
-                  </li>
-                  {isMine && msg.type === 'text' && (
+                  {canSend && (
+                    <li onClick={() => { onReply(); closeAll(); }}>
+                      <span className="mm-icon">↩</span> Reply
+                    </li>
+                  )}
+                  {canSend && (
+                    <li onClick={() => { onForward(); closeAll(); }}>
+                      <span className="mm-icon">↪</span> Forward
+                    </li>
+                  )}
+                  {canSend && isMine && msg.type === 'text' && (
                     <li onClick={() => { setEditing(true); closeAll(); }}>
                       <span className="mm-icon">✏️</span> Edit
                     </li>
                   )}
+                  {/* Pin/Unpin — not a "send" action, always available */}
                   <li onClick={() => { onPin(); closeAll(); }}>
                     <span className="mm-icon">{msg.is_pinned ? '📌' : '📍'}</span>
                     {msg.is_pinned ? 'Unpin' : 'Pin'}
@@ -246,12 +231,15 @@ export function MessageBubble({
 
           {/* ── WhatsApp-style reply quote ── */}
           {msg.reply_to_message && (
-            <div className="reply-quote" onClick={e => {
-      e.stopPropagation();
-      if (!msg.reply_to_message?.is_deleted) {
-        onJumpToReply?.(msg.reply_to_message!.id);
-      }
-    }}>
+            <div
+              className="reply-quote"
+              onClick={e => {
+                e.stopPropagation();
+                if (!msg.reply_to_message?.is_deleted) {
+                  onJumpToReply?.(msg.reply_to_message!.id);
+                }
+              }}
+            >
               <div className="reply-quote-bar" />
               <div className="reply-quote-body">
                 <span className="reply-quote-sender">
@@ -347,13 +335,11 @@ export function MessageBubble({
             {isMine && (
               <span className="read-receipt" title={isRead ? 'Read' : 'Delivered'}>
                 {isRead ? (
-                  /* double blue ticks */
                   <svg width="18" height="11" viewBox="0 0 18 11" fill="none">
                     <path d="M1 6l3.5 3.5L12 2" stroke="#53bdeb" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                     <path d="M6 6l3.5 3.5L17 2" stroke="#53bdeb" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 ) : (
-                  /* single grey tick */
                   <svg width="12" height="11" viewBox="0 0 12 11" fill="none">
                     <path d="M1 6l3.5 3.5L11 2" stroke="#999" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
@@ -362,15 +348,15 @@ export function MessageBubble({
             )}
           </div>
 
-          {/* ── Reaction chips (WhatsApp style) ── */}
+          {/* ── Reaction chips (WhatsApp style) — always available, regardless of canSend ── */}
           {hasReacts && (
             <div className="reaction-row">
-              {Object.entries(reactionGroups).map(([emoji, { count, users }]) => (
+              {Object.entries(reactionGroups).map(([emoji, { count, names }]) => (
                 <button
                   key={emoji}
                   className={`reaction-chip ${myReaction?.reaction === emoji ? 'mine' : ''}`}
                   onClick={() => myReaction?.reaction === emoji ? onRemoveReact() : onReact(emoji)}
-                // title={users.join(', ')}
+                  title={names.join(', ')}
                 >
                   <span className="reaction-emoji">{emoji}</span>
                   {count > 1 && <span className="reaction-count">{count}</span>}
@@ -398,6 +384,7 @@ export function MessageBubble({
           </div>
         </div>
       )}
+
       {/* ── Report modal ── */}
       {showReportModal && (
         <div className="modal-overlay" onClick={() => setShowReportModal(false)}>
@@ -448,8 +435,6 @@ export function MessageBubble({
           </div>
         </div>
       )}
-
-
 
       {/* ── Lightbox ── */}
       {lightbox && msg.media_url && (

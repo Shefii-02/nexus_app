@@ -20,6 +20,7 @@ interface Props {
   onForward: (msg: Message) => void;
   onPin: (id: number) => void;
   onReport: (id: number, reason: string) => void;
+  canSend: boolean; 
 }
 
 export interface MessageListHandle {
@@ -182,6 +183,7 @@ export const MessageList = forwardRef<MessageListHandle, Props>(function Message
                   showAvatar={showAvatar}
                   currentUserId={currentUserId}
                   currentUserRole={currentUserRole ?? ''}
+                  canSend={canSend} 
                   onReply={() => onReply(msg)}
                   onEdit={text => onEdit(msg.id, text)}
                   onDelete={fe => onDelete(msg.id, fe)}
@@ -191,6 +193,7 @@ export const MessageList = forwardRef<MessageListHandle, Props>(function Message
                   onPin={() => onPin(msg.id)}
                   onReport={reason => onReport(msg.id, reason)}
                   onJumpToReply={scrollToMessage}
+                  
                 />
               </div>
             );

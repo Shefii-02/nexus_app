@@ -35,4 +35,6 @@ return [
         ],
     ],
 
+    'otp_service' => filter_var(env('OTP_SERVICE', true), FILTER_VALIDATE_BOOLEAN),
+
 ];

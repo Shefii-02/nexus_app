@@ -55,11 +55,13 @@ class OtpService
             ]);
         }
 
-        // Send via WhatsApp
-        $sent = $this->sendWhatsAppOtp($phone, $otp);
+        if (config('services.otp_service')) {
+            // Send via WhatsApp
+            $sent = $this->sendWhatsAppOtp($phone, $otp);
 
-        if (!$sent) {
-            return ['success' => false, 'message' => 'Failed to send OTP via WhatsApp'];
+            if (!$sent) {
+                return ['success' => false, 'message' => 'Failed to send OTP via WhatsApp'];
+            }
         }
 
         return ['success' => true, 'message' => 'OTP sent successfully'];

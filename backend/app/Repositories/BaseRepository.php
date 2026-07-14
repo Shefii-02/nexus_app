@@ -26,7 +26,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
 //         'sql' => $query->toSql(),
 //         'bindings' => $query->getBindings(),
 //     ]);
-Log::info($query->paginate($perPage, ['*'], 'page', $page));
+
         return $query->paginate($perPage, ['*'], 'page', $page);
     }
 
@@ -89,6 +89,7 @@ Log::info($query->paginate($perPage, ['*'], 'page', $page));
      */
     protected function applyFilters($query, array $filters)
     {
+        Log("applyFilters");
         return $query;
     }
 }

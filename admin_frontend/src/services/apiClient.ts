@@ -2,7 +2,7 @@ import axios, { type AxiosRequestConfig } from 'axios'
 import { getToken, setToken, getRefreshToken, setRefreshToken, clearAllTokens } from '../utils/storage'
 
 const apiClient = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL || 'https://univexa.in/api',
+    baseURL: import.meta.env.VITE_API_BASE_URL || 'https://api.nexus-connect.in/api',
     headers: {
         'Content-Type': 'application/json',
     },

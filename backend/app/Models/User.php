@@ -21,9 +21,12 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class User extends Authenticatable implements JWTSubject
 {
 
+
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, HasRoles, SoftDeletes;
     protected $guard_name = 'api';
+    protected $fillable = ['name', 'email', 'password', 'agree_terms', 'phone', 'avatar', 'acc_type', 'status'];
+
     /**
      * Get the attributes that should be cast.
      *

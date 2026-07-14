@@ -17,6 +17,7 @@ interface Props {
   onPin: () => void;
   onForward: () => void;
   onReport: (reason: string) => void;
+  onJumpToReply?: (messageId: number) => void;
 }
 
 const EMOJI_REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
@@ -25,8 +26,8 @@ export function MessageBubble({
   message: msg,
   isMine,
   showAvatar,
-  currentUserRole,
   currentUserId,
+  currentUserRole,
   onReply,
   onEdit,
   onDelete,
@@ -34,6 +35,8 @@ export function MessageBubble({
   onRemoveReact,
   onForward,
   onPin,
+  onReport,
+  onJumpToReply,
 }: Props) {
   const [showActions, setShowActions] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
@@ -175,11 +178,11 @@ export function MessageBubble({
             </div>
 
             {/* Reply */}
-            <button className="action-bar-btn" onClick={onReply} title="Reply">
+            {/* <button className="action-bar-btn" onClick={onReply} title="Reply">
               <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <polyline points="9 17 4 12 9 7" /><path d="M20 18v-2a4 4 0 0 0-4-4H4" />
               </svg>
-            </button>
+            </button> */}
 
             {/* More */}
             <div className="ab-item" ref={dropdownRef}>
@@ -243,7 +246,12 @@ export function MessageBubble({
 
           {/* ── WhatsApp-style reply quote ── */}
           {msg.reply_message && (
-            <div className="reply-quote">
+            <div className="reply-quote" onClick={e => {
+      e.stopPropagation();
+      if (!msg.reply_message?.is_deleted) {
+        onJumpToReply?.(msg.reply_message!.id);
+      }
+    }}>
               <div className="reply-quote-bar" />
               <div className="reply-quote-body">
                 <span className="reply-quote-sender">

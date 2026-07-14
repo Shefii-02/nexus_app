@@ -51,6 +51,8 @@ export function subscribeToConversation(
     onMessageRead?: (data: any) => void;
     onTyping?: (data: any) => void;
     onReaction?: (data: any) => void;
+    onReactionRemoved?: (data: any) => void; // ✅ new
+
   }
 ) {
   const echo = getEcho();
@@ -61,6 +63,7 @@ export function subscribeToConversation(
   if (handlers.onMessageDeleted) channel.listen('.message.deleted', handlers.onMessageDeleted);
   if (handlers.onMessageRead)    channel.listen('.message.read',    handlers.onMessageRead);
   if (handlers.onReaction)       channel.listen('.reaction.added',  handlers.onReaction);
+  if (handlers.onReactionRemoved) channel.listen('.reaction.removed', handlers.onReactionRemoved); // ✅
 
   const presenceChannel = echo.join(`conversation.${conversationId}`);
   if (handlers.onTyping) presenceChannel.listenForWhisper('typing', handlers.onTyping);

@@ -104,7 +104,16 @@ class MessageResource extends JsonResource
 
             'is_pinned' =>
             $this->is_pinned,
-
+            'reactions'       => $this->whenLoaded(
+                'reactions',
+                fn() =>
+                $this->reactions->map(fn($r) => [
+                    'id'        => $r->id,
+                    'user_id'   => $r->user_id,
+                    'reaction'  => $r->reaction,
+                    'user_name' => $r->user?->name,
+                ])
+            ),
             'created_at' =>
             $this->created_at?->toISOString(),
 

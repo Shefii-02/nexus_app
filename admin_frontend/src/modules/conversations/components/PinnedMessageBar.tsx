@@ -5,6 +5,7 @@ interface Props {
   pinnedMsgs: Message[];
   onScrollTo: (messageId: number) => void;
   onClose: () => void;
+  onUnpin: (messageId: number) => void;   // ✅ new
 }
 
 function mediaLabel(type: string) {
@@ -15,10 +16,9 @@ function mediaLabel(type: string) {
   return map[type] ?? `📎 ${type}`;
 }
 
-export function PinnedMessageBar({ pinnedMsgs, onScrollTo, onClose }: Props) {
+export function PinnedMessageBar({ pinnedMsgs, onScrollTo, onClose, onUnpin }: Props) {
   if (pinnedMsgs.length === 0) return null;
 
-  // Show the most recently pinned (last in array)
   const latest = pinnedMsgs[pinnedMsgs.length - 1];
 
   const preview = latest.is_deleted
@@ -38,9 +38,22 @@ export function PinnedMessageBar({ pinnedMsgs, onScrollTo, onClose }: Props) {
         </span>
         <span className="pinned-bar-preview">{preview}</span>
       </div>
+
+      {/* ✅ actually unpins the currently shown message */}
+      <button
+        className="pinned-bar-unpin"
+        title="Unpin this message"
+        onClick={e => { e.stopPropagation(); onUnpin(latest.id); }}
+      >
+        <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+          <path d="M12 2 L12 12 M8 6 L16 6 M9 12 L15 12 L14 22 L10 22 Z"/>
+        </svg>
+      </button>
+
+      {/* dismisses the banner without unpinning */}
       <button
         className="pinned-bar-close"
-        title="Close"
+        title="Dismiss"
         onClick={e => { e.stopPropagation(); onClose(); }}
       >
         <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">

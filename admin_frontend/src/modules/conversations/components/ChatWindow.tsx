@@ -51,7 +51,8 @@ export function ChatWindow({
     pinMsg,
     reportMsg,
     sendTypingSignal,
-  } = useMessages(conversation.id, onNewMessage);
+  } = useMessages(conversation.id, currentUserId, onNewMessage); 
+  //  = useMessages(conversation.id, onNewMessage);
 
   const handleSend = async (params: {
     message?: string;
@@ -88,6 +89,7 @@ export function ChatWindow({
           pinnedMsgs={pinnedMsgs}
           onScrollTo={handleScrollToPin}
           onClose={() => setShowPinnedBar(false)}
+          onUnpin={pinMsg} 
         />
       )}
 

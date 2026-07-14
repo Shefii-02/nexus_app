@@ -1,5 +1,6 @@
 // src/modules/conversations/components/MessageList.tsx
-import { useRef, useCallback, useEffect, forwardRef, useImperativeHandle } from 'react';
+// import { useRef, useCallback, useLayoutEffect, forwardRef, useImperativeHandle } from 'react';
+import { useRef, useCallback, useLayoutEffect, useEffect, forwardRef, useImperativeHandle } from 'react';
 import type { Message } from '../services/chatService';
 import { MessageBubble } from './MessageBubble';
 import { formatDateGroup } from '../utils';
@@ -33,35 +34,78 @@ export const MessageList = forwardRef<MessageListHandle, Props>(function Message
   },
   ref,
 ) {
-  const listRef          = useRef<HTMLDivElement>(null);
-  const bottomRef        = useRef<HTMLDivElement>(null);
-  const msgRefs          = useRef<Record<number, HTMLDivElement | null>>({});
-  const isFirstLoad      = useRef(true);
-  const prevCount        = useRef(0);
+  const listRef = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const msgRefs = useRef<Record<number, HTMLDivElement | null>>({});
+  const isFirstLoad = useRef(true);
+  const firstIdRef = useRef<number | null>(null);
+  const lastIdRef = useRef<number | null>(null);
+  const prevScrollHeightRef = useRef(0);
 
-  // Expose scrollToMessage to parent (for pinned bar click)
-  useImperativeHandle(ref, () => ({
-    scrollToMessage(messageId: number) {
-      const el = msgRefs.current[messageId];
-      if (!el) return;
+  // useImperativeHandle(ref, () => ({
+  //   scrollToMessage(messageId: number) {
+  //     const el = msgRefs.current[messageId];
+  //     if (!el) return;
+  //     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  //     el.classList.add('msg-highlight');
+  //     setTimeout(() => el.classList.remove('msg-highlight'), 1500);
+  //   },
+  // }));
+  // ✅ replace with this
+  const requestLoadMore = useCallback(() => {
+    const list = listRef.current;
+    if (list) prevScrollHeightRef.current = list.scrollHeight;
+    onLoadMore();
+  }, [onLoadMore]);
+
+  const scrollToMessage = useCallback((messageId: number, attempts = 0) => {
+    const el = msgRefs.current[messageId];
+    if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // Flash highlight
       el.classList.add('msg-highlight');
       setTimeout(() => el.classList.remove('msg-highlight'), 1500);
-    },
-  }));
+      return;
+    }
+    // not loaded yet — page backwards and retry, up to 6 tries
+    if (attempts < 6 && hasMore && !loading) {
+      requestLoadMore();
+      setTimeout(() => scrollToMessage(messageId, attempts + 1), 350);
+    }
+  }, [hasMore, loading, requestLoadMore]);
 
-  // Auto-scroll to bottom
-  useEffect(() => {
-    const newCount = messages.length;
-    if (newCount === 0) return;
+  useImperativeHandle(ref, () => ({ scrollToMessage }));
+
+  // ── Single source of truth for scroll behaviour ─────────────────────────────
+  useLayoutEffect(() => {
+    const list = listRef.current;
+
+    if (messages.length === 0) {
+      firstIdRef.current = null;
+      lastIdRef.current = null;
+      isFirstLoad.current = true;
+      return;
+    }
+
+    const newFirstId = messages[0].id;
+    const newLastId = messages[messages.length - 1].id;
 
     if (isFirstLoad.current) {
+      // Very first render of this conversation → jump to bottom
       bottomRef.current?.scrollIntoView({ behavior: 'instant' });
       isFirstLoad.current = false;
-    } else if (newCount > prevCount.current) {
-      // Only scroll if user is near bottom
-      const list = listRef.current;
+    } else if (
+      firstIdRef.current !== null &&
+      newFirstId !== firstIdRef.current &&
+      newLastId === lastIdRef.current
+    ) {
+      // Older messages were PREPENDED (pagination) → restore visual position,
+      // never scroll to bottom for this case
+      if (list) {
+        const newHeight = list.scrollHeight;
+        list.scrollTop = list.scrollTop + (newHeight - prevScrollHeightRef.current);
+      }
+    } else if (lastIdRef.current !== null && newLastId !== lastIdRef.current) {
+      // A NEW message arrived at the bottom → only auto-scroll if user was already near bottom
       if (list) {
         const distFromBottom = list.scrollHeight - list.scrollTop - list.clientHeight;
         if (distFromBottom < 200) {
@@ -69,32 +113,46 @@ export const MessageList = forwardRef<MessageListHandle, Props>(function Message
         }
       }
     }
-    prevCount.current = newCount;
-  }, [messages.length]);
 
-  // Reset on conversation change
+    firstIdRef.current = newFirstId;
+    lastIdRef.current = newLastId;
+  }, [messages]);
+
+  // ── Intersection observer for loading older messages ────────────────────────
+  // const topSentinel = useCallback(
+  //   (node: HTMLDivElement | null) => {
+  //     if (!node) return;
+  //     const obs = new IntersectionObserver(
+  //       ([e]) => {
+  //         if (e.isIntersecting && hasMore && !loading) {
+  //           const list = listRef.current;
+  //           if (list) prevScrollHeightRef.current = list.scrollHeight; // capture BEFORE fetch
+  //           onLoadMore();
+  //         }
+  //       },
+  //       { threshold: 0.1 },
+  //     );
+  //     obs.observe(node);
+  //     return () => obs.disconnect();
+  //   },
+  //   [hasMore, loading, onLoadMore],
+  // );
+  // ✅ new
+  // ✅ add near your other refs
+  const topSentinelRef = useRef<HTMLDivElement>(null);
+
+  // ✅ replace the callback-ref logic with a proper effect
   useEffect(() => {
-    if (messages.length === 0) {
-      isFirstLoad.current = true;
-      prevCount.current   = 0;
-    }
-  }, [messages.length]);
+    const node = topSentinelRef.current;
+    if (!node) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting && hasMore && !loading) requestLoadMore(); },
+      { threshold: 0.1 },
+    );
+    obs.observe(node);
+    return () => obs.disconnect();   // ✅ this is a valid useEffect cleanup, works everywhere
+  }, [hasMore, loading, requestLoadMore]);
 
-  // Intersection observer for loading older messages
-  const topSentinel = useCallback(
-    (node: HTMLDivElement | null) => {
-      if (!node) return;
-      const obs = new IntersectionObserver(
-        ([e]) => { if (e.isIntersecting && hasMore && !loading) onLoadMore(); },
-        { threshold: 0.1 },
-      );
-      obs.observe(node);
-      return () => obs.disconnect();
-    },
-    [hasMore, loading, onLoadMore],
-  );
-
-  // Group by calendar date
   const grouped: { date: string; messages: Message[] }[] = [];
   let curDate = '';
   messages.forEach(msg => {
@@ -105,31 +163,25 @@ export const MessageList = forwardRef<MessageListHandle, Props>(function Message
 
   return (
     <div className="message-list" ref={listRef}>
-      {/* Top sentinel */}
-      <div ref={topSentinel}>
+      <div ref={topSentinelRef}>
         {loading && <div className="loading-spinner"><div className="spinner" /></div>}
       </div>
 
       {grouped.map(group => (
         <div key={group.date}>
           <div className="date-separator"><span>{formatDateGroup(group.date)}</span></div>
-
           {group.messages.map((msg, i) => {
-            const isMine     = msg.sender_id === currentUserId;
-            const prev       = group.messages[i - 1];
+            const isMine = msg.sender_id === currentUserId;
+            const prev = group.messages[i - 1];
             const showAvatar = !isMine && (!prev || prev.sender_id !== msg.sender_id);
-
             return (
-              <div
-                key={msg.id}
-                ref={el => { msgRefs.current[msg.id] = el; }}
-              >
+              <div key={msg.id} ref={el => { msgRefs.current[msg.id] = el; }}>
                 <MessageBubble
                   message={msg}
                   isMine={isMine}
                   showAvatar={showAvatar}
                   currentUserId={currentUserId}
-                  currentUserRole={currentUserRole}
+                  currentUserRole={currentUserRole ?? ''}
                   onReply={() => onReply(msg)}
                   onEdit={text => onEdit(msg.id, text)}
                   onDelete={fe => onDelete(msg.id, fe)}
@@ -138,6 +190,7 @@ export const MessageList = forwardRef<MessageListHandle, Props>(function Message
                   onForward={() => onForward(msg)}
                   onPin={() => onPin(msg.id)}
                   onReport={reason => onReport(msg.id, reason)}
+                  onJumpToReply={scrollToMessage}
                 />
               </div>
             );

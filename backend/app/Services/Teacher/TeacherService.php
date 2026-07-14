@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Repositories\Teacher\TeacherRepositoryInterface;
 use App\Services\BaseService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class TeacherService extends BaseService
 {
@@ -21,6 +22,7 @@ class TeacherService extends BaseService
      */
     public function create(TeacherDTO $dto): object
     {
+        Log::info($dto->toUserArray());
         return DB::transaction(function () use ($dto) {
 
             // ✅ 1. Create User

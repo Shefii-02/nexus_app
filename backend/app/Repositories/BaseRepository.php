@@ -22,10 +22,11 @@ abstract class BaseRepository implements BaseRepositoryInterface
     {
         $query = $this->model->query();
         $query = $this->applyFilters($query, $filters);
-   Log::info('SQL Query', [
-        'sql' => $query->toSql(),
-        'bindings' => $query->getBindings(),
-    ]);
+//    Log::info('SQL Query', [
+//         'sql' => $query->toSql(),
+//         'bindings' => $query->getBindings(),
+//     ]);
+Log::info($query->paginate($perPage, ['*'], 'page', $page));
         return $query->paginate($perPage, ['*'], 'page', $page);
     }
 

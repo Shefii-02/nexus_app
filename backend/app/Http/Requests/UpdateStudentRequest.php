@@ -44,7 +44,7 @@ class UpdateStudentRequest extends BaseRequest
             'guardian_name' => 'nullable|string|max:255',
             'guardian_phone' => 'nullable|string|max:20',
             'roll_number' => [
-                'required',
+                'nullable',
                 'string',
                 'max:50',
                 Rule::unique('students', 'roll_number')->ignore($user->student?->id),

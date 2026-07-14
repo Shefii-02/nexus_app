@@ -44,7 +44,13 @@ use Illuminate\Support\Facades\Response;
 
 
 // routes/api.php
-Route::get('/ping', fn() => response()->json(['status' => 'ok']));
+// Route::get('/ping', fn() => response()->json(['status' => 'ok']));
+Route::get('/ping', function () {
+    return response()->json([
+        'status' => app()->environment('production') ? 'ok' : 'development',
+        'environment' => app()->environment(),
+    ]);
+});
 
 Route::post('/broadcasting/auth', function () {
     return Broadcast::auth(request());

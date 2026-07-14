@@ -31,7 +31,7 @@ export const MessageList = forwardRef<MessageListHandle, Props>(function Message
   {
     messages, loading, hasMore, currentUserId, currentUserRole,
     onLoadMore, onReply, onEdit, onDelete, onReact, onRemoveReact,
-    onForward, onPin, onReport,
+    onForward, onPin, onReport,canSend
   },
   ref,
 ) {

@@ -54,7 +54,7 @@ const TeacherTable = ({ teachers, loading, onEdit, onView, onDelete }: TeacherTa
                     {teacher.user?.phone ?? '—'}
                   </td>
                   {/* <td className="px-6 py-4">{teacher.subject ?? '—'}</td> */}
-                  <td className="px-6 py-4 capitalize">{teacher.status ?? '—'}</td>
+                  <td className="px-6 py-4 capitalize">{teacher.user?.status ?? '—'}</td>
                   <td className="px-6 py-4">{humanDate(teacher.user?.last_activated) ?? '—'}</td>
                   <td className="px-6 py-4">{humanDate(teacher.user?.created_at) ?? '—'}</td>
                   <td className="px-6 py-4 text-right">

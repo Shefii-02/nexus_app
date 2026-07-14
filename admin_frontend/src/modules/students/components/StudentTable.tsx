@@ -6,6 +6,7 @@ import { useDeleteStudent } from '../studentHooks'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { handleMutationWithToast } from '../../../utils/handleMutationWithToast'
+import { humanDate } from '../../../utils/dateTime'
 
 
 interface Props {
@@ -28,7 +29,7 @@ const StudentTable = ({ students, loading, onView, onEdit, onDelete }: Props) =>
           <thead className="bg-gray-50">
             <tr>
               <th className="p-3 text-left">Name</th>
-              <th className="p-3 text-left">Roll No</th>
+              {/* <th className="p-3 text-left">Roll No</th> */}
               <th className="px-6 py-4 text-left">Status</th>
               <th className="px-6 py-4 text-left">Last Active</th>
               <th className="px-6 py-4 text-left">Created At</th>
@@ -57,10 +58,10 @@ const StudentTable = ({ students, loading, onView, onEdit, onDelete }: Props) =>
                     {s.user?.email || '-'} <br />
                     {s.phone} <br />
                   </td>
-                  <td className="p-3">{s.roll_number}</td>
-                  <td className="p-3 capitalize">{s.status}</td>
-                  <td className="p-3">{s.user?.last_activated || '-'}</td> 
-                  <td className="p-3">{s.user?.created_at || '-'}</td>
+                  {/* <td className="p-3">{s.roll_number}</td> */}
+                  <td className="p-3 capitalize">{s.user?.status || '-'}</td>
+                  <td className="p-3">{humanDate(s.user?.last_activated) || '-'}</td> 
+                  <td className="p-3">{humanDate(s.user?.created_at) || '-'}</td>
                   <td className="p-3 text-right">
                     <Dropdown
                       trigger={

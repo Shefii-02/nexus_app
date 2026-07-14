@@ -50,7 +50,7 @@ class TeacherRepository extends BaseRepository implements TeacherRepositoryInter
             $search = $filters['search'];
             $query->whereHas('teacher', function ($q) use ($search) {
                 $q->where('subject', 'like', "%{$search}%");
-            })
+            })->where('acc_type', 'teacher')
             ->orWhere('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%");
         }
 

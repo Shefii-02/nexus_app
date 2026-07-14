@@ -33,6 +33,7 @@ class TeacherRepository extends BaseRepository implements TeacherRepositoryInter
     {
 
     Log::info($filters);
+    Log::info(11111);
         $query->with('teacher');
         $query->where('acc_type', 'teacher');
 

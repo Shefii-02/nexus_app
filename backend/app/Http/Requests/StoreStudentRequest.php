@@ -20,10 +20,10 @@ class StoreStudentRequest extends BaseRequest
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
             'phone' => 'required|string|max:20|unique:users,phone',
-            'roll_number' => 'required|string|max:50|unique:students,roll_number',
-            'address' => 'required|string|max:500',
-            'guardian_name' => 'required|string|max:255',
-            'guardian_phone' => 'required|string|max:20',
+            'roll_number' => 'nullable|string|max:50|unique:students,roll_number',
+            'address' => 'nullable|string|max:500',
+            'guardian_name' => 'nullable|string|max:255',
+            'guardian_phone' => 'nullable|string|max:20',
         ];
     }
 

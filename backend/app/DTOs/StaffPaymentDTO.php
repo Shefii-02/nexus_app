@@ -41,7 +41,7 @@ class StaffPaymentDTO
 
             salary_month: date('Y-m-d', strtotime($data['salary_month'])),
 
-            salary_amount: $data['salary_amount'],
+            salary_amount: $data['salary_amount'] ?? 0,
 
             bonus_amount: $data['bonus_amount'] ?? 0,
 

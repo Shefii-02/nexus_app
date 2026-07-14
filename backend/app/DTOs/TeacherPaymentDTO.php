@@ -32,7 +32,7 @@ class TeacherPaymentDTO
             period_start:      $data['period_start'],
             period_end:        $data['period_end'],
             total_classes:     $data['total_classes']     ?? null,
-            gross_amount:      $data['salary_amount'],
+            gross_amount:      $data['salary_amount'] ?? 0,
             deduction_amount:  $data['deduction_amount']  ?? 0,
             deduction_reason:  $data['deduction_reason']  ?? null,
             amount:            $data['final_amount'],

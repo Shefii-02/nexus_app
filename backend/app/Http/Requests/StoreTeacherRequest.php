@@ -17,12 +17,12 @@ class StoreTeacherRequest extends BaseRequest
         return [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6',
+            'password' => 'nullable|min:6',
             'phone' => 'required|string|max:20|unique:users,phone',
-            'qualification' => 'required|string|max:255',
-            'subject' => 'required|string|max:255',
-            'experience_years' => 'required|integer|min:0|max:100',
-            'address' => 'required|string|max:500',
+            'qualification' => 'nullable|string|max:255',
+            'subject' => 'nullable|string|max:255',
+            'experience_years' => 'nullable|integer|min:0|max:100',
+            'address' => 'nullable|string|max:500',
             'status' => 'nullable|sometimes|required|in:active,inactive',
         ];
     }

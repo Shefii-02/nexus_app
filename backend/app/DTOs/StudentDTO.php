@@ -48,7 +48,7 @@ class StudentDTO
     {
         return [
             'user_id' => $userId,
-            'roll_number' => $this->roll_number,
+            'roll_number' => $this->roll_number ?? rand(111,999),
             'phone' => $this->phone,
             'address' => $this->address,
             'guardian_name' => $this->guardian_name,

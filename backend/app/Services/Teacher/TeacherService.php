@@ -23,14 +23,11 @@ class TeacherService extends BaseService
      */
     public function create(TeacherDTO $dto): object
     {
-        Log::info($dto->toUserArray());
+
         return DB::transaction(function () use ($dto) {
 
             // ✅ 1. Create User
-            // $user = User::create($dto->toUserArray());
-            $user = new User();
-            $user->forceFill($dto->toUserArray());
-            $user->save();
+            $user = User::create($dto->toUserArray());
 
             // ✅ 2. Assign Role (if using spatie)
             $user->assignRole('teacher');

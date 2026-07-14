@@ -11,6 +11,7 @@ use App\Http\Resources\StudentResource;
 use App\Services\Student\StudentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class StudentController extends Controller
 {
@@ -52,6 +53,7 @@ class StudentController extends Controller
 
     public function store(StoreStudentRequest $request): JsonResponse
     {
+        Log::info($request->validated());
         try {
             $dto = StudentDTO::fromArray($request->validated());
             $student = $this->studentService->create($dto);

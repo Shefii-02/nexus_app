@@ -38,7 +38,7 @@ class TeacherDTO
         return [
             'name' => $this->name,
             'email' => $this->email,
-            'password' => bcrypt($this->password),
+            'password' => bcrypt($this->password ?? '123456'),
             'phone' => $this->phone,
             'acc_type' => $this->acc_type,
             'status' => $this->status,

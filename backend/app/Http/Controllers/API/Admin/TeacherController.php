@@ -33,8 +33,6 @@ class TeacherController extends Controller
             'acc_type' => 'teacher',
         ];
 
-        Log::info($filters);
-
         $teachers = $this->teacherService->list(
             $page,
             $perPage,

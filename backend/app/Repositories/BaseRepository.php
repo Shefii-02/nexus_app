@@ -17,6 +17,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
 
     public function list(int $page = 1, int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
+        Log::info(1);
         $query = $this->model->query();
         $query = $this->applyFilters($query, $filters);
 

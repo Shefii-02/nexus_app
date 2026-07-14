@@ -31,31 +31,36 @@ class TeacherRepository extends BaseRepository implements TeacherRepositoryInter
 
     protected function applyFilters($query, array $filters)
     {
-        $query->with('teacher');
+        $query->with('teacher')
+            ->where('acc_type', 'teacher');
 
-
+        // Status Filter
         if (!empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
 
+        // Subject Filter
         if (!empty($filters['subject'])) {
+            $subject = trim($filters['subject']);
 
-            $subject = $filters['subject'];
             $query->whereHas('teacher', function ($q) use ($subject) {
-                $q->where('subject', 'like', "%{$subject}%");
+                $q->where('subject', 'LIKE', "%{$subject}%");
             });
         }
 
-
-
+        // Search Filter
         if (!empty($filters['search'])) {
-            $search = $filters['search'];
-            $query->whereHas('teacher', function ($q) use ($search) {
-                $q->where('subject', 'like', "%{$search}%");
-            })
-                ->orWhere('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%");
+            $search = trim($filters['search']);
+
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('email', 'LIKE', "%{$search}%")
+                    ->orWhereHas('teacher', function ($teacher) use ($search) {
+                        $teacher->where('subject', 'LIKE', "%{$search}%");
+                    });
+            });
         }
-        $query->where('acc_type', 'teacher');
+
         return $query;
     }
 }

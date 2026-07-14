@@ -48,7 +48,7 @@ class StudentController extends Controller
             return $this->errorResponse('Student not found', null, 404);
         }
 
-        return $this->successResponse(StudentResource::make($studentData->load('user')), 'Student retrieved successfully');
+        return $this->successResponse(StudentResource::make($studentData->load('student')), 'Student retrieved successfully');
     }
 
     public function store(StoreStudentRequest $request): JsonResponse
@@ -84,7 +84,7 @@ class StudentController extends Controller
             $updated = $this->studentService->update($student, $dto);
 
             return $this->successResponse(
-                StudentResource::make($updated->load('user')),
+                StudentResource::make($updated->load('student')),
                 'Student updated successfully'
             );
         } catch (\Exception $e) {

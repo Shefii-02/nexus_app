@@ -130,12 +130,12 @@ export function ChatWindow({
         </div>
       )}
 
-      <MessageComposer
+      {/* <MessageComposer
         replyTo={replyTo}
         onCancelReply={() => setReplyTo(null)}
         onSend={handleSend}
         onTyping={sendTypingSignal}
-      />
+      /> */}
 
       {showInfo && conversation.type === 'group' && (
         <GroupInfoDrawer

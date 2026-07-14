@@ -34,26 +34,28 @@ class StudentRepository extends BaseRepository implements StudentRepositoryInter
         return $this->model->active()->with(['student', 'batch'])->paginate(15);
     }
 
-    protected function applyFilters($query, array $filters)
+     protected function applyFilters($query, array $filters)
     {
+        $query->with('student')
+            ->where('acc_type', 'student');
 
-        $query->with('student');
-        $query->where('acc_type', 'student');
-
+        // Status Filter
         if (!empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
 
-        if (!empty($filters['batch_id'])) {
-            $query->where('batch_id', $filters['batch_id']);
-        }
 
+        // Search Filter
         if (!empty($filters['search'])) {
-            $search = $filters['search'];
-            $query->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%")
-                ->orWhereHas('student', function ($q) use ($search) {
-                    $q->where('roll_number', 'like', "%{$search}%");
-                });
+            $search = trim($filters['search']);
+
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('email', 'LIKE', "%{$search}%")
+                    ->orWhereHas('student', function ($teacher) use ($search) {
+                        $teacher->where('roll_number', 'LIKE', "%{$search}%");
+                    });
+            });
         }
 
         return $query;

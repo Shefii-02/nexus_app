@@ -11,26 +11,28 @@ export const courseClassFormConfig = [
     label: 'Teacher',
     type: 'select',
     section: 'basic',
+    required: true,
     options: [],
   },
 
- 
+
 
   {
     name: 'source',
     label: 'Source',
     type: 'select',
+    required: true,
     options: [
       { label: 'Google Meet', value: 'google_meet' },
-      { label: 'Youtube', value: 'youtube' },
-      { label: 'Zoom', value: 'zoom'},
-      { label: 'Offline', value: 'offline'},
-      { label: 'Other', value: 'other'},
+      // { label: 'Youtube', value: 'youtube' },
+      // { label: 'Zoom', value: 'zoom' },
+      // { label: 'Offline', value: 'offline' },
+      // { label: 'Other', value: 'other' },
     ],
     section: 'basic',
   },
 
-   {
+  {
     name: 'title',
     label: 'Title',
     type: 'text',
@@ -63,12 +65,12 @@ export const courseClassFormConfig = [
 
 
 
-  {
-    name: 'class_number',
-    label: 'Class Number',
-    type: 'text',
-    section: 'schedule',
-  },
+  // {
+  //   name: 'class_number',
+  //   label: 'Class Number',
+  //   type: 'text',
+  //   section: 'schedule',
+  // },
 
   {
     name: 'scheduled_date',
@@ -77,14 +79,14 @@ export const courseClassFormConfig = [
     section: 'schedule',
   },
 
-   {
+  {
     name: 'started_at',
     label: 'Started At',
     type: 'datetime-local',
     section: 'schedule',
   },
 
-   {
+  {
     name: 'ended_at',
     label: 'Ended At',
     type: 'datetime-local',
@@ -98,12 +100,12 @@ export const courseClassFormConfig = [
     section: 'schedule',
   },
 
-  {
-    name: 'room_location',
-    label: 'Room Location',
-    type: 'text',
-    section: 'schedule',
-  },
+  // {
+  //   name: 'room_location',
+  //   label: 'Room Location',
+  //   type: 'text',
+  //   section: 'schedule',
+  // },
 
   {
     name: 'status',
@@ -111,7 +113,7 @@ export const courseClassFormConfig = [
     type: 'select',
     section: 'meta',
     options: [
-      { label: 'Draft', value: 'draft'},
+      { label: 'Draft', value: 'draft' },
       { label: 'Scheduled', value: 'scheduled' },
       { label: 'Completed', value: 'completed' },
       { label: 'Cancelled', value: 'cancelled' },

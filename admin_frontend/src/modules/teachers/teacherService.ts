@@ -55,7 +55,7 @@ export interface TeacherFormPayload {
 
 export const teacherService = {
   getAll: (params?: Record<string, string | number | boolean>) =>
-    apiClient.get<TeacherListResponse>('/teachers', { params }),
+    apiClient.get<TeacherListResponse>("/teachers?acc_type'teacher'", { params }),
   getById: (id: number) => apiClient.get<{ data: Teacher }>(`/teachers/${id}`),
   create: (payload: TeacherFormPayload) => apiClient.post<Teacher>('/teachers', payload),
   update: (id: number, payload: TeacherFormPayload) => apiClient.put<Teacher>(`/teachers/${id}`, payload),

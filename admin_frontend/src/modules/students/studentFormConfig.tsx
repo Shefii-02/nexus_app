@@ -6,7 +6,7 @@ export const studentFormConfig = [
   { name: 'password', label: 'Password', type: 'password', required: true, section: 'user_details', hideOnEdit: true },
 
   // STUDENT
-  { name: 'roll_number', label: 'Roll Number', type: 'text', required: true, section: 'personal_details' },
+  { name: 'roll_number', label: 'Roll Number', type: 'text', required: false, section: 'personal_details' },
 
   { name: 'guardian_name', label: 'Guardian Name', type: 'text', section: 'personal_details' },
   {

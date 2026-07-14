@@ -38,11 +38,11 @@ class UpdateStudentRequest extends BaseRequest
                 Rule::unique('users', 'phone')->ignore($student),
             ],
 
-            'password' => 'sometimes|string|min:6',
+            'password' => 'sometimes',
             'status' => 'sometimes|in:active,inactive',
-            'address' => 'sometimes|string|max:500',
-            'guardian_name' => 'sometimes|string|max:255',
-            'guardian_phone' => 'sometimes|string|max:20',
+            'address' => 'nullable|string|max:500',
+            'guardian_name' => 'nullable|string|max:255',
+            'guardian_phone' => 'nullable|string|max:20',
             'roll_number' => [
                 'required',
                 'string',

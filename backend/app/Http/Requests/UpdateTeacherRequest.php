@@ -37,12 +37,12 @@ class UpdateTeacherRequest extends BaseRequest
                 Rule::unique('users', 'phone')->ignore($teacher),
             ],
 
-            'password' => 'sometimes|string|min:6',
+            'password' => 'nullable',
             'status' => 'sometimes|in:active,inactive',
 
-            'qualification' => 'sometimes|string|max:255',
-            'subject' => 'sometimes|string|max:255',
-            'experience_years' => 'sometimes|integer|min:0|max:100',
+            'qualification' => 'nullable|string|max:255',
+            'subject' => 'nullable|string|max:255',
+            'experience_years' => 'nullable|integer|min:0|max:100',
             'address' => 'nullable|sometimes|string|max:500',
         ];
     }

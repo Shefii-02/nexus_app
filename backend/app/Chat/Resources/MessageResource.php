@@ -31,7 +31,7 @@ class MessageResource extends JsonResource
                     'name' =>
                     $this->sender->name,
                     'avatar' =>
-                    $this->sender->avatar,
+                    $this->sender->avatar_url,
                 ]
             ),
 

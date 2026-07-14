@@ -24,7 +24,7 @@ class StudentDTO
             email: $data['email'],
             password: $data['password'] ?? '',
             phone: $data['phone'],
-            roll_number: $data['roll_number'],
+            roll_number: $data['roll_number'] ?? rand(111,999),
             address: $data['address'] ?? '',
             guardian_name: $data['guardian_name'] ?? '',
             guardian_phone: $data['guardian_phone'] ?? '',

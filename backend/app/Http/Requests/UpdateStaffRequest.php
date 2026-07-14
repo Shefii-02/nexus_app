@@ -35,11 +35,11 @@ class UpdateStaffRequest extends BaseRequest
                 'max:20',
                 Rule::unique('users', 'phone')->ignore($staff),
             ],
-            'department' => 'sometimes|string|max:255',
-            'designation' => 'sometimes|string|max:255',
-            'phone' => 'sometimes|string|max:20|unique:users,phone,' . $this->route('staff'),
-            'address' => 'sometimes|string|max:500',
-            'status' => 'sometimes|in:active,inactive,suspended',
+            'department' => 'nullable|string|max:255',
+            'designation' => 'nullable|string|max:255',
+            // 'phone' => 'nullable|string|max:20|unique:users,phone,' . $this->route('staff'),
+            'address' => 'nullable|string|max:500',
+            'status' => 'nullable|in:active,inactive,suspended',
         ];
     }
 

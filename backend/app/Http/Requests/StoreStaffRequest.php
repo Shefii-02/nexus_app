@@ -17,11 +17,11 @@ class StoreStaffRequest extends BaseRequest
         return [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6',
+            'password' => 'nullable',
             'phone' => 'required|string|max:20|unique:users,phone',
-            'department' => 'required|string|max:255',
-            'designation' => 'required|string|max:255',
-            'address' => 'required|string|max:500',
+            'department' => 'nullable|string|max:255',
+            'designation' => 'nullable|string|max:255',
+            'address' => 'nullable|string|max:500',
         ];
     }
     protected function failedValidation(Validator $validator)

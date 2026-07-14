@@ -3,6 +3,7 @@
 namespace App\Services\Staff;
 
 use App\DTOs\StaffDTO;
+use App\Models\Staff;
 use App\Models\User;
 use App\Repositories\Staff\StaffRepositoryInterface;
 use App\Services\BaseService;
@@ -26,7 +27,7 @@ class StaffService extends BaseService
             $user->assignRole('staff');
 
             // ✅ 3. Create Staff
-            $staff = $this->repository->create(
+            $staff = Staff::create(
                 $dto->toStaffArray($user->id)
             );
 

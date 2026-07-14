@@ -17,7 +17,7 @@ class StoreTeacherRequest extends BaseRequest
         return [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'nullable|min:6',
+            'password' => 'nullable',
             'phone' => 'required|string|max:20|unique:users,phone',
             'qualification' => 'nullable|string|max:255',
             'subject' => 'nullable|string|max:255',

@@ -51,7 +51,7 @@ class StaffController extends Controller
             $staff = $this->staffService->create($dto);
 
             return $this->successResponse(
-                StaffResource::make($staff->load('staff')),
+                StaffResource::make($staff->load('user')),
                 'Staff created successfully',
                 201
             );

@@ -32,7 +32,7 @@ class TeacherRepository extends BaseRepository implements TeacherRepositoryInter
     protected function applyFilters($query, array $filters)
     {
         $query->with('teacher');
-        $query->where('acc_type', 'teacher');
+
 
         if (!empty($filters['status'])) {
             $query->where('status', $filters['status']);
@@ -55,7 +55,7 @@ class TeacherRepository extends BaseRepository implements TeacherRepositoryInter
             })
                 ->orWhere('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%");
         }
-
+        $query->where('acc_type', 'teacher');
         return $query;
     }
 }

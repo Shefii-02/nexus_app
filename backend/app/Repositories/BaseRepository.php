@@ -89,7 +89,6 @@ abstract class BaseRepository implements BaseRepositoryInterface
      */
     protected function applyFilters($query, array $filters)
     {
-        Log("applyFilters");
         return $query;
     }
 }

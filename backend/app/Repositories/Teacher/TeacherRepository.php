@@ -4,6 +4,7 @@ namespace App\Repositories\Teacher;
 
 use App\Models\User;
 use App\Repositories\BaseRepository;
+use Illuminate\Support\Facades\Log;
 
 class TeacherRepository extends BaseRepository implements TeacherRepositoryInterface
 {
@@ -31,8 +32,9 @@ class TeacherRepository extends BaseRepository implements TeacherRepositoryInter
     protected function applyFilters($query, array $filters)
     {
 
+    Log::info($filters);
         $query->with('teacher');
-            $query->where('acc_type', 'teacher');
+        $query->where('acc_type', 'teacher');
 
         if (!empty($filters['status'])) {
             $query->where('status', $filters['status']);
@@ -51,7 +53,7 @@ class TeacherRepository extends BaseRepository implements TeacherRepositoryInter
             $query->whereHas('teacher', function ($q) use ($search) {
                 $q->where('subject', 'like', "%{$search}%");
             })->where('acc_type', 'teacher')
-            ->orWhere('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%");
+                ->orWhere('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%");
         }
 
         return $query;

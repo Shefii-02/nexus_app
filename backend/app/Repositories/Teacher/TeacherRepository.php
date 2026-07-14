@@ -32,7 +32,6 @@ class TeacherRepository extends BaseRepository implements TeacherRepositoryInter
     protected function applyFilters($query, array $filters)
     {
 
-    Log::info($filters);
 
         $query->with('teacher');
         $query->where('acc_type', 'teacher');

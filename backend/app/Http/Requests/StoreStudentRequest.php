@@ -16,9 +16,9 @@ class StoreStudentRequest extends BaseRequest
     public function rules(): array
     {
         return [
-             'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6',
+            'password' => 'nullable',
             'phone' => 'required|string|max:20|unique:users,phone',
             'roll_number' => 'nullable|string|max:50|unique:students,roll_number',
             'address' => 'nullable|string|max:500',
@@ -27,7 +27,7 @@ class StoreStudentRequest extends BaseRequest
         ];
     }
 
-      protected function failedValidation(Validator $validator)
+    protected function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(response()->json([
             'status' => false,

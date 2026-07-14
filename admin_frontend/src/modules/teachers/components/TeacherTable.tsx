@@ -6,6 +6,7 @@ import { MoreVertical } from 'lucide-react'
 import { handleMutationWithToast } from '../../../utils/handleMutationWithToast'
 import { useDeleteTeacher } from '../teacherHooks'
 import { useNavigate } from 'react-router-dom'
+import { humanDate } from '../../../utils/dateTime'
 
 interface TeacherTableProps {
   teachers: Teacher[]
@@ -27,7 +28,7 @@ const TeacherTable = ({ teachers, loading, onEdit, onView, onDelete }: TeacherTa
           <thead className="bg-slate-50">
             <tr>
               <th className="px-6 py-4 text-left">User</th>
-              <th className="px-6 py-4 text-left">Subject</th>
+              {/* <th className="px-6 py-4 text-left">Subject</th> */}
               <th className="px-6 py-4 text-left">Status</th>
               <th className="px-6 py-4 text-left">Last Active</th>
               <th className="px-6 py-4 text-left">Created At</th>
@@ -52,10 +53,10 @@ const TeacherTable = ({ teachers, loading, onEdit, onView, onDelete }: TeacherTa
                     {teacher.user?.email ?? '—'}<br/>
                     {teacher.user?.phone ?? '—'}
                   </td>
-                  <td className="px-6 py-4">{teacher.subject ?? '—'}</td>
+                  {/* <td className="px-6 py-4">{teacher.subject ?? '—'}</td> */}
                   <td className="px-6 py-4 capitalize">{teacher.status ?? '—'}</td>
-                  <td className="px-6 py-4">{teacher.user?.last_activated ?? '—'}</td>
-                  <td className="px-6 py-4">{teacher.user?.created_at ?? '—'}</td>
+                  <td className="px-6 py-4">{humanDate(teacher.user?.last_activated) ?? '—'}</td>
+                  <td className="px-6 py-4">{humanDate(teacher.user?.created_at) ?? '—'}</td>
                   <td className="px-6 py-4 text-right">
                     <Dropdown
                       trigger={

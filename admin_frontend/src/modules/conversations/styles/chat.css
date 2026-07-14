@@ -1574,6 +1574,7 @@
 .emoji-picker.floating button:hover,
 .emoji-picker.floating button.active {
   background: var(--bg-hover);
+  height: 25px;
 }
 
 /* Dropdown menu */
@@ -1798,6 +1799,7 @@
 
 /* Emoji picker floating */
 .emoji-picker.floating {
+  height: 40px;
   position: absolute;
   bottom: calc(100% + 6px);
   display: flex;

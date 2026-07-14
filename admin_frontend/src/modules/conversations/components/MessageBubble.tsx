@@ -245,30 +245,30 @@ export function MessageBubble({
           )}
 
           {/* ── WhatsApp-style reply quote ── */}
-          {msg.reply_message && (
+          {msg.reply_to_message && (
             <div className="reply-quote" onClick={e => {
       e.stopPropagation();
-      if (!msg.reply_message?.is_deleted) {
-        onJumpToReply?.(msg.reply_message!.id);
+      if (!msg.reply_to_message?.is_deleted) {
+        onJumpToReply?.(msg.reply_to_message!.id);
       }
     }}>
               <div className="reply-quote-bar" />
               <div className="reply-quote-body">
                 <span className="reply-quote-sender">
-                  {msg.reply_message.sender?.name ?? 'Unknown'}
+                  {msg.reply_to_message.sender?.name ?? 'Unknown'}
                 </span>
                 <span className="reply-quote-text">
-                  {msg.reply_message.is_deleted
+                  {msg.reply_to_message.is_deleted
                     ? 'This message was deleted'
-                    : msg.reply_message.type !== 'text'
-                      ? mediaLabel(msg.reply_message.type)
-                      : (msg.reply_message.message?.substring(0, 100) ?? '')}
+                    : msg.reply_to_message.type !== 'text'
+                      ? mediaLabel(msg.reply_to_message.type)
+                      : (msg.reply_to_message.message?.substring(0, 100) ?? '')}
                 </span>
               </div>
-              {msg.reply_message.type === 'image' && msg.reply_message.media_url && (
+              {msg.reply_to_message.type === 'image' && msg.reply_to_message.media_url && (
                 <img
                   className="reply-quote-thumb"
-                  src={msg.reply_message.media_url}
+                  src={msg.reply_to_message.media_url}
                   alt="reply"
                 />
               )}

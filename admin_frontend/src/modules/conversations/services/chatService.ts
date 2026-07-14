@@ -27,7 +27,8 @@ export interface Message {
   media_url: string | null;
   media_meta: MediaMeta | null;
   reply_to: number | null;
-  reply_message?: Message | null;
+  // reply_message?: Message | null;
+  reply_to_message?: Message | null;
   is_deleted: boolean;
   is_edited: boolean;
   is_pinned: boolean;

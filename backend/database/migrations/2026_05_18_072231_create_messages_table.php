@@ -27,7 +27,8 @@ return new class extends Migration
                 'voice',
                 'video',
                 'class_link',
-                'record_link'
+                'record_link',
+                'poll'
             ])->default('text');
 
             $table->string('media_url')->nullable();

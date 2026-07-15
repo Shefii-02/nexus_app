@@ -133,7 +133,7 @@ class CourseMaterialController extends Controller
         }
 
         if ($material->file_url && is_int($material->file_url)) {
-            Log::info('File Deleting');
+            // Log::info('File Deleting');
             $this->mediaService->delete($material->file_url);
         }
 

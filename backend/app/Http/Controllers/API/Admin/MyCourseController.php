@@ -336,6 +336,6 @@ class MyCourseController extends Controller
 
 
     public function teacherCall(Request $request){
-        Log::info($request->all());
+        // Log::info($request->all());
     }
 }

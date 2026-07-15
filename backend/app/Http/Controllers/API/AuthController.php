@@ -231,11 +231,11 @@ class AuthController extends Controller
             ]);
         } catch (\Exception $e) {
 
-            Log::error('Setup Profile Error', [
-                'user_id' => auth()->id(),
-                'error'   => $e->getMessage(),
-                'trace'   => $e->getTraceAsString(),
-            ]);
+            // Log::error('Setup Profile Error', [
+            //     'user_id' => auth()->id(),
+            //     'error'   => $e->getMessage(),
+            //     'trace'   => $e->getTraceAsString(),
+            // ]);
 
             return response()->json([
                 'status'  => false,
@@ -377,7 +377,7 @@ class AuthController extends Controller
 
 
             if (!$result['success']) {
-                Log::info('Failed');
+                // Log::info('Failed');
                 return response()->json($result, 422);
             }
             //   Log::info('Received OTP Subimt', ['phone' => $request->phone,'otp' => $request->otp, 'device_id' => $request->device_id]);

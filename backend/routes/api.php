@@ -121,17 +121,17 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::post('/user/fcm-token', function (Request $request) {
         $request->validate(['fcm_token' => 'required|string', 'platform' => 'required|string']);
-        Log::info('-------------------------------');
-        Log::info($request->all());
-        Log::info('-------------------------------');
+        // Log::info('-------------------------------');
+        // Log::info($request->all());
+        // Log::info('-------------------------------');
         // $request->user()->update(['fcm_token' => $request->fcm_token]);
         return response()->json(['success' => true]);
     });
 
     Route::delete('/user/fcm-token', function (Request $request) {
-        Log::info('-------------------------------');
-        Log::info($request->all());
-        Log::info('-------------------------------');
+        // Log::info('-------------------------------');
+        // Log::info($request->all());
+        // Log::info('-------------------------------');
         //   $request->user()->update(['fcm_token' => null]);
         return response()->json(['success' => true]);
     });

@@ -480,7 +480,7 @@ class OtpController extends Controller
       Mail::to($email)->send(new SendOtpMail($otp, $expTime));
       return $this->success('OTP sent successfully', ['email' => $email]);
     } catch (\Exception $e) {
-      Log::error("Email OTP failed: " . $e->getMessage());
+    //   Log::error("Email OTP failed: " . $e->getMessage());
       return $this->error('Failed to send OTP: ' . $e->getMessage(), Response::HTTP_BAD_REQUEST);
     }
   }

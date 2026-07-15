@@ -190,8 +190,8 @@ class AnnouncementController extends Controller
         $userId = $request->user()->id;
         $now    = now();
 
-        Log::info("message");
-        Log::info($userId);
+        // Log::info("message");
+        // Log::info($userId);
 
         $announcement = Announcement::where('status', 'published')
             // ->where(function ($q) use ($now) {
@@ -207,7 +207,7 @@ class AnnouncementController extends Controller
             // })
             ->findOrFail($id);
 
-        Log::info($announcement);
+        // Log::info($announcement);
 
         // Upsert pivot: mark delivered + read
         $pivot = AnnouncementUser::firstOrNew([

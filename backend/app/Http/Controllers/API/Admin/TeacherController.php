@@ -103,7 +103,7 @@ class TeacherController extends Controller
                 'Teacher updated successfully'
             );
         } catch (\Exception $e) {
-            Log::info($e->getMessage());
+            // Log::info($e->getMessage());
             return $this->errorResponse(
                 'Failed to update teacher',
                 ['error' => $e->getMessage()],

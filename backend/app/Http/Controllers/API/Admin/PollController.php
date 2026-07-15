@@ -3,8 +3,9 @@ namespace App\Http\Controllers\API\Admin;
 
 use App\Chat\Events\PollClosed;
 use App\Chat\Events\PollVoteCast;
+use App\Chat\Models\Message;
 use App\Http\Controllers\Controller;
-use App\Models\{Conversation, ConversationParticipant, Message, Poll, PollOption, PollVote};
+use App\Models\{Conversation, ConversationParticipant, Poll, PollOption, PollVote};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 

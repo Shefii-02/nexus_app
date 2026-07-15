@@ -16,6 +16,7 @@ class MessageResource extends JsonResource
 
             'id' => $this->id,
 
+
             'conversation_id' =>
             $this->conversation_id,
 

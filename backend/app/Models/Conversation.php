@@ -32,7 +32,7 @@ class Conversation extends Model
      */
     public function canUserSend(\App\Models\User $user): bool
     {
-        $userRank = self::ROLE_RANK[$user->role] ?? 0;
+        $userRank = self::ROLE_RANK[$user->acc_type] ?? 0;
         $requiredRank = self::ROLE_RANK[$this->reply_permission] ?? 0;
 
         return $userRank >= $requiredRank;

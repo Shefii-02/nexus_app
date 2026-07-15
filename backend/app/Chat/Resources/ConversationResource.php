@@ -2,6 +2,7 @@
 
 namespace App\Chat\Resources;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,7 +15,7 @@ class ConversationResource extends JsonResource
     public function toArray(Request $request): array
     {
         $participant = $this->participants->firstWhere('user_id', $this->currentUserId ?? $request->user()?->id);
-
+        $user = User::where('id',$this->currentUserId ?? $request->user()?->id)->first();
         return [
             'id'            => $this->id,
             'type'          => $this->type,
@@ -25,6 +26,7 @@ class ConversationResource extends JsonResource
             'created_by'    => $this->created_by,
             'created_at'    => $this->created_at->toISOString(),
             'updated_at'    => $this->updated_at->toISOString(),
+            // 'reply_permission' => $this->canUserSend($user) ?? 0,
 
             // Participant-specific
             'is_muted'      => $participant?->is_muted ?? false,

@@ -97,14 +97,12 @@ class MessageResource extends JsonResource
                 ] : null
             ),
 
-            'is_deleted' =>
-            $this->is_deleted,
+            'is_deleted' => $this->is_deleted,
 
-            'is_edited' =>
-            $this->is_edited,
+            'is_edited' => $this->is_edited,
 
-            'is_pinned' =>
-            $this->is_pinned,
+            'is_pinned' => $this->is_pinned,
+
             'reactions'       => $this->whenLoaded(
                 'reactions',
                 fn() =>
@@ -115,6 +113,7 @@ class MessageResource extends JsonResource
                     'user_name' => $r->user?->name,
                 ])
             ),
+
             'poll' => $this->whenLoaded('poll', function () {
                 if (!$this->poll) return null;
 

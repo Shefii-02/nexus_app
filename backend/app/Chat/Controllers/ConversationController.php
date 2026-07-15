@@ -23,6 +23,7 @@ class ConversationController extends Controller
     public function index(Request $request): JsonResponse
     {
         $userId = $request->user()->id;
+        $user   = $request->user();
 
         $conversations = Conversation::with([
             'participants.user:id,name,avatar',
@@ -40,17 +41,17 @@ class ConversationController extends Controller
             })
             ->paginate(30);
 
-        $conversations->getCollection()->transform(function ($conv) use ($userId) {
-            $participant = $conv->participants->firstWhere('user_id', $userId);
-            $conv->unread_count  = $conv->getUnreadCountFor($userId);
+        $conversations->getCollection()->transform(function ($conv) use ($user) {
+            $participant = $conv->participants->firstWhere('user_id', $user->id);
+            $conv->unread_count  = $conv->getUnreadCountFor($user->id);
             $conv->is_muted      = $participant?->is_muted ?? false;
             $conv->is_pinned     = $participant?->is_pinned ?? false;
             $conv->last_message  = $conv->messages->first();
-            // $conv->reply_permission = $conv->reply_permission ?? 'all';
+            $conv->reply_permission = $conv->canUserSend($user) ?? 0;
 
             // For single chats, expose the other user as the "title"
             if ($conv->type === 'single') {
-                $other = $conv->participants->firstWhere('user_id', '!=', $userId);
+                $other = $conv->participants->firstWhere('user_id', '!=', $user->id);
                 $conv->other_user = $other?->user;
             }
             unset($conv->messages);

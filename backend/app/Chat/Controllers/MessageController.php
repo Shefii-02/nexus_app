@@ -54,6 +54,18 @@ class MessageController extends Controller
             'replyTo.sender:id,name',
             'reactions.user:id,name',
             'reads:message_id,user_id,read_at',
+            // ── Poll — counts only, plus the CURRENT USER's own vote(s) ──────────
+            // Never eager-load every voter here; that's what GET /polls/{id}/voters
+            // (admin/staff-gated) is for. This keeps the bulk message list light
+            // and safe for students to receive.
+            'poll' => fn($q) => $q->withCount([
+                'votes as total_voters' => fn($vq) => $vq->select(
+                    \Illuminate\Support\Facades\DB::raw('count(distinct user_id)')
+                ),
+            ]),
+            'poll.options' => fn($q) => $q->withCount('votes')->with([
+                'votes' => fn($vq) => $vq->where('user_id', $userId),
+            ]),
         ])
             ->where('conversation_id', $conversationId)
             ->visibleTo($userId)

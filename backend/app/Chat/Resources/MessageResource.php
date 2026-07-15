@@ -115,6 +115,27 @@ class MessageResource extends JsonResource
                     'user_name' => $r->user?->name,
                 ])
             ),
+            'poll' => $this->whenLoaded('poll', function () {
+                if (!$this->poll) return null;
+
+                return [
+                    'id'                    => $this->poll->id,
+                    'question'              => $this->poll->question,
+                    'allow_multiple_votes'  => $this->poll->allow_multiple_votes,
+                    'is_closed'             => $this->poll->is_closed
+                        || ($this->poll->closes_at && $this->poll->closes_at->isPast()),
+                    'closes_at'             => $this->poll->closes_at?->toISOString(),
+                    'total_voters'          => $this->poll->total_voters ?? 0,
+                    'options'               => $this->poll->options->map(fn($opt) => [
+                        'id'         => $opt->id,
+                        'text'       => $opt->option_text,
+                        'count'      => $opt->votes_count ?? 0,
+                        // true/false — did the CURRENT user vote for this option.
+                        // Only their own vote rows were eager-loaded, so this is safe.
+                        'voted_by_me' => $opt->votes->isNotEmpty(),
+                    ]),
+                ];
+            }),
             'created_at' =>
             $this->created_at?->toISOString(),
 

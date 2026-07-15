@@ -46,7 +46,7 @@ class ConversationController extends Controller
             $conv->is_muted      = $participant?->is_muted ?? false;
             $conv->is_pinned     = $participant?->is_pinned ?? false;
             $conv->last_message  = $conv->messages->first();
-            // $conv->reply_permission = $conv->reply_permission ?? 'all';
+            $conv->reply_permission = $conv->reply_permission ?? 'all';
 
             // For single chats, expose the other user as the "title"
             if ($conv->type === 'single') {

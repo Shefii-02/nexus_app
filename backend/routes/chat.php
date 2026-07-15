@@ -3,6 +3,7 @@
 use App\Chat\Controllers\ConversationController;
 use App\Chat\Controllers\MessageController;
 use App\Chat\Events\TypingIndicator;
+use App\Http\Controllers\API\Admin\PollController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,11 +22,11 @@ Route::middleware(['auth:api'])->prefix('chat')->group(function () {
     Route::get('conversations/{id}',             [ConversationController::class, 'show']);
     Route::put('conversations/{id}',             [ConversationController::class, 'update']);
     Route::delete('conversations/{id}/leave',    [ConversationController::class, 'leaveGroup']);
-    Route::post('conversations/{id}/participants',[ConversationController::class, 'addParticipants']);
+    Route::post('conversations/{id}/participants', [ConversationController::class, 'addParticipants']);
     Route::post('conversations/{id}/mute',       [ConversationController::class, 'toggleMute']);
     Route::post('conversations/{id}/pin',        [ConversationController::class, 'togglePin']);
     Route::post('conversations/{id}/report',     [ConversationController::class, 'report']);
-     Route::get('conversations/{conversation}/shared-media', [ConversationController::class, 'sharedMedia']);
+    Route::get('conversations/{conversation}/shared-media', [ConversationController::class, 'sharedMedia']);
     // ─── Messages ────────────────────────────────────────────────────────
     Route::get('conversations/{conversationId}/messages',             [MessageController::class, 'index']);
     Route::post('conversations/{conversationId}/messages',            [MessageController::class, 'store']);
@@ -49,6 +50,14 @@ Route::middleware(['auth:api'])->prefix('chat')->group(function () {
         ))->toOthers();
         return response()->json(['status' => 'ok']);
     });
+
+
+    // ─── Polls ──────────────────────────────────────────────────────────
+    Route::post('conversations/{conversationId}/polls', [PollController::class, 'store']);
+    Route::post('polls/{pollId}/vote',                  [PollController::class, 'vote']);
+    Route::get('polls/{pollId}/results',                [PollController::class, 'results']);
+    Route::get('polls/{pollId}/voters',                 [PollController::class, 'voters']);   // admin/staff gated inside controller
+    Route::post('polls/{pollId}/close',                 [PollController::class, 'close']);
 });
 
 // ─── Broadcasting Auth (Reverb) ───────────────────────────────────────────────

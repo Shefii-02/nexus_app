@@ -38,6 +38,11 @@ class Message extends Model
         return $this->belongsTo(Conversation::class);
     }
 
+    public function poll(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Poll::class);
+    }
+
     public function sender(): BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class, 'sender_id');

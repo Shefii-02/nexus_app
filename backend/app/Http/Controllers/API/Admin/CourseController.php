@@ -86,7 +86,6 @@ class CourseController extends Controller
             $conversation = Conversation::query()
                 ->where('type', 'group')
                 ->where('module_id', $course->id)
-
                 ->first();
 
             if (!$conversation) {
@@ -99,7 +98,6 @@ class CourseController extends Controller
                 $conversation->reply_permission = 'all';
                 $conversation->save();
             }
-
 
             ConversationParticipant::firstOrCreate([
                 'conversation_id' => $conversation->id,
@@ -122,10 +120,6 @@ class CourseController extends Controller
                     'course_id' => (string) $course->id,
                 ]
             );
-
-
-
-
 
             return $this->successResponse(
                 CourseResource::make($course->load(['teacher', 'batch'])),

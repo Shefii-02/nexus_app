@@ -72,18 +72,19 @@ export const courseFormConfig = [
         name: 'net_price',
         label: 'Net Price',
         type: 'number',
+        required: true,
         section: 'pricing',
     },
-    {
-        name: 'coupon_available',
-        label: 'Coupon Available',
-        type: 'radio',
-        section: 'pricing',
-        options: [
-            { label: 'Yes', value: 1, default: false },
-            { label: 'No', value: 0, default: true },
-        ],
-    },
+    // {
+    //     name: 'coupon_available',
+    //     label: 'Coupon Available',
+    //     type: 'radio',
+    //     section: 'pricing',
+    //     options: [
+    //         { label: 'Yes', value: 1, default: false },
+    //         { label: 'No', value: 0, default: true },
+    //     ],
+    // },
     {
         name: 'is_renewal',
         label: 'Renewal',
@@ -116,6 +117,7 @@ export const courseFormConfig = [
         label: 'Teacher',
         type: 'select',
         section: 'class',
+        required: true,
         options: [], // 🔥 dynamic (inject in page)
     },
 

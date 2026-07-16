@@ -93,7 +93,7 @@ class CourseController extends Controller
                 $conversation->module_id = $course->id;
                 $conversation->type = 'group';
                 $conversation->title = $course->name;
-                $conversation->created_by = auth()->id;
+                $conversation->created_by = auth()->user()->id;
                 $conversation->status     = 'active';
                 $conversation->reply_permission = 'all';
                 $conversation->save();
@@ -197,7 +197,7 @@ class CourseController extends Controller
                 $conversation->module_id = $current->id;
                 $conversation->type = 'group';
                 $conversation->title = $current->name;
-                $conversation->created_by = auth()->id;
+                $conversation->created_by = auth()->user()->id;
                 $conversation->status     = 'active';
                 $conversation->reply_permission = 'all';
                 $conversation->save();

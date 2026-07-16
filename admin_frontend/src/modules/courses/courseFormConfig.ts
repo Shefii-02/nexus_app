@@ -66,6 +66,7 @@ export const courseFormConfig = [
         name: 'actual_price',
         label: 'Actual Price',
         type: 'number',
+        required: true,
         section: 'pricing',
     },
     {

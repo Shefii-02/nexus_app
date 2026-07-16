@@ -133,7 +133,7 @@ class ConversationController extends Controller
             'module_id'   => 'nullable|integer',
         ]);
 
-        $authId = $request->user()->id;
+        $authId = config('adminId', 1) ?? $request->user()->id;
         $userIds = array_unique(array_merge([$authId], $request->user_ids));
 
         DB::beginTransaction();

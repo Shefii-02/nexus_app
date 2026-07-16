@@ -185,16 +185,16 @@ export function MessageBubble({
                       <span className="mm-icon">↩</span> Reply
                     </li>
                   )}
-                  {canSend && (
+                  {canSend && msg.type == 'text' && (
                     <li onClick={() => { onForward(); closeAll(); }}>
                       <span className="mm-icon">↪</span> Forward
                     </li>
                   )}
-                  {canSend && isMine && msg.type === 'text' && (
-                    <li onClick={() => { setEditing(true); closeAll(); }}>
-                      <span className="mm-icon">✏️</span> Edit
-                    </li>
-                  )}
+                  {/* {canSend && isMine && msg.type === 'text' && ( */}
+                    // <li onClick={() => { setEditing(true); closeAll(); }}>
+                    //   <span className="mm-icon">✏️</span> Edit
+                    // </li>
+                  // )}
                   {/* Pin/Unpin — not a "send" action, always available */}
                   <li onClick={() => { onPin(); closeAll(); }}>
                     <span className="mm-icon">{msg.is_pinned ? '📌' : '📍'}</span>

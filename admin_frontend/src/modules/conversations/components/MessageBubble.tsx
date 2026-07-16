@@ -191,10 +191,10 @@ export function MessageBubble({
                     </li>
                   )}
                   {/* {canSend && isMine && msg.type === 'text' && ( */}
-                    // <li onClick={() => { setEditing(true); closeAll(); }}>
+                    {/* // <li onClick={() => { setEditing(true); closeAll(); }}>
                     //   <span className="mm-icon">✏️</span> Edit
-                    // </li>
-                  // )}
+                    // </li> */}
+                  {/* // )} */}
                   {/* Pin/Unpin — not a "send" action, always available */}
                   <li onClick={() => { onPin(); closeAll(); }}>
                     <span className="mm-icon">{msg.is_pinned ? '📌' : '📍'}</span>

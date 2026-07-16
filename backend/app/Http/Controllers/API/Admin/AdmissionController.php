@@ -7,6 +7,8 @@ use App\Http\Controllers\API\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AdmissionResource;
 use App\Http\Requests\AdmissionRequest;
+use App\Models\Conversation;
+use App\Models\ConversationParticipant;
 use App\Services\Admission\AdmissionService;
 use App\Services\Notification\FcmNotificationService;
 use Illuminate\Http\JsonResponse;
@@ -73,6 +75,21 @@ class AdmissionController extends Controller
                     ]
                 );
             }
+
+
+            $conversation = Conversation::query()
+                ->where('type', 'group')
+                ->where('module_id', $request->course_id)
+                ->first();
+
+
+            if ($conversation) {
+                ConversationParticipant::firstOrCreate([
+                    'conversation_id' => $conversation->id,
+                    'user_id' =>  $request->teacher_id
+                ]);
+            }
+
 
             return $this->successResponse(
                 AdmissionResource::make($admission),

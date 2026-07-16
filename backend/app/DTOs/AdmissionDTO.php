@@ -2,6 +2,8 @@
 
 namespace App\DTOs;
 
+use App\Models\Course;
+
 class AdmissionDTO
 {
     public function __construct(
@@ -32,6 +34,9 @@ class AdmissionDTO
     public static function fromArray(
         array $data
     ): self {
+
+
+        $course = Course::where('id',$data['course_id'])->first();
 
         return new self(
 
@@ -68,9 +73,9 @@ class AdmissionDTO
             status: $data['status']
                 ?? 'active',
 
-            paid_amount: (float)($data['paid_amount'] ?? 0),
+            paid_amount: (float)($data['paid_amount'] ?? $course['net_price']),
 
-            payment_method: $data['payment_method'] ?? '',
+            payment_method: $data['payment_method'] ?? 'upi',
 
             transaction_no: $data['transaction_no'] ?? null,
 

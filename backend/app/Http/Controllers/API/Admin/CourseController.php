@@ -83,6 +83,35 @@ class CourseController extends Controller
             ]);
 
 
+            $conversation = Conversation::query()
+                ->where('type', 'group')
+                ->where('module_id', $course->id)
+
+                ->first();
+
+            if (!$conversation) {
+                $conversation = new Conversation();
+                $conversation->module_id = $course->id;
+                $conversation->type = 'group';
+                $conversation->title = $course->name;
+                $conversation->created_by = auth()->id;
+                $conversation->status     = 'active';
+                $conversation->reply_permission = 'all';
+                $conversation->save();
+            }
+
+
+            ConversationParticipant::firstOrCreate([
+                'conversation_id' => $conversation->id,
+                'user_id' =>  config('adminId', 1)
+            ]);
+
+            ConversationParticipant::firstOrCreate([
+                'conversation_id' => $conversation->id,
+                'user_id' =>  $request->teacher_id
+            ]);
+
+
             // Notify assigned teacher
             (new FcmNotificationService())->sendCustom(
                 [$request->teacher_id],
@@ -93,6 +122,8 @@ class CourseController extends Controller
                     'course_id' => (string) $course->id,
                 ]
             );
+
+
 
 
 
@@ -162,6 +193,36 @@ class CourseController extends Controller
             }
 
 
+            $conversation = Conversation::query()
+                ->where('type', 'group')
+                ->where('module_id', $current->id)
+                ->first();
+
+            if (!$conversation) {
+                $conversation = new Conversation();
+                $conversation->module_id = $current->id;
+                $conversation->type = 'group';
+                $conversation->title = $current->name;
+                $conversation->created_by = auth()->id;
+                $conversation->status     = 'active';
+                $conversation->reply_permission = 'all';
+                $conversation->save();
+            }
+
+
+            ConversationParticipant::firstOrCreate([
+                'conversation_id' => $conversation->id,
+                'user_id' =>  config('adminId', 1)
+            ]);
+
+            ConversationParticipant::firstOrCreate([
+                'conversation_id' => $conversation->id,
+                'user_id' =>  $request->teacher_id
+            ]);
+
+
+
+
             return $this->successResponse(CourseResource::make($updated), 'Course updated successfully');
         } catch (\Exception $e) {
             return $this->errorResponse('Failed to update course', ['error' => $e->getMessage()], 500);
@@ -181,6 +242,11 @@ class CourseController extends Controller
             }
 
             $this->courseService->delete($course);
+
+            Conversation::query()
+                ->where('type', 'group')
+                ->where('module_id', $current->id)
+                ->delete();
 
             return $this->successResponse(null, 'Course deleted successfully');
         } catch (\Exception $e) {

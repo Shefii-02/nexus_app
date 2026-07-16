@@ -58,7 +58,7 @@ class CourseRequest extends BaseRequest
 
             // 🔹 RELATION
             'teacher_id' => [
-                'nullable',
+                'required',
                 'exists:users,id', // ⚠️ change if using users table
             ],
 

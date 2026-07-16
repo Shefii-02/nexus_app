@@ -53,44 +53,44 @@ export const admissionFormConfig = [
   //   required: true,
   // },
 
-  {
-    section: 'Payment',
-    name: 'paid_amount',
-    label: 'Paid Amount',
-    type: 'number',
-  },
+  // {
+  //   section: 'Payment',
+  //   name: 'paid_amount',
+  //   label: 'Paid Amount',
+  //   type: 'number',
+  // },
 
-  {
-    section: 'Payment',
-    name: 'payment_method',
-    label: 'Payment Method',
-    type: 'select',
-    options: [
-      {
-        label: 'Cash',
-        value: 'cash',
-      },
-      {
-        label: 'UPI',
-        value: 'upi',
-      },
-      {
-        label: 'Card',
-        value: 'card',
-      },
-      {
-        label: 'Bank Transfer',
-        value: 'bank_transfer',
-      },
-    ],
-  },
+  // {
+  //   section: 'Payment',
+  //   name: 'payment_method',
+  //   label: 'Payment Method',
+  //   type: 'select',
+  //   options: [
+  //     {
+  //       label: 'Cash',
+  //       value: 'cash',
+  //     },
+  //     {
+  //       label: 'UPI',
+  //       value: 'upi',
+  //     },
+  //     {
+  //       label: 'Card',
+  //       value: 'card',
+  //     },
+  //     {
+  //       label: 'Bank Transfer',
+  //       value: 'bank_transfer',
+  //     },
+  //   ],
+  // },
 
-  {
-    section: 'Payment',
-    name: 'transaction_no',
-    label: 'Transaction No',
-    type: 'text',
-  },
+  // {
+  //   section: 'Payment',
+  //   name: 'transaction_no',
+  //   label: 'Transaction No',
+  //   type: 'text',
+  // },
 
   // {
   //   section: 'Others',

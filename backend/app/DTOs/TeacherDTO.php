@@ -23,7 +23,8 @@ class TeacherDTO
             name: $data['name'],
             email: $data['email'],
             password: $data['password'] ?? '',
-            phone: $data['phone'],
+            // phone: $data['phone'],
+            phone: self::formatPhone($data['phone'] ?? ''),
             qualification: $data['qualification'] ?? "",
             subject: $data['subject'] ?? "",
             experience_years: $data['experience_years'] ?? "",
@@ -54,5 +55,29 @@ class TeacherDTO
             'experience_years' => $this->experience_years,
             'address' => $this->address ?? '',
         ];
+    }
+
+
+    private static function formatPhone(?string $phone): string
+    {
+        if (empty($phone)) {
+            return '';
+        }
+
+        // Remove all non-numeric characters except +
+        $phone = preg_replace('/[^0-9+]/', '', trim($phone));
+
+        // Remove leading +
+        $phone = ltrim($phone, '+');
+
+        // Remove country code 91 if present
+        if (str_starts_with($phone, '91')) {
+            $phone = substr($phone, 2);
+        }
+
+        // Keep only last 10 digits
+        $phone = substr($phone, -10);
+
+        return '+91 ' . $phone;
     }
 }

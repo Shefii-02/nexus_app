@@ -86,7 +86,7 @@ class AdmissionController extends Controller
             if ($conversation) {
                 ConversationParticipant::firstOrCreate([
                     'conversation_id' => $conversation->id,
-                    'user_id' =>  $request->teacher_id
+                    'user_id' =>  $request->student_id
                 ]);
             }
 

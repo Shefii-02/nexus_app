@@ -37,6 +37,18 @@ class UserController extends Controller
         ]);
     }
 
+    public function byRole(Request $request)
+    {
+        $validated = $request->validate(['role' => 'required|in:admin,staff,teacher,student']);
+        $meId = $request->user()->id;
+
+        $users = User::where('role', $validated['role'])
+            ->where('id', '!=', $meId)
+            ->get(['id', 'name', 'email', 'phone', 'avatar', 'role']);
+
+        return response()->json(['data' => $users]);
+    }
+
     public function RegisterDevice(Request $request)
     {
         $user = $request->user();
@@ -137,7 +149,7 @@ class UserController extends Controller
         $q = $request->q;
 
         $users = User::query()
-            ->where('acc_type','teacher')
+            ->where('acc_type', 'teacher')
             ->when($q, function ($query) use ($q) {
                 $query->where('name', 'like', "%{$q}%")
                     ->orWhere('email', 'like', "%{$q}%")
@@ -157,7 +169,7 @@ class UserController extends Controller
         $q = $request->q;
 
         $users = User::query()
-            ->where('acc_type','staff')
+            ->where('acc_type', 'staff')
             ->when($q, function ($query) use ($q) {
                 $query->where('name', 'like', "%{$q}%")
                     ->orWhere('email', 'like', "%{$q}%")

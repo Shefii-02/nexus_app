@@ -4,6 +4,7 @@ use App\Chat\Controllers\ConversationController;
 use App\Chat\Controllers\MessageController;
 use App\Chat\Events\TypingIndicator;
 use App\Http\Controllers\API\Admin\PollController;
+use App\Http\Controllers\API\Admin\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -15,6 +16,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:api'])->prefix('chat')->group(function () {
 
+    Route::get('users/by-role', [UserController::class, 'byRole']);
+    Route::get('users/search', [UserController::class, 'allUsers']);
     // ─── Conversations ───────────────────────────────────────────────────
     Route::get('conversations',                  [ConversationController::class, 'index']);
     Route::post('conversations/individual',      [ConversationController::class, 'createIndividual']);

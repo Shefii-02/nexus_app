@@ -41,6 +41,8 @@ use Illuminate\Support\Facades\Log;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
+// routes/api.php — inside the auth:api group
+
 
 
 // routes/api.php
@@ -136,7 +138,7 @@ Route::middleware(['auth:api'])->group(function () {
         return response()->json(['success' => true]);
     });
 
-
+    Route::get('users/by-role', [UserController::class, 'byRole']);
     Route::get('users/search', [UserController::class, 'allUsers']);
     Route::get('teacher/search', [UserController::class, 'teacherSearch']);
     Route::get('staff/search', [UserController::class, 'staffSearch']);

@@ -44,7 +44,7 @@ class UserController extends Controller
 
         $users = User::where('acc_type', $validated['role'])
             ->where('id', '!=', $meId)
-            ->get(['id', 'name', 'email', 'phone', 'avatar', 'acc']);
+            ->get();
 
         return response()->json([
             'data' => UserResource::collection($users)

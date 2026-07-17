@@ -149,9 +149,9 @@ class PollController extends Controller
         $poll = Poll::with(['options.votes.user:id,name,avatar'])->findOrFail($pollId);
         $user = $request->user();
 
-        if (!in_array($user->role, ['admin', 'staff'])) {
-            return response()->json(['message' => 'Not authorized to view voter details.'], 403);
-        }
+        // if (!in_array($user->role, ['admin', 'staff'])) {
+        //     return response()->json(['message' => 'Not authorized to view voter details.'], 403);
+        // }
 
         $isMember = ConversationParticipant::where('conversation_id', $poll->conversation_id)
             ->where('user_id', $user->id)

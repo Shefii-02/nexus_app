@@ -146,7 +146,7 @@ class PollController extends Controller
     // ── Full voter breakdown — admin/staff only ─────────────────────────────
     public function voters(Request $request, int $pollId)
     {
-        $poll = Poll::with(['options.votes.user:id,name,avatar'])->findOrFail($pollId);
+        $poll = Poll::with(['options.votes.user:id,name,avatar_url,phone'])->findOrFail($pollId);
         $user = $request->user();
 
         // if (!in_array($user->role, ['admin', 'staff'])) {

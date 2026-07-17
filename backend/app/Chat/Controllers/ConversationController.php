@@ -443,7 +443,7 @@ class ConversationController extends Controller
     // 1 — Full detail: permission + member list with role/phone/avatar
     public function detail(Request $request, int $id)
     {
-        $conv = Conversation::with(['participants.user:id,name,phone,avatar,role'])->findOrFail($id);
+        $conv = Conversation::with(['participants.user:id,name,phone,avatar,acc_type'])->findOrFail($id);
         $user = $request->user();
 
         abort_unless(
@@ -467,7 +467,7 @@ class ConversationController extends Controller
                     'name'   => $p->user->name,
                     'phone'  => $p->user->phone,
                     'avatar' => $p->user->avatar_url ?? null,
-                    'role'   => $p->user->role,
+                    'role'   => $p->user->acc_type,
                     'is_creator' => $p->user->id === $conv->created_by,
                 ])->values(),
             ],
@@ -533,7 +533,7 @@ class ConversationController extends Controller
                 ->update(['status' => 'active']);
         });
 
-        $updated = $conv->fresh(['participants.user:id,name,phone,avatar,role']);
+        $updated = $conv->fresh(['participants.user:id,name,phone,avatar,acc_type']);
 
         // broadcast(new \App\Events\ConversationUpdated($conv->id, ['participants_changed' => true]))->toOthers();
 

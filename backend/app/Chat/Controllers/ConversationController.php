@@ -481,7 +481,7 @@ class ConversationController extends Controller
         $conv = Conversation::findOrFail($id);
         $user = $request->user();
 
-        if (!in_array($user->role, ['admin', 'staff'])) {
+        if (!in_array($user->acc_type, ['admin', 'staff'])) {
             return response()->json(['status' => false, 'message' => 'Not authorized.'], 403);
         }
 

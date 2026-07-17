@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\API\Admin;
 
 use App\Chat\Events\PollClosed;
@@ -146,7 +147,11 @@ class PollController extends Controller
     // ── Full voter breakdown — admin/staff only ─────────────────────────────
     public function voters(Request $request, int $pollId)
     {
-        $poll = Poll::with(['options.votes.user:id,name,avatar_url,phone'])->findOrFail($pollId);
+        // $poll = Poll::with(['options.votes.user:id,name,avatar,phone,options.votes.user.media'])->findOrFail($pollId);
+        $poll = Poll::with([
+            'options.votes.user:id,name,phone,avatar',   // ✅ id + phone + avatar FK column
+            'options.votes.user.media',                   // ✅ separate entry — nested relation
+        ])->findOrFail($pollId);
         $user = $request->user();
 
         // if (!in_array($user->role, ['admin', 'staff'])) {
@@ -166,11 +171,11 @@ class PollController extends Controller
                 'question' => $poll->question,
                 'allow_multiple_votes' => $poll->allow_multiple_votes,
                 'total_voters' => $poll->totalVoters(),
-                'options' => $poll->options->map(fn ($opt) => [
+                'options' => $poll->options->map(fn($opt) => [
                     'id'    => $opt->id,
                     'text'  => $opt->option_text,
                     'count' => $opt->votes->count(),
-                    'voters' => $opt->votes->map(fn ($v) => [
+                    'voters' => $opt->votes->map(fn($v) => [
                         'id'     => $v->user->id,
                         'name'   => $v->user->name,
                         'phone'  => $v->user->phone,
@@ -203,7 +208,7 @@ class PollController extends Controller
             'poll_id'      => $poll->id,
             'total_voters' => $poll->totalVoters(),
             'options'      => $poll->options()->withCount('votes')->get()
-                ->map(fn ($o) => ['id' => $o->id, 'count' => $o->votes_count]),
+                ->map(fn($o) => ['id' => $o->id, 'count' => $o->votes_count]),
         ];
     }
 }

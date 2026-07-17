@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:api'])->prefix('chat')->group(function () {
 
+
     Route::get('users/by-role', [UserController::class, 'byRole']);
     Route::get('users/search', [UserController::class, 'allUsers']);
     // ─── Conversations ───────────────────────────────────────────────────
@@ -24,6 +25,17 @@ Route::middleware(['auth:api'])->prefix('chat')->group(function () {
     Route::post('conversations/group',           [ConversationController::class, 'createGroup']);
     Route::get('conversations/{id}',             [ConversationController::class, 'show']);
     Route::put('conversations/{id}',             [ConversationController::class, 'update']);
+
+
+    // routes/api.php — inside chat prefix group
+    Route::get('conversations/{id}/detail',              [ConversationController::class, 'detail']);
+    Route::post('conversations/{id}/reply-permission',   [ConversationController::class, 'updateReplyPermission']);
+    Route::post('conversations/{id}/participants/sync',  [ConversationController::class, 'syncParticipants']);
+    Route::post('conversations/{id}/status',              [ConversationController::class, 'updateStatus']);
+    Route::delete('conversations/{id}',                   [ConversationController::class, 'destroy']);
+
+
+
     Route::delete('conversations/{id}/leave',    [ConversationController::class, 'leaveGroup']);
     Route::post('conversations/{id}/participants', [ConversationController::class, 'addParticipants']);
     Route::post('conversations/{id}/mute',       [ConversationController::class, 'toggleMute']);

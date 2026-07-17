@@ -434,6 +434,160 @@ class ConversationController extends Controller
         ]);
     }
 
+
+
+
+
+    // app/Http/Controllers/Chat/ConversationController.php
+
+    // 1 — Full detail: permission + member list with role/phone/avatar
+    public function detail(Request $request, int $id)
+    {
+        $conv = Conversation::with(['participants.user:id,name,phone,avatar,role'])->findOrFail($id);
+        $user = $request->user();
+
+        abort_unless(
+            $conv->participants->contains('user_id', $user->id),
+            403,
+            'Not a participant.'
+        );
+
+        return response()->json([
+            'conversation' => [
+                'id'               => $conv->id,
+                'title'            => $conv->title,
+                'avatar'           => $conv->avatar,
+                'type'             => $conv->type,
+                'status'           => $conv->status,
+                'reply_permission' => $conv->reply_permission,
+                'created_by'       => $conv->created_by,
+                'total_members'    => $conv->participants->where('status', 'active')->count(),
+                'participants'     => $conv->participants->where('status', 'active')->map(fn($p) => [
+                    'id'     => $p->user->id,
+                    'name'   => $p->user->name,
+                    'phone'  => $p->user->phone,
+                    'avatar' => $p->user->avatar_url ?? null,
+                    'role'   => $p->user->role,
+                    'is_creator' => $p->user->id === $conv->created_by,
+                ])->values(),
+            ],
+        ]);
+    }
+
+    // 2 — Update reply permission only (admin/staff)
+    public function updateReplyPermission(Request $request, int $id)
+    {
+        $conv = Conversation::findOrFail($id);
+        $user = $request->user();
+
+        if (!in_array($user->role, ['admin', 'staff'])) {
+            return response()->json(['status' => false, 'message' => 'Not authorized.'], 403);
+        }
+
+        $validated = $request->validate([
+            'reply_permission' => 'required|in:admin,staff,teacher,all',
+        ]);
+
+        $conv->update($validated);
+
+        // broadcast(new \App\Events\ConversationUpdated($conv->id, ['reply_permission' => $conv->reply_permission]))->toOthers();
+
+        return response()->json(['status' => true, 'reply_permission' => $conv->reply_permission]);
+    }
+
+    // 3 — Sync participants: replace full member set (used by "All Teachers/Students/Staff" auto-sync + custom multi-select)
+    public function syncParticipants(Request $request, int $id)
+    {
+        $conv = Conversation::findOrFail($id);
+        $user = $request->user();
+
+        if (!in_array($user->role, ['admin', 'staff'])) {
+            return response()->json(['status' => false, 'message' => 'Not authorized.'], 403);
+        }
+
+        $validated = $request->validate([
+            'user_ids'   => 'required|array|min:1',
+            'user_ids.*' => 'integer|exists:users,id',
+        ]);
+
+        DB::transaction(function () use ($conv, $validated) {
+            $incoming = collect($validated['user_ids']);
+            $current  = $conv->participants()->pluck('user_id');
+
+            $toAdd    = $incoming->diff($current);
+            $toRemove = $current->diff($incoming);
+
+            foreach ($toAdd as $uid) {
+                $conv->participants()->create(['user_id' => $uid, 'status' => 'active']);
+            }
+
+            if ($toRemove->isNotEmpty()) {
+                $conv->participants()->whereIn('user_id', $toRemove)
+                    ->update(['status' => 'removed']);
+            }
+
+            // reactivate anyone previously removed but now re-included
+            $conv->participants()
+                ->whereIn('user_id', $incoming)
+                ->where('status', '!=', 'active')
+                ->update(['status' => 'active']);
+        });
+
+        $updated = $conv->fresh(['participants.user:id,name,phone,avatar,role']);
+
+        // broadcast(new \App\Events\ConversationUpdated($conv->id, ['participants_changed' => true]))->toOthers();
+
+        return response()->json([
+            'status'  => true,
+            'total_members' => $updated->participants->where('status', 'active')->count(),
+            'participants'  => $updated->participants->where('status', 'active')->map(fn($p) => [
+                'id' => $p->user->id,
+                'name' => $p->user->name,
+                'phone' => $p->user->phone,
+                'avatar' => $p->user->avatar_url,
+                'role' => $p->user->role,
+            ])->values(),
+        ]);
+    }
+
+    // 4 — Group status edit (active/suspended/expired/declined)
+    public function updateStatus(Request $request, int $id)
+    {
+        $conv = Conversation::findOrFail($id);
+        $user = $request->user();
+
+        if (!in_array($user->role, ['admin', 'staff'])) {
+            return response()->json(['status' => false, 'message' => 'Not authorized.'], 403);
+        }
+
+        $validated = $request->validate([
+            'status' => 'required|in:active,suspended,expired,declined',
+        ]);
+
+        $conv->update($validated);
+        // broadcast(new \App\Events\ConversationUpdated($conv->id, ['status' => $conv->status]))->toOthers();
+
+        return response()->json(['status' => true, 'conversation_status' => $conv->status]);
+    }
+
+    // 5 — Remove group entirely
+    public function destroy(Request $request, int $id)
+    {
+        $conv = Conversation::findOrFail($id);
+        $user = $request->user();
+
+        if ($conv->created_by !== $user->id && $user->role !== 'admin') {
+            return response()->json(['status' => false, 'message' => 'Not authorized.'], 403);
+        }
+
+        // broadcast(new \App\Events\ConversationDeleted($conv->id))->toOthers();
+        $conv->delete(); // add cascading deletes for messages/participants at DB level if not already set
+
+        return response()->json(['status' => true, 'message' => 'Group removed.']);
+    }
+
+
+
     // public function sharedMedia(Conversation $conversation, Request $request)
     // {
     //     $type = $request->query('type', 'media'); // 'media' | 'links' | 'docs'

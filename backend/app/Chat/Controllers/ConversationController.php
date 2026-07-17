@@ -48,6 +48,7 @@ class ConversationController extends Controller
             $conv->is_pinned     = $participant?->is_pinned ?? false;
             $conv->last_message  = $conv->messages->first();
             $conv->reply_permission = $conv->canUserSend($user) ?? 0;
+            $conv->reply_permission_value = $conv->reply_permission;
 
             // For single chats, expose the other user as the "title"
             if ($conv->type === 'single') {

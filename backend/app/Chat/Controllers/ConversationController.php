@@ -501,7 +501,7 @@ class ConversationController extends Controller
         $conv = Conversation::findOrFail($id);
         $user = $request->user();
 
-        if (!in_array($user->role, ['admin', 'staff'])) {
+        if (!in_array($user->acc_type, ['admin', 'staff'])) {
             return response()->json(['status' => false, 'message' => 'Not authorized.'], 403);
         }
 
@@ -545,7 +545,7 @@ class ConversationController extends Controller
                 'name' => $p->user->name,
                 'phone' => $p->user->phone,
                 'avatar' => $p->user->avatar_url,
-                'role' => $p->user->role,
+                'role' => $p->user->acc_type,
             ])->values(),
         ]);
     }
@@ -556,7 +556,7 @@ class ConversationController extends Controller
         $conv = Conversation::findOrFail($id);
         $user = $request->user();
 
-        if (!in_array($user->role, ['admin', 'staff'])) {
+        if (!in_array($user->acc_type, ['admin', 'staff'])) {
             return response()->json(['status' => false, 'message' => 'Not authorized.'], 403);
         }
 
@@ -575,8 +575,8 @@ class ConversationController extends Controller
     {
         $conv = Conversation::findOrFail($id);
         $user = $request->user();
-
-        if ($conv->created_by !== $user->id && $user->role !== 'admin') {
+        // $conv->created_by !== $user->id &&
+        if ($user->acc_type !== 'admin') {
             return response()->json(['status' => false, 'message' => 'Not authorized.'], 403);
         }
 

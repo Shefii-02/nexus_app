@@ -44,9 +44,12 @@ class UserController extends Controller
 
         $users = User::where('acc_type', $validated['role'])
             ->where('id', '!=', $meId)
-            ->get(['id', 'name', 'email', 'phone', 'avatar', 'role']);
+            ->get(['id', 'name', 'email', 'phone', 'avatar', 'acc']);
 
-        return response()->json(['data' => $users]);
+        return response()->json([
+            'data' => UserResource::collection($users)
+        ]);
+        // return response()->json(['data' => $users]);
     }
 
     public function RegisterDevice(Request $request)

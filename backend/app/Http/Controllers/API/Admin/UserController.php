@@ -42,7 +42,7 @@ class UserController extends Controller
         $validated = $request->validate(['role' => 'required|in:admin,staff,teacher,student']);
         $meId = $request->user()->id;
 
-        $users = User::where('role', $validated['role'])
+        $users = User::where('acc_type', $validated['role'])
             ->where('id', '!=', $meId)
             ->get(['id', 'name', 'email', 'phone', 'avatar', 'role']);
 

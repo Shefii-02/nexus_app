@@ -173,7 +173,8 @@ class PollController extends Controller
                     'voters' => $opt->votes->map(fn ($v) => [
                         'id'     => $v->user->id,
                         'name'   => $v->user->name,
-                        'avatar' => $v->user->avatar,
+                        'phone'  => $v->user->phone,
+                        'avatar' => $v->user->avatar_url,
                         'voted_at' => $v->created_at,
                     ]),
                 ]),

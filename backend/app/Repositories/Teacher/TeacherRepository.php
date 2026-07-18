@@ -55,6 +55,7 @@ class TeacherRepository extends BaseRepository implements TeacherRepositoryInter
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'LIKE', "%{$search}%")
                     ->orWhere('email', 'LIKE', "%{$search}%")
+                    ->orWhere('phone', 'LIKE', "%{$search}%")
                     ->orWhereHas('teacher', function ($teacher) use ($search) {
                         $teacher->where('subject', 'LIKE', "%{$search}%");
                     });

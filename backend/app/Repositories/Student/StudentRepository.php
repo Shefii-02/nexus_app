@@ -52,6 +52,7 @@ class StudentRepository extends BaseRepository implements StudentRepositoryInter
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'LIKE', "%{$search}%")
                     ->orWhere('email', 'LIKE', "%{$search}%")
+                    ->orWhere('phone', 'LIKE', "%{$search}%")
                     ->orWhereHas('student', function ($teacher) use ($search) {
                         $teacher->where('roll_number', 'LIKE', "%{$search}%");
                     });

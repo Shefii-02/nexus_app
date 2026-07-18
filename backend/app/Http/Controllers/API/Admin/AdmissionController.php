@@ -311,42 +311,108 @@ class AdmissionController extends Controller
     public function admissionStatus(Request $request, int $id)
     {
         try {
-            $current = Admission::with(['student', 'course', 'teacher'])->find($id);
-            $oldStatus = $current->status;
-            $current->status = $request->status;
-            $current->save();
+            $validated = $request->validate([
+                'status' => [
+                    'required',
+                    'string',
+                    'in:active,pending,completed,cancelled,expired',
+                ],
+            ]);
 
-            $conv = Conversation::where('module_id', $current->course_id)->first();
-            $convId = $conv->id;
+            $current = Admission::with([
+                'student',
+                'course',
+                'teacher',
+            ])->find($id);
 
-            if ($conv && ($request->status == 'expired' || $request->status == 'cancelled')) {
-                ConversationParticipant::where('conversation_id', $convId)->where('user_id', $current->id)->update(['status' => 'suspended']);
-            } else {
-                ConversationParticipant::where('conversation_id', $convId)->where('user_id', $current->id)->update(['status' => 'active']);
+            if (!$current) {
+                return $this->errorResponse(
+                    'Admission not found',
+                    [],
+                    404
+                );
             }
 
-            // Notify only when status changes
-            if (isset($request->validated()['status']) && $request->validated()['status'] !== $oldStatus) {
-                if ($current->student_id && $current->course) {
-                    (new FcmNotificationService())->sendAdmissionNotification(
+            $oldStatus = $current->status;
+            $newStatus = $validated['status'];
+
+            // Update admission status
+            $current->status = $newStatus;
+            $current->save();
+
+            /*
+        |--------------------------------------------------------------------------
+        | Update Conversation Participant
+        |--------------------------------------------------------------------------
+        */
+
+            $conv = Conversation::where(
+                'module_id',
+                $current->course_id
+            )->first();
+
+            if ($conv) {
+                $participantStatus = in_array(
+                    $newStatus,
+                    ['expired', 'cancelled']
+                )
+                    ? 'suspended'
+                    : 'active';
+
+                ConversationParticipant::where(
+                    'conversation_id',
+                    $conv->id
+                )
+                    ->where(
+                        'user_id',
+                        $current->student_id
+                    )
+                    ->update([
+                        'status' => $participantStatus,
+                    ]);
+            }
+
+            /*
+        |--------------------------------------------------------------------------
+        | Send Notification Only When Status Changes
+        |--------------------------------------------------------------------------
+        */
+
+            if (
+                $oldStatus !== $newStatus &&
+                $current->student_id &&
+                $current->course
+            ) {
+                (new FcmNotificationService())
+                    ->sendAdmissionNotification(
                         $current->student_id,
                         [
-                            'course_name'  => $current->course->name ?? 'your course',
-                            'status'       => $current->status,
+                            'course_name' => $current->course->name
+                                ?? 'your course',
+
+                            'status' => $current->status,
+
                             'admission_id' => $current->id,
                         ]
                     );
-                }
             }
+
             return $this->successResponse(
-                AdmissionResource::make($current),
+                AdmissionResource::make($current->fresh([
+                    'student',
+                    'course',
+                    'teacher',
+                ])),
                 'Admission updated successfully'
             );
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
         } catch (\Exception $e) {
-
             return $this->errorResponse(
-                'Failed to update admission2',
-                ['error' => $e->getMessage()],
+                'Failed to update admission',
+                [
+                    'error' => $e->getMessage(),
+                ],
                 500
             );
         }

@@ -7,6 +7,7 @@ use App\Http\Controllers\API\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AdmissionResource;
 use App\Http\Requests\AdmissionRequest;
+use App\Models\Admission;
 use App\Models\Conversation;
 use App\Models\ConversationParticipant;
 use App\Services\Admission\AdmissionService;
@@ -295,6 +296,41 @@ class AdmissionController extends Controller
 
             return $this->errorResponse(
                 'Failed to retrieve payments',
+                ['error' => $e->getMessage()],
+                500
+            );
+        }
+    }
+
+    public function admissionStatus(Request $request, int $id)
+    {
+        try {
+            $current = Admission::with(['student', 'course', 'teacher'])->find($id);
+            $oldStatus = $current->status;
+            $current->status = $request->status;
+            $current->save();
+
+            // Notify only when status changes
+            if (isset($request->validated()['status']) && $request->validated()['status'] !== $oldStatus) {
+                if ($current->student_id && $current->course) {
+                    (new FcmNotificationService())->sendAdmissionNotification(
+                        $current->student_id,
+                        [
+                            'course_name'  => $current->course->name ?? 'your course',
+                            'status'       => $current->status,
+                            'admission_id' => $current->id,
+                        ]
+                    );
+                }
+            }
+            return $this->successResponse(
+                AdmissionResource::make($current),
+                'Admission updated successfully'
+            );
+        } catch (\Exception $e) {
+
+            return $this->errorResponse(
+                'Failed to update admission',
                 ['error' => $e->getMessage()],
                 500
             );

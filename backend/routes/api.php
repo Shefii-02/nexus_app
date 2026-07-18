@@ -659,6 +659,10 @@ Route::middleware(['auth:api'])->group(function () {
         });
     });
 
+
+     Route::post('admissions/{id}/status', [AdmissionController::class, 'admissionStatus']);
+
+
     Route::apiResource(
         'admissions',
         AdmissionController::class

@@ -15,10 +15,10 @@ class StudentResource extends JsonResource
             'address' => $this->student?->address,
             'guardian_name' => $this->student?->guardian_name,
             'guardian_phone' => $this->student?->guardian_phone,
-            'name' => $this->user?->name,
-            'email' => $this->user?->email,
-            'avatar' => $this->user?->avatar_url,
-            'status'  => $this->user?->status ?? $this->user,
+            'name' => $this->name,
+            'email' => $this->email,
+            'avatar' => $this->avatar_url,
+            'status'  => $this->status ?? $this->student->status,
 
             'user' => [
                 'id' => $this->id,

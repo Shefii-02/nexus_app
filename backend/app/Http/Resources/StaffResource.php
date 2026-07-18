@@ -12,11 +12,13 @@ class StaffResource extends JsonResource
             'id' => $this->id,
             'department' => $this->staff?->department,
             'designation' => $this->staff?->designation,
-            'phone' => $this->staff?->phone,
+            'name' => $this->name,
+            'email' => $this->email,
+            'phone' => $this->phone,
             'address' => $this->staff?->address,
             'status'  => $this->status ?? $this->status,
-
-
+            'avatar' => $this->avatar_url,
+            'permissions' => [],
             'user' => [
                 'id' => $this->id,
                 'name' => $this->name,

@@ -17,6 +17,8 @@ class TeacherResource extends JsonResource
             'address' => $this->teacher?->address,
             'status'  => $this->status ?? $this->user->status,
             'name' => $this->name,
+            'phone' => $this->phone,
+            'email' => $this->email,
             'avatar' => $this->avatar_url,
 
             'user' => [

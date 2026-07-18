@@ -243,14 +243,14 @@ class AdmissionController extends Controller
     public function destroy(
         int $id
     ): JsonResponse {
-
         try {
+            $current = Admission::with([
+                'student',
+                'course',
+                'teacher',
+            ])->find($id);
 
-            if (
-                !$this->admissionService
-                    ->find($id)
-            ) {
-
+            if (!$current) {
                 return $this->errorResponse(
                     'Admission not found',
                     null,
@@ -258,29 +258,53 @@ class AdmissionController extends Controller
                 );
             }
 
-            $current = Admission::with(['student', 'course', 'teacher'])->find($id);
+            /*
+        |--------------------------------------------------------------------------
+        | Remove Student From Course Conversation
+        |--------------------------------------------------------------------------
+        */
 
-            $this->admissionService
-                ->delete($id);
+            $conv = Conversation::where(
+                'module_id',
+                $current->course_id
+            )->first();
 
-            $conv = Conversation::where('module_id', $current->course_id)->first();
-            $convId = $conv->id;
-            ConversationParticipant::where('conversation_id', $convId)->where('user_id', $current->id)->delete();
+            if ($conv) {
+                ConversationParticipant::where(
+                    'conversation_id',
+                    $conv->id
+                )
+                    ->where(
+                        'user_id',
+                        $current->student_id
+                    )
+                    ->delete();
+            }
+
+            /*
+        |--------------------------------------------------------------------------
+        | Delete Admission
+        |--------------------------------------------------------------------------
+        */
+
+            $this->admissionService->delete(
+                $current->id
+            );
 
             return $this->successResponse(
                 null,
                 'Admission deleted successfully'
             );
         } catch (\Exception $e) {
-
             return $this->errorResponse(
                 'Failed to delete admission',
-                ['error' => $e->getMessage()],
+                [
+                    'error' => $e->getMessage(),
+                ],
                 500
             );
         }
     }
-
     /**
      * Admission Payments
      */

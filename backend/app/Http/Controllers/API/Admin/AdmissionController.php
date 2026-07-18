@@ -258,8 +258,14 @@ class AdmissionController extends Controller
                 );
             }
 
+            $current = Admission::with(['student', 'course', 'teacher'])->find($id);
+
             $this->admissionService
                 ->delete($id);
+
+            $conv = Conversation::where('module_id', $current->course_id)->first();
+            $convId = $conv->id;
+            ConversationParticipant::where('conversation_id', $convId)->where('user_id', $current->id)->delete();
 
             return $this->successResponse(
                 null,
@@ -309,6 +315,15 @@ class AdmissionController extends Controller
             $oldStatus = $current->status;
             $current->status = $request->status;
             $current->save();
+
+            $conv = Conversation::where('module_id', $current->course_id)->first();
+            $convId = $conv->id;
+
+            if ($conv && ($request->status == 'expired' || $request->status == 'cancelled')) {
+                ConversationParticipant::where('conversation_id', $convId)->where('user_id', $current->id)->update(['status' => 'suspended']);
+            } else {
+                ConversationParticipant::where('conversation_id', $convId)->where('user_id', $current->id)->update(['status' => 'active']);
+            }
 
             // Notify only when status changes
             if (isset($request->validated()['status']) && $request->validated()['status'] !== $oldStatus) {

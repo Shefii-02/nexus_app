@@ -345,7 +345,7 @@ class AdmissionController extends Controller
         } catch (\Exception $e) {
 
             return $this->errorResponse(
-                'Failed to update admission',
+                'Failed to update admission2',
                 ['error' => $e->getMessage()],
                 500
             );

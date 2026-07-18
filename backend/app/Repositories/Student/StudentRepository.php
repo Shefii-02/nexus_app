@@ -34,7 +34,7 @@ class StudentRepository extends BaseRepository implements StudentRepositoryInter
         return $this->model->active()->with(['student', 'batch'])->paginate(15);
     }
 
-     protected function applyFilters($query, array $filters)
+    protected function applyFilters($query, array $filters)
     {
         $query->with('student')
             ->where('acc_type', 'student');

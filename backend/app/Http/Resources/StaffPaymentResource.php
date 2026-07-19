@@ -23,14 +23,14 @@ extends JsonResource
             date('Y-m', strtotime($this->salary_month)),
 
             'salary_amount' =>
-            $this->salary_amount,
+            floatval($this->salary_amount),
 
             'bonus_amount' =>
             floatval($this->bonus_amount),
 
-            'deduction_amount' =>  $this->deduction_amount,
+            'deduction_amount' =>  floatval($this->deduction_amount),
 
-            'final_amount' =>  $this->final_amount,
+            'final_amount' =>  floatval($this->final_amount),
 
             'status' =>  $this->status,
 

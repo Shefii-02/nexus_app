@@ -3,6 +3,7 @@
 namespace App\Services\Auth;
 
 use App\Models\OtpVerification;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -18,53 +19,99 @@ class OtpService
     }
 
     // ─── Generate & Send OTP ────────────────────────────────────────────────
+    // public function sendOtp(string $phone, string $deviceId): array
+    // {
+
+
+    //  // Dummy account for app store review / testing
+    //     if ($phone === env('dummyNumber','+91 9846366783')) {
+    //         return ['success' => true, 'message' => 'OTP sent successfully'];
+    //     }
+
+
+    //     // Check for an existing unused OTP
+    //     $existing = OtpVerification::where('phone', $phone)
+    //         ->where('is_used', false)
+    //         ->latest()
+    //         ->first();
+
+    //     if ($existing) {
+    //         // Resend the same OTP, just refresh expiry
+    //         $existing->update(['expires_at' => now()->addMinutes(15)]);
+    //         $otp = $existing->otp_code;
+    //     } else {
+    //         // Invalidate any old used OTPs and generate a fresh one
+    //         OtpVerification::where('phone', $phone)
+    //             ->update(['is_used' => true]);
+
+    //         $otp = str_pad(random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+
+    //         OtpVerification::create([
+    //             'phone'      => $phone,
+    //             'otp_code'   => $otp,
+    //             'device_id'  => $deviceId,
+    //             'type'       => 'phone',
+    //             'is_used'    => false,
+    //             'expires_at' => now()->addMinutes(15),
+    //         ]);
+    //     }
+
+    //     if (config('services.otp_service')) {
+    //         // Send via WhatsApp
+    //         $sent = $this->sendWhatsAppOtp($phone, $otp);
+
+    //         if (!$sent) {
+    //             return ['success' => false, 'message' => 'Failed to send OTP via WhatsApp'];
+    //         }
+    //     }
+
+    //     return ['success' => true, 'message' => 'OTP sent successfully'];
+    // }
     public function sendOtp(string $phone, string $deviceId): array
     {
-
-
-     // Dummy account for app store review / testing
-        if ($phone === env('dummyNumber','+91 9846366783')) {
+        if ($phone === env('dummyNumber', '+91 9846366783')) {
             return ['success' => true, 'message' => 'OTP sent successfully'];
         }
 
+        return DB::transaction(function () use ($phone, $deviceId) {
+            // Lock any existing rows for this phone so a concurrent request
+            // has to wait here instead of racing past this check.
+            $existing = OtpVerification::where('phone', $phone)
+                ->where('is_used', false)
+                ->latest()
+                ->lockForUpdate()
+                ->first();
 
-        // Check for an existing unused OTP
-        $existing = OtpVerification::where('phone', $phone)
-            ->where('is_used', false)
-            ->latest()
-            ->first();
+            if ($existing) {
+                $existing->update(['expires_at' => now()->addMinutes(15)]);
+                $otp = $existing->otp_code;
+            } else {
+                OtpVerification::where('phone', $phone)
+                    ->where('is_used', false)
+                    ->update(['is_used' => true]);
 
-        if ($existing) {
-            // Resend the same OTP, just refresh expiry
-            $existing->update(['expires_at' => now()->addMinutes(15)]);
-            $otp = $existing->otp_code;
-        } else {
-            // Invalidate any old used OTPs and generate a fresh one
-            OtpVerification::where('phone', $phone)
-                ->update(['is_used' => true]);
+                $otp = str_pad(random_int(0, 9999), 4, '0', STR_PAD_LEFT);
 
-            $otp = str_pad(random_int(0, 9999), 4, '0', STR_PAD_LEFT);
-
-            OtpVerification::create([
-                'phone'      => $phone,
-                'otp_code'   => $otp,
-                'device_id'  => $deviceId,
-                'type'       => 'phone',
-                'is_used'    => false,
-                'expires_at' => now()->addMinutes(15),
-            ]);
-        }
-
-        if (config('services.otp_service')) {
-            // Send via WhatsApp
-            $sent = $this->sendWhatsAppOtp($phone, $otp);
-
-            if (!$sent) {
-                return ['success' => false, 'message' => 'Failed to send OTP via WhatsApp'];
+                OtpVerification::create([
+                    'phone'      => $phone,
+                    'otp_code'   => $otp,
+                    'device_id'  => $deviceId,
+                    'type'       => 'phone',
+                    'is_used'    => false,
+                    'expires_at' => now()->addMinutes(15),
+                ]);
             }
-        }
 
-        return ['success' => true, 'message' => 'OTP sent successfully'];
+            if (config('services.otp_service')) {
+                $sent = $this->sendWhatsAppOtp($phone, $otp);
+                if (!$sent) {
+                    // Roll back the transaction so no orphan OTP row is left behind
+                    throw new \RuntimeException('Failed to send OTP via WhatsApp');
+                }
+            }
+
+            return ['success' => true, 'message' => 'OTP sent successfully'];
+        });
     }
 
     // ─── Verify OTP ─────────────────────────────────────────────────────────

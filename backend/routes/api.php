@@ -14,6 +14,7 @@ use App\Http\Controllers\API\Admin\CourseController;
 use App\Http\Controllers\API\Admin\CourseClassController;
 use App\Http\Controllers\API\Admin\PaymentController;
 use App\Http\Controllers\API\Admin\AnnouncementController;
+use App\Http\Controllers\API\Admin\AppAnnouncementController;
 use App\Http\Controllers\API\Admin\BroadcastCallController;
 use App\Http\Controllers\API\Admin\CallController;
 use App\Http\Controllers\API\Admin\ConversationController;

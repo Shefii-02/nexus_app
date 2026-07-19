@@ -15,25 +15,34 @@ class AdmissionStudentResource extends JsonResource
             'student_id' => $this->student_id,
 
             'student_name' =>
-                $this->student?->name,
+            $this->student?->name,
+            'student' => $this->whenLoaded(
+                'student',
+                fn() => [
+                    'id' => $this->student?->id,
+                    'name' => $this->student?->name,
+                    'email' => $this->student?->email,
+                    'phone' => $this->student?->phone,
+                ]
+            ),
 
             'phone' =>
-                $this->student?->phone,
+            $this->student?->phone,
 
             'course_id' =>
-                $this->course_id,
+            $this->course_id,
 
             'course_name' =>
-                $this->course?->name,
+            $this->course?->name,
 
             'admission_date' =>
-                $this->admission_date,
+            $this->admission_date,
 
             'expiry_date' =>
-                $this->expiry_date,
+            $this->expiry_date,
 
             'status' =>
-                $this->status,
+            $this->status,
         ];
     }
 }

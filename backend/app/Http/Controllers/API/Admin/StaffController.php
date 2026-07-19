@@ -162,7 +162,7 @@ class StaffController extends Controller
         }
     }
 
-    public function permissionUpdate(Request $request, User $user)
+    public function permissionUpdate(Request $request,$user)
     {
         $validated = $request->validate([
             'permissions' => ['required', 'array'],
@@ -172,7 +172,7 @@ class StaffController extends Controller
         $rows = collect($validated['permissions'])
             ->only(UserAppPermission::KEYS)
             ->map(fn($granted, $key) => [
-                'user_id' => $user->id,
+                'user_id' => $user,
                 'permission_key' => $key,
                 'granted' => (bool) $granted,
                 'updated_at' => now(),

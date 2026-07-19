@@ -23,7 +23,7 @@ class TeacherPaymentResource extends JsonResource
             'payment_date'     => $this->payment_date?->toDateString(),
             'remarks'          => $this->remarks,
             'status'           => $this->status, // pending | released
-            'paid_at'          => $this->paid_at?->toISOString(),
+            'paid_at'          => $this->paid_at?->toIso8601String(true),
             'released_by_name' => $this->whenLoaded('releasedBy', fn() => $this->releasedBy?->name),
             'created_by_name'  => $this->whenLoaded('createdBy', fn() => $this->createdBy?->name),
             'items'            => TeacherPaymentItemResource::collection(

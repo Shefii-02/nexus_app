@@ -19,9 +19,9 @@ class AdmissionPaymentResource extends JsonResource
             'payment_method' => $this->payment_method,
             'transaction_no' => $this->transaction_no,
             'remarks'        => $this->remarks,
-            'paid_at'        => $this->paid_at?->toISOString(),
+            'paid_at'        => $this->paid_at?->toIso8601String(true),
             'received_by'    => $this->whenLoaded('receivedBy', fn() => $this->receivedBy?->name),
-            'created_at'     => $this->created_at?->toISOString(),
+            'created_at'     => $this->created_at?->toIso8601String(true),
         ];
     }
 }

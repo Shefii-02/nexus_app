@@ -24,8 +24,8 @@ class ConversationResource extends JsonResource
             'module_id'     => $this->module_id,
             'status'        => $this->status,
             'created_by'    => $this->created_by,
-            'created_at'    => $this->created_at->toISOString(),
-            'updated_at'    => $this->updated_at->toISOString(),
+            'created_at'    => $this->created_at->toIso8601String(true),
+            'updated_at'    => $this->updated_at->toIso8601String(true),
             // 'reply_permission' => $this->canUserSend($user) ?? 0,
 
             // Participant-specific
@@ -54,7 +54,7 @@ class ConversationResource extends JsonResource
                     'status'      => $p->status,
                     'is_muted'    => $p->is_muted,
                     'is_pinned'   => $p->is_pinned,
-                    'last_read_at' => $p->last_read_at?->toISOString(),
+                    'last_read_at' => $p->last_read_at?->toIso8601String(true),
                     'user'        => $p->user ? [
                         'id'     => $p->user->id,
                         'name'   => $p->user->name,

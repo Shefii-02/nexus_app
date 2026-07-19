@@ -19,10 +19,10 @@ class AdmissionRenewalResource extends JsonResource
             'amount'              => (float) $this->amount,
             'discount_amount'     => (float) $this->discount_amount,
             'final_amount'        => (float) $this->final_amount,
-            'paid_at'             => $this->paid_at?->toISOString(),
+            'paid_at'             => $this->paid_at?->toIso8601String(true),
             'status'              => $this->status, // pending | paid | expired
             'remarks'             => $this->remarks,
-            'created_at'          => $this->created_at?->toISOString(),
+            'created_at'          => $this->created_at?->toIso8601String(true),
         ];
     }
 }

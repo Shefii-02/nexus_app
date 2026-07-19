@@ -31,7 +31,7 @@ class PollClosed implements ShouldBroadcast
         return [
             'poll_id'   => $this->pollId,
             'is_closed' => true,
-            'closed_at' => now()->toISOString(),
+            'closed_at' => now()->toIso8601String(true),
         ];
     }
 }

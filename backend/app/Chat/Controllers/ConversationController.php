@@ -614,7 +614,7 @@ class ConversationController extends Controller
     //         'file_name'   => $m->file_name,
     //         'file_ext'    => $m->file_ext,
     //         'file_size'   => $m->file_size,
-    //         'sent_at'     => $m->created_at?->toISOString(),
+    //         'sent_at'     => $m->created_at?->toIso8601String(true),
     //     ]);
 
     //     return response()->json(['data' => $items]);

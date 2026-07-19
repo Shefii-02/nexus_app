@@ -89,7 +89,7 @@ class MessageResource extends JsonResource
                     'type'            => $this->replyTo?->type,
                     'media_url'       => $this->replyTo?->media_url,
                     'is_deleted'      => $this->replyTo?->is_deleted,
-                    'created_at'      => $this->replyTo?->created_at?->toISOString(),
+                    'created_at'      => $this->replyTo?->created_at?->toIso8601String(true),
                     'sender'          => $this->replyTo?->sender ? [
                         'id'   => $this->replyTo?->sender->id,
                         'name' => $this->replyTo?->sender->name,
@@ -123,7 +123,7 @@ class MessageResource extends JsonResource
                     'allow_multiple_votes'  => $this->poll->allow_multiple_votes,
                     'is_closed'             => $this->poll->is_closed
                         || ($this->poll->closes_at && $this->poll->closes_at->isPast()),
-                    'closes_at'             => $this->poll->closes_at?->toISOString(),
+                    'closes_at'             => $this->poll->closes_at?->toIso8601String(true),
                     'total_voters'          => $this->poll->total_voters ?? 0,
                     'options'               => $this->poll->options->map(fn($opt) => [
                         'id'         => $opt->id,
@@ -136,10 +136,10 @@ class MessageResource extends JsonResource
                 ];
             }),
             'created_at' =>
-            $this->created_at?->toISOString(),
+            $this->created_at?->toIso8601String(true),
 
             'updated_at' =>
-            $this->updated_at?->toISOString(),
+            $this->updated_at?->toIso8601String(true),
         ];
     }
 }
@@ -180,7 +180,7 @@ class MessageResource extends JsonResource
 //                     'type'            => $this->replyTo->type,
 //                     'media_url'       => $this->replyTo->media_url,
 //                     'is_deleted'      => $this->replyTo->is_deleted,
-//                     'created_at'      => $this->replyTo->created_at?->toISOString(),
+//                     'created_at'      => $this->replyTo->created_at?->toIso8601String(true),
 //                     'sender'          => $this->replyTo->sender ? [
 //                         'id'   => $this->replyTo->sender->id,
 //                         'name' => $this->replyTo->sender->name,
@@ -208,8 +208,8 @@ class MessageResource extends JsonResource
 //                     'read_at' => $r->read_at,
 //                 ])
 //             ),
-//             'created_at'      => $this->created_at->toISOString(),
-//             'updated_at'      => $this->updated_at->toISOString(),
+//             'created_at'      => $this->created_at->toIso8601String(true),
+//             'updated_at'      => $this->updated_at->toIso8601String(true),
 //         ];
 //     }
 // }

@@ -40,7 +40,7 @@ class StaffPaymentResource extends JsonResource
             'deduction_reason' => $this->deduction_reason,
             'final_amount'     => (float) $this->final_amount,
             'status'           => $this->status, // pending | paid
-            'paid_at'          => $this->paid_at?->toISOString(),
+            'paid_at'          => $this->paid_at?->toIso8601String(true),
             'payment_method'   => $this->payment_method,
             'transaction_no'   => $this->transaction_no,
             'payment_date'     => $this->payment_date?->toDateString(),

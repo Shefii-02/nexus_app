@@ -56,7 +56,7 @@ class MessageSent implements ShouldBroadcast
             //     'is_edited'       => $this->message->is_edited,
             //     'is_pinned'       => $this->message->is_pinned,
             //     'reactions'       => $this->message->reactions,
-            //     'created_at'      => $this->message->created_at->toISOString(),
+            //     'created_at'      => $this->message->created_at->toIso8601String(true),
             // ],
         ];
     }

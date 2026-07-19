@@ -52,6 +52,41 @@ class StaffController extends Controller
             $dto = StaffDTO::fromArray($request->validated());
             $staff = $this->staffService->create($dto);
 
+            $validated = $request->validate([
+                'permissions' => ['nullable', 'array'],
+                'permissions.*' => ['boolean'],
+            ]);
+
+            if (!empty($validated['permissions'])) {
+                // NOTE: confirm this matches your schema.
+                // permissionUpdate() below keys permissions to the User's id
+                // ($user->id), so this uses $staff->user_id to stay consistent
+                // (assumes $staffService->create() returns a Staff model with
+                // a user_id FK, per the $staff->load('user') call further down).
+                // If create() instead returns the User model directly, change
+                // this to $staff->id.
+                $rows = collect($validated['permissions'])
+                    ->only(UserAppPermission::KEYS)
+                    ->map(fn($granted, $key) => [
+                        'user_id' => $staff->user_id,
+                        'permission_key' => $key,
+                        'granted' => (bool) $granted,
+                        'updated_at' => now(),
+                        'created_at' => now(),
+                    ])
+                    ->values()
+                    ->all();
+
+                DB::transaction(function () use ($rows) {
+                    foreach ($rows as $row) {
+                        UserAppPermission::updateOrCreate(
+                            ['user_id' => $row['user_id'], 'permission_key' => $row['permission_key']],
+                            ['granted' => $row['granted']],
+                        );
+                    }
+                });
+            }
+
             return $this->successResponse(
                 StaffResource::make($staff->load('user')),
                 'Staff created successfully',
@@ -78,6 +113,34 @@ class StaffController extends Controller
             $this->staffService->update($staff, $dto);
             $updated = $this->staffService->findWithRelations($staff, ['staff']);
 
+            $validated = $request->validate([
+                'permissions' => ['nullable', 'array'],
+                'permissions.*' => ['boolean'],
+            ]);
+
+            if (!empty($validated['permissions'])) {
+                $rows = collect($validated['permissions'])
+                    ->only(UserAppPermission::KEYS)
+                    ->map(fn($granted, $key) => [
+                        'user_id' => $staff, // here $staff is the int route param, so this is already correct
+                        'permission_key' => $key,
+                        'granted' => (bool) $granted,
+                        'updated_at' => now(),
+                        'created_at' => now(),
+                    ])
+                    ->values()
+                    ->all();
+
+                DB::transaction(function () use ($rows) {
+                    foreach ($rows as $row) {
+                        UserAppPermission::updateOrCreate(
+                            ['user_id' => $row['user_id'], 'permission_key' => $row['permission_key']],
+                            ['granted' => $row['granted']],
+                        );
+                    }
+                });
+            }
+
             return $this->successResponse(StaffResource::make($updated), 'Staff updated successfully');
         } catch (\Exception $e) {
             return $this->errorResponse('Failed to update staff', ['error' => $e->getMessage()], 500);
@@ -98,7 +161,6 @@ class StaffController extends Controller
             return $this->errorResponse('Failed to delete staff', ['error' => $e->getMessage()], 500);
         }
     }
-
 
     public function permissionUpdate(Request $request, User $user)
     {

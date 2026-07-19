@@ -17,6 +17,7 @@ extends JsonResource
                 'id'    => $this->staff->id,
                 'name'  => $this->staff->name,
                 'email' => $this->staff->email,
+                'avatar'=>$this->staff->avatar_url,
             ]),
 
             'salary_month' =>

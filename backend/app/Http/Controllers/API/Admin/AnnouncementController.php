@@ -79,29 +79,23 @@ class AnnouncementController extends Controller
     {
         $data = $request->validated();
 
-
         $current = $this->service->find($id);
 
-
-
         if ($request->hasFile('thumbnail')) {
-            $current = $this->service->find($id);
             // 1. delete old media
-            if ($current->thumbnail && is_int($current->thumbnail)) {
-                $this->mediaService->delete($current->thumbnail);
+            if ($current->image && is_int($current->image)) {
+                $this->mediaService->delete($current->image);
             }
             $media = $this->mediaService->upload($request->file('thumbnail'), auth()->id(), 'announcements');
-            $data['thumbnail'] = $media->id;
+            $data['image'] = $media->id;
         }
-
 
         $dto = AnnouncementDTO::fromArray(array_merge(
             $current->toArray(),
             $data
         ));
 
-        // $dto = AnnouncementDTO::fromArray(array_merge($request->validated(), $data));
-
+        $announcement = $this->service->update($id, $dto);
 
         // Fetch the users this announcement targets
         $targetUserIds = AnnouncementUser::where('announcement_id', $id)
@@ -110,16 +104,15 @@ class AnnouncementController extends Controller
 
         if (!empty($targetUserIds) && $request->status == 'published') {
             (new FcmNotificationService())->sendAnnouncement($targetUserIds, [
-                'title'           => $request->title,
+                'title'           => $announcement->title,
                 'body'            => \Illuminate\Support\Str::limit(strip_tags($announcement->content ?? ''), 100),
                 'announcement_id' => $id,
                 'course_name'     => '',
             ]);
         }
 
-
         return response()->json([
-            'data' => $this->service->update($id, $dto)
+            'data' => $announcement
         ]);
     }
 

@@ -26,7 +26,7 @@ extends JsonResource
             $this->salary_amount,
 
             'bonus_amount' =>
-            $this->bonus_amount,
+            intval($this->bonus_amount),
 
             'deduction_amount' =>  $this->deduction_amount,
 

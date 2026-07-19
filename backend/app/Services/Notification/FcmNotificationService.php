@@ -174,7 +174,8 @@ class FcmNotificationService
 
     /**
      * Send to multiple users. Loads all platforms in one query,
-     * then dispatches FCM/VoIP per device.
+     * then dispatches FCM per device. Dead/invalid tokens are cleared
+     * automatically when FCM reports them as unregistered.
      */
     private function toUsers(array $userIds, array $notification, array $data): void
     {
@@ -185,18 +186,14 @@ class FcmNotificationService
             ->get();
 
         foreach ($platforms as $platform) {
+            if (!$platform->fcm_token) {
+                continue;
+            }
+
             try {
-                if ($platform->platform === 'ios') {
-                    // For non-call notifications on iOS, use FCM APNs (not VoIP).
-                    // VoIP is reserved for incoming-call pushes only.
-                    if ($platform->fcm_token) {
-                        $this->dispatchFcm($platform->fcm_token, $notification, $data);
-                    }
-                } else {
-                    if ($platform->fcm_token) {
-                        $this->dispatchFcm($platform->fcm_token, $notification, $data);
-                    }
-                }
+                // Note: VoIP push is reserved for incoming-call pushes only.
+                // All other notification types (iOS included) go through FCM/APNs.
+                $this->dispatchFcm($platform, $notification, $data);
             } catch (\Throwable $e) {
                 Log::error('FcmNotificationService: dispatch failed', [
                     'user_id'  => $platform->user_id,
@@ -209,13 +206,18 @@ class FcmNotificationService
     }
 
     /**
-     * Build and POST one FCM v1 message.
+     * Build and POST one FCM v1 message for a given device/platform row.
+     *
+     * If FCM reports the token as invalid/unregistered (404, or an
+     * UNREGISTERED / NOT_FOUND / INVALID_ARGUMENT error status), the
+     * token is cleared from the DB so future sends skip that device.
      *
      * $notification = ['title' => '...', 'body' => '...']
      * $data         = ['type' => '...', ...string values...]
      */
-    private function dispatchFcm(string $token, array $notification, array $data): void
+    private function dispatchFcm(UserPlatform $platform, array $notification, array $data): void
     {
+        $token      = $platform->fcm_token;
         $stringData = array_map('strval', $data);
 
         $payload = [
@@ -250,21 +252,60 @@ class FcmNotificationService
             ],
         ];
 
-        $response = $this->client->post(
-            'https://fcm.googleapis.com/v1/projects/' . $this->projectId() . '/messages:send',
-            [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->accessToken(),
-                    'Content-Type'  => 'application/json',
-                ],
-                'json' => $payload,
-            ]
-        );
+        try {
+            $response = $this->client->post(
+                'https://fcm.googleapis.com/v1/projects/' . $this->projectId() . '/messages:send',
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->accessToken(),
+                        'Content-Type'  => 'application/json',
+                    ],
+                    'json' => $payload,
+                ]
+            );
 
-        Log::info('FcmNotificationService: sent', [
-            'type'   => $data['type'] ?? '?',
-            'status' => $response->getStatusCode(),
-        ]);
+            Log::info('FcmNotificationService: sent', [
+                'type'   => $data['type'] ?? '?',
+                'status' => $response->getStatusCode(),
+            ]);
+        } catch (RequestException $e) {
+            if ($this->isInvalidTokenError($e)) {
+                $platform->fcm_token = null;
+                $platform->save();
+
+                Log::warning('FcmNotificationService: invalid token cleared', [
+                    'user_id'  => $platform->user_id,
+                    'platform' => $platform->platform,
+                    'type'     => $data['type'] ?? 'unknown',
+                ]);
+                return;
+            }
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Determine whether an FCM error response indicates the token
+     * is dead/invalid and should be removed from the DB, as opposed
+     * to a transient failure (rate limit, server error, etc.).
+     */
+    private function isInvalidTokenError(RequestException $e): bool
+    {
+        $response = $e->getResponse();
+        if (!$response) {
+            return false;
+        }
+
+        if ($response->getStatusCode() === 404) {
+            return true;
+        }
+
+        $body = json_decode((string) $response->getBody(), true);
+        $errorStatus = $body['error']['status'] ?? null;
+
+        // FCM v1 uses these statuses when the token is no longer valid.
+        return in_array($errorStatus, ['UNREGISTERED', 'NOT_FOUND', 'INVALID_ARGUMENT'], true);
     }
 
     /**

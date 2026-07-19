@@ -8,16 +8,18 @@ use App\Http\Controllers\API\ApiResponse;
 use App\Http\Requests\StoreStaffRequest;
 use App\Http\Requests\UpdateStaffRequest;
 use App\Http\Resources\StaffResource;
+use App\Models\User;
+use App\Models\UserAppPermission;
 use App\Services\Staff\StaffService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class StaffController extends Controller
 {
     use ApiResponse;
 
-    public function __construct(private StaffService $staffService)
-    {
-    }
+    public function __construct(private StaffService $staffService) {}
 
     public function index(): JsonResponse
     {
@@ -27,7 +29,7 @@ class StaffController extends Controller
 
         $staff = $this->staffService->list($page, $perPage, $filters);
 
-         return $this->paginatedResponse(
+        return $this->paginatedResponse(
             StaffResource::collection($staff),
             'Staff retrieved successfully'
         );
@@ -95,5 +97,41 @@ class StaffController extends Controller
         } catch (\Exception $e) {
             return $this->errorResponse('Failed to delete staff', ['error' => $e->getMessage()], 500);
         }
+    }
+
+
+    public function permissionUpdate(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'permissions' => ['required', 'array'],
+            'permissions.*' => ['boolean'],
+        ]);
+
+        $rows = collect($validated['permissions'])
+            ->only(UserAppPermission::KEYS)
+            ->map(fn($granted, $key) => [
+                'user_id' => $user->id,
+                'permission_key' => $key,
+                'granted' => (bool) $granted,
+                'updated_at' => now(),
+                'created_at' => now(),
+            ])
+            ->values()
+            ->all();
+
+        DB::transaction(function () use ($rows) {
+            foreach ($rows as $row) {
+                UserAppPermission::updateOrCreate(
+                    ['user_id' => $row['user_id'], 'permission_key' => $row['permission_key']],
+                    ['granted' => $row['granted']],
+                );
+            }
+        });
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Permissions updated successfully',
+            'data' => $user->fresh()->permissions_map,
+        ]);
     }
 }

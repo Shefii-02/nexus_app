@@ -121,7 +121,7 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsTo(MediaFile::class, 'avatar');
     }
 
-      public function avatar()
+    public function avatar()
     {
         return $this->belongsTo(MediaFile::class, 'avatar');
     }
@@ -130,5 +130,31 @@ class User extends Authenticatable implements JWTSubject
     public function getAvatarUrlAttribute()
     {
         return $this->media  ? asset('storage/' . $this->media?->file_path) : 'https://ui-avatars.com/api/?name=' . urlencode($this->name);
+    }
+
+
+    /**
+     * All permission rows (one per key) belonging to this user.
+     */
+    public function appPermissions(): HasMany
+    {
+        return $this->hasMany(UserAppPermission::class);
+    }
+
+    /**
+     * Convenience accessor returning a flat ['course_manage' => true, ...] map
+     * with every key from UserAppPermission::KEYS present (defaults to false),
+     * matching the shape the Flutter app's Staff.fromJson() expects.
+     */
+    public function getPermissionsMapAttribute(): array
+    {
+        $granted = $this->appPermissions()
+            ->where('granted', true)
+            ->pluck('permission_key')
+            ->all();
+
+        return collect(\App\Models\UserAppPermission::KEYS)
+            ->mapWithKeys(fn($key) => [$key => in_array($key, $granted, true)])
+            ->all();
     }
 }

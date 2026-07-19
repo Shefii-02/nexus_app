@@ -18,7 +18,7 @@ class StaffResource extends JsonResource
             'address' => $this->staff?->address,
             'status'  => $this->status ?? $this->status,
             'avatar' => $this->avatar_url,
-            'permissions' => [],
+            'permissions' => $this->appPermissions,
             'user' => [
                 'id' => $this->id,
                 'name' => $this->name,

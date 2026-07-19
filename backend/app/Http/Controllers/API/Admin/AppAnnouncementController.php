@@ -15,7 +15,7 @@ use App\Services\Notification\FcmNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
-class AnnouncementController extends Controller
+class AppAnnouncementController extends Controller
 {
     use ApiResponse;
 
@@ -61,9 +61,14 @@ class AnnouncementController extends Controller
 
     public function index(Request $request)
     {
-        $filter = $request->all();
+        $filters[] = $request->all();
+
+        $filters = [
+            'status' => 'published',
+        ];
+
         return AnnouncementResource::collection(
-            $this->service->forAll($filter)
+            $this->service->forAll($filters)
         );
     }
 
@@ -79,8 +84,6 @@ class AnnouncementController extends Controller
     {
         $data = $request->validated();
 
-        Log::info( $data );
-
         if ($request->hasFile('thumbnail')) {
             $current = $this->service->find($id);
             // 1. delete old media
@@ -88,11 +91,11 @@ class AnnouncementController extends Controller
                 $this->mediaService->delete($current->thumbnail);
             }
             $media = $this->mediaService->upload($request->file('thumbnail'), auth()->id(), 'announcements');
+
+
             $data['thumbnail'] = $media->id;
         }
 
-
-        dd($data['thumbnail'] );
         $dto = AnnouncementDTO::fromArray($request->validated());
 
         return response()->json([

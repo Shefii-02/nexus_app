@@ -151,6 +151,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::apiResource('students', StudentController::class);
 
     // Staff Management
+
+    Route::post('staff/{id}/permission-update', [StaffController::class, 'permissionUpdate']);
     Route::apiResource('staff', StaffController::class);
 
     Route::apiResource('roles', RoleController::class);
@@ -518,6 +520,7 @@ Route::middleware(['auth:api'])->group(function () {
 
 
     // Announcement Management
+      Route::apiResource('app/announcements', AppAnnouncementController::class);
     Route::apiResource('announcements', AnnouncementController::class);
     Route::get('announcements/published', [AnnouncementController::class, 'published']);
     Route::post('announcements/{announcement}/publish', [AnnouncementController::class, 'publish']);

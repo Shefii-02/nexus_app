@@ -92,7 +92,7 @@ class AnnouncementController extends Controller
         }
 
 
-        dd($data['thumbnail'] );
+        dd($data );
         $dto = AnnouncementDTO::fromArray($request->validated());
 
         return response()->json([

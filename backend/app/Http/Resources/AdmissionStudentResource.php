@@ -23,6 +23,7 @@ class AdmissionStudentResource extends JsonResource
                     'name' => $this->student?->name,
                     'email' => $this->student?->email,
                     'phone' => $this->student?->phone,
+                    'avatar'=>$this->student?->avatar_url,
                 ]
             ),
 

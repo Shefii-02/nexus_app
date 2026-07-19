@@ -190,10 +190,12 @@ class StaffController extends Controller
             }
         });
 
+        $user = User::where('id',$user)->first();
+
         return response()->json([
             'status' => true,
             'message' => 'Permissions updated successfully',
-            'data' => $user->permissions,
+            'data' => $user->permissions_map,
         ]);
     }
 }

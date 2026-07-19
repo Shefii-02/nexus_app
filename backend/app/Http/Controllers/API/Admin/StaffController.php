@@ -193,7 +193,7 @@ class StaffController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Permissions updated successfully',
-            'data' => $user->fresh()->permissions_map,
+            'data' => $user->permissions_map,
         ]);
     }
 }

@@ -92,7 +92,6 @@ class AnnouncementController extends Controller
         }
 
 
-        dd($data );
         $dto = AnnouncementDTO::fromArray($request->validated());
 
         return response()->json([

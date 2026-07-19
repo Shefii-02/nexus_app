@@ -43,7 +43,7 @@ class AnnouncementController extends Controller
             ->pluck('user_id')
             ->all();
 
-        if (!empty($targetUserIds)) {
+        if (!empty($targetUserIds) && $request->status == 'published') {
             (new FcmNotificationService())->sendAnnouncement($targetUserIds, [
                 'title'           => $announcement->title,
                 'body'            => \Illuminate\Support\Str::limit(strip_tags($announcement->content ?? ''), 100),
@@ -79,7 +79,10 @@ class AnnouncementController extends Controller
     {
         $data = $request->validated();
 
-        Log::info( $data );
+
+        $current = $this->service->find($id);
+
+
 
         if ($request->hasFile('thumbnail')) {
             $current = $this->service->find($id);
@@ -92,7 +95,28 @@ class AnnouncementController extends Controller
         }
 
 
-        $dto = AnnouncementDTO::fromArray($request->validated());
+        $dto = AnnouncementDTO::fromArray(array_merge(
+            $current->toArray(),
+            $data
+        ));
+
+        // $dto = AnnouncementDTO::fromArray(array_merge($request->validated(), $data));
+
+
+        // Fetch the users this announcement targets
+        $targetUserIds = AnnouncementUser::where('announcement_id', $id)
+            ->pluck('user_id')
+            ->all();
+
+        if (!empty($targetUserIds) && $request->status == 'published') {
+            (new FcmNotificationService())->sendAnnouncement($targetUserIds, [
+                'title'           => $request->title,
+                'body'            => \Illuminate\Support\Str::limit(strip_tags($announcement->content ?? ''), 100),
+                'announcement_id' => $id,
+                'course_name'     => '',
+            ]);
+        }
+
 
         return response()->json([
             'data' => $this->service->update($id, $dto)

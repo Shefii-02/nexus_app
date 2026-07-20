@@ -71,7 +71,7 @@ class TeacherController extends Controller
             $teacher = $this->teacherService->create($dto);
 
             return $this->successResponse(
-                TeacherResource::make($teacher->load('user')),
+                TeacherResource::make($teacher->load('teacher')),
                 'Teacher created successfully',
                 201
             );
@@ -99,7 +99,7 @@ class TeacherController extends Controller
             $updated = $this->teacherService->update($teacher, $dto);
 
             return $this->successResponse(
-                TeacherResource::make($updated->load('user')),
+                TeacherResource::make($updated->load('teacher')),
                 'Teacher updated successfully'
             );
         } catch (\Exception $e) {

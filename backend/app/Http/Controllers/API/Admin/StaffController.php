@@ -147,14 +147,20 @@ class StaffController extends Controller
         }
     }
 
-    public function destroy(int $staff): JsonResponse
+    public function destroy(Request $request, int $staff): JsonResponse
     {
         try {
             if (!$this->staffService->exists($staff)) {
                 return $this->errorResponse('Staff member not found', null, 404);
             }
+            $user = $request->user();
 
-            $this->staffService->delete($staff);
+            if ($user->acc_type === 'admin') {
+                $this->staffService->forceDelete($staff);
+            } else {
+                $this->staffService->delete($staff);
+            }
+            // $this->staffService->delete($staff);
 
             return $this->successResponse(null, 'Staff deleted successfully');
         } catch (\Exception $e) {
@@ -162,7 +168,7 @@ class StaffController extends Controller
         }
     }
 
-    public function permissionUpdate(Request $request,$user)
+    public function permissionUpdate(Request $request, $user)
     {
         $validated = $request->validate([
             'permissions' => ['required', 'array'],
@@ -190,7 +196,7 @@ class StaffController extends Controller
             }
         });
 
-        $user = User::where('id',$user)->first();
+        $user = User::where('id', $user)->first();
 
         return response()->json([
             'status' => true,

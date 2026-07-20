@@ -25,7 +25,7 @@ class StudentController extends Controller
         $perPage = $request->query('per_page', 15);
         // $filters = $request->query('filters', []);
 
-          $filters = [
+        $filters = [
             'search' => request('search'),
             'status' => request('status'),
             'acc_type' => 'student',
@@ -92,14 +92,21 @@ class StudentController extends Controller
         }
     }
 
-    public function destroy(int $student): JsonResponse
+    public function destroy(Request $request, int $student): JsonResponse
     {
         try {
             if (!$this->studentService->exists($student)) {
                 return $this->errorResponse('Student not found', null, 404);
             }
 
-            $this->studentService->delete($student);
+            $user = $request->user();
+
+            if ($user->acc_type === 'admin') {
+                $this->studentService->forceDelete($student);
+            } else {
+                $this->studentService->delete($student);
+            }
+            // $this->studentService->delete($student);
 
             return $this->successResponse(null, 'Student deleted successfully');
         } catch (\Exception $e) {

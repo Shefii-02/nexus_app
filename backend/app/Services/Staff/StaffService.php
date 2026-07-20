@@ -101,4 +101,9 @@ class StaffService extends BaseService
             return $this->repository->delete($id);
         });
     }
+
+    public function forceDelete(int $id): bool
+    {
+        return User::withTrashed()->findOrFail($id)->forceDelete(); // permanent delete
+    }
 }

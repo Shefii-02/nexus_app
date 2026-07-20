@@ -140,4 +140,9 @@ class TeacherService extends BaseService
             return true;
         });
     }
+
+     public function forceDelete(int $id): bool
+    {
+        return User::withTrashed()->findOrFail($id)->forceDelete(); // permanent delete
+    }
 }

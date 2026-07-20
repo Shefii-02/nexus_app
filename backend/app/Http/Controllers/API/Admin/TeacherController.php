@@ -10,6 +10,7 @@ use App\Http\Requests\UpdateTeacherRequest;
 use App\Http\Resources\TeacherResource;
 use App\Services\Teacher\TeacherService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class TeacherController extends Controller
@@ -115,14 +116,20 @@ class TeacherController extends Controller
     /**
      * Delete teacher
      */
-    public function destroy(int $teacher): JsonResponse
+    public function destroy(Request $request, int $teacher): JsonResponse
     {
         try {
             if (!$this->teacherService->exists($teacher)) {
                 return $this->errorResponse('Teacher not found', null, 404);
             }
+            $user = $request->user();
 
-            $this->teacherService->delete($teacher);
+            if ($user->acc_type === 'admin') {
+                $this->teacherService->forceDelete($teacher);
+            } else {
+                $this->teacherService->delete($teacher);
+            }
+            // $this->teacherService->delete($teacher);
 
             return $this->successResponse(null, 'Teacher deleted successfully');
         } catch (\Exception $e) {

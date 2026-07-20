@@ -384,6 +384,14 @@ class AuthController extends Controller
 
             $dummyName = 'User_' . substr($request->phone, -4);
             // Find or create user
+            // $user = User::firstOrCreate(
+            //     ['phone' => $request->phone],
+            //     [
+            //         'name'      => $dummyName,
+            //         'device_id' => $request->device_id,
+            //         'password'  => Hash::make(str()->random(16)),
+            //     ]
+            // );
             $user = User::firstOrCreate(
                 ['phone' => $request->phone],
                 [
@@ -392,6 +400,10 @@ class AuthController extends Controller
                     'password'  => Hash::make(str()->random(16)),
                 ]
             );
+
+            if ($user->wasRecentlyCreated) {
+                $user->refresh();
+            }
 
             // $user->update(['device_id' => $request->device_id]);
 

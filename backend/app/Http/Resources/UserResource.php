@@ -21,6 +21,7 @@ class UserResource extends JsonResource
             'roles' => $this->getRoleNames(),
             'permissions' => $this->getAllPermissions()->pluck('name'),
             'profile_complete' => !empty($this->email),
+            'app_permissions' => $this->permissions_map,
         ];
     }
 }

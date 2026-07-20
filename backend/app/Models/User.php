@@ -153,7 +153,7 @@ class User extends Authenticatable implements JWTSubject
             ->pluck('permission_key')
             ->all();
 
-        return collect(\App\Models\UserAppPermission::KEYS)
+        return collect(UserAppPermission::KEYS)
             ->mapWithKeys(fn($key) => [$key => in_array($key, $granted, true)])
             ->all();
     }

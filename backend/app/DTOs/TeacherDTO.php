@@ -27,7 +27,7 @@ class TeacherDTO
             phone: self::formatPhone($data['phone'] ?? ''),
             qualification: $data['qualification'] ?? "",
             subject: $data['subject'] ?? "",
-            experience_years: $data['experience_years'] ?? "",
+            experience_years: $data['experience_years'] ?? 0,
             address: $data['address'] ?? '',
             acc_type: 'teacher',
             status: $data['status'] ?? 'active',

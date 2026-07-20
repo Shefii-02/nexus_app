@@ -146,7 +146,11 @@ class AuthController extends Controller
 
             // Mark profile completed
             $data['profile_completed'] = 1;
-            $data['acc_type'] = $data['role'] == 'teacher' ? 'teacher' : 'student';
+            if ($user->acc_type == 'admin' || $user->acc_type == 'staff') {
+                $data['acc_type'] = $data['role'];
+            } else {
+                $data['acc_type'] = $data['role'] == 'teacher' ? 'teacher' : 'student';
+            }
             // Update user
             $user->update($data);
             $user->refresh();

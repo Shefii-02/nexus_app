@@ -250,7 +250,7 @@ class AuthController extends Controller
                 ) {
                     return [
                         'user_id' => $userId,
-                        'type' => 'new-account',
+                        'type' => 'new_account',
                         'title' => 'Created a new account',
                         'body' => "{$user->name} created a new account.",
                         'data' => json_encode([

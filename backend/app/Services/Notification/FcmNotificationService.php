@@ -184,17 +184,19 @@ class FcmNotificationService
         if (empty($userIds)) return;
 
 
-        $now = now();
-        AppNotification::insert(array_map(fn($userId) => [
-            'user_id'    => $userId,
-            'type'       => $data['type'] ?? 'custom',
-            'title'      => $notification['title'],
-            'body'       => $notification['body'],
-            'data'       => json_encode($data),
-            'read_at'    => null,
-            'created_at' => $now,
-            'updated_at' => $now,
-        ], $userIds));
+        if ($data['type'] != 'new_message') {
+            $now = now();
+            AppNotification::insert(array_map(fn($userId) => [
+                'user_id'    => $userId,
+                'type'       => $data['type'] ?? 'custom',
+                'title'      => $notification['title'],
+                'body'       => $notification['body'],
+                'data'       => json_encode($data),
+                'read_at'    => null,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ], $userIds));
+        }
 
         $platforms = UserPlatform::whereIn('user_id', $userIds)
             ->whereNull('deleted_at')

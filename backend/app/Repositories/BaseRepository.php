@@ -33,7 +33,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
     public function all(array $filters = []): mixed
     {
         $query = $this->model->query();
-        return $this->applyFilters($query, $filters)->get();
+        return $this->applyFilters($query, $filters)->orderBy('id', 'desc')->get();
     }
 
     public function find(int $id): ?object

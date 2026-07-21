@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
+use App\Models\AppNotification;
 use App\Models\Conversation;
 use App\Models\ConversationParticipant;
 use App\Models\RefreshToken;
@@ -118,6 +119,8 @@ class AuthController extends Controller
 
             $user = $request->user();
 
+            $oldEmail = $user->email;
+
             $data = $request->only([
                 'name',
                 'email',
@@ -225,6 +228,46 @@ class AuthController extends Controller
                             'status'          => "active",
                         ]);
                     });
+                }
+            }
+
+
+            if (empty($oldEmail)) {
+
+                $now = now();
+
+                // Change this according to your notification requirement.
+                // Example: notify all active admins and staff.
+
+                $userIds = User::query()
+                    ->whereIn('acc_type', ['admin'])
+                    ->where('status', 1)
+                    ->pluck('id');
+
+                $notifications = $userIds->map(function ($userId) use (
+                    $user,
+                    $now
+                ) {
+                    return [
+                        'user_id' => $userId,
+                        'type' => 'new-account',
+                        'title' => 'Created a new account',
+                        'body' => "{$user->name} created a new account.",
+                        'data' => json_encode([
+                            'user_id' => $user->id,
+                            'name' => $user->name,
+                            'email' => $user->email,
+                            'acc_type' => $user->acc_type,
+                        ]),
+                        'section_id' => $user->id,
+                        'read_at' => null,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                })->toArray();
+
+                if (!empty($notifications)) {
+                    AppNotification::insert($notifications);
                 }
             }
 

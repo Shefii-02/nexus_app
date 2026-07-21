@@ -1,6 +1,8 @@
 <?php
+
 namespace App\Services\Notification;
 
+use App\Models\AppNotification;
 use App\Models\UserPlatform;
 use Google\Auth\Credentials\ServiceAccountCredentials;
 use GuzzleHttp\Client;
@@ -65,7 +67,7 @@ class FcmNotificationService
             'type'        => 'admission',
             'course_name' => $data['course_name'] ?? '',
             'status'      => $data['status'] ?? '',
-            'admission_id'=> (string) ($data['admission_id'] ?? ''),
+            'admission_id' => (string) ($data['admission_id'] ?? ''),
         ]);
     }
 
@@ -180,6 +182,19 @@ class FcmNotificationService
     private function toUsers(array $userIds, array $notification, array $data): void
     {
         if (empty($userIds)) return;
+
+
+        $now = now();
+        AppNotification::insert(array_map(fn($userId) => [
+            'user_id'    => $userId,
+            'type'       => $data['type'] ?? 'custom',
+            'title'      => $notification['title'],
+            'body'       => $notification['body'],
+            'data'       => json_encode($data),
+            'read_at'    => null,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ], $userIds));
 
         $platforms = UserPlatform::whereIn('user_id', $userIds)
             ->whereNull('deleted_at')

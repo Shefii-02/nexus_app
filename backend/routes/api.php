@@ -121,6 +121,13 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/device/register', [UserController::class, 'RegisterDevice']);
     Route::post('/visitor/store', [UserController::class, 'visitorStore']);
 
+    // routes/api.php
+    Route::prefix('notifications')->group(function () {
+        Route::get('/', [NotificationController::class, 'index']);
+        Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
+        Route::post('/{id}/read', [NotificationController::class, 'markRead']);
+        Route::post('/read-all', [NotificationController::class, 'markAllRead']);
+    });
 
     Route::post('/user/fcm-token', function (Request $request) {
         $request->validate(['fcm_token' => 'required|string', 'platform' => 'required|string']);
@@ -521,7 +528,7 @@ Route::middleware(['auth:api'])->group(function () {
 
 
     // Announcement Management
-      Route::apiResource('app/announcements', AppAnnouncementController::class);
+    Route::apiResource('app/announcements', AppAnnouncementController::class);
     Route::apiResource('announcements', AnnouncementController::class);
     Route::get('announcements/published', [AnnouncementController::class, 'published']);
     Route::post('announcements/{announcement}/publish', [AnnouncementController::class, 'publish']);

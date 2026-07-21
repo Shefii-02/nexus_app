@@ -15,6 +15,7 @@ use App\Http\Controllers\API\Admin\CourseClassController;
 use App\Http\Controllers\API\Admin\PaymentController;
 use App\Http\Controllers\API\Admin\AnnouncementController;
 use App\Http\Controllers\API\Admin\AppAnnouncementController;
+use App\Http\Controllers\API\Admin\AppNotificationController;
 use App\Http\Controllers\API\Admin\BroadcastCallController;
 use App\Http\Controllers\API\Admin\CallController;
 use App\Http\Controllers\API\Admin\ConversationController;
@@ -122,11 +123,11 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/visitor/store', [UserController::class, 'visitorStore']);
 
     // routes/api.php
-    Route::prefix('notifications')->group(function () {
-        Route::get('/', [NotificationController::class, 'index']);
-        Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
-        Route::post('/{id}/read', [NotificationController::class, 'markRead']);
-        Route::post('/read-all', [NotificationController::class, 'markAllRead']);
+    Route::prefix('app-notifications')->group(function () {
+        Route::get('/', [AppNotificationController::class, 'index']);
+        Route::get('/unread-count', [AppNotificationController::class, 'unreadCount']);
+        Route::post('/{id}/read', [AppNotificationController::class, 'markRead']);
+        Route::post('/read-all', [AppNotificationController::class, 'markAllRead']);
     });
 
     Route::post('/user/fcm-token', function (Request $request) {

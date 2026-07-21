@@ -21,6 +21,8 @@ class StudentResource extends JsonResource
             'avatar' => $this->avatar_url,
             'status'  => $this->status ?? $this->student->status,
 
+            'created_at'=> $this->created_at,
+            'last_active'=> $this->last_activation,
             'user' => [
                 'id' => $this->id,
                 'name' => $this->name,

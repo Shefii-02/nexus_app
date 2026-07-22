@@ -94,7 +94,7 @@ class StudentController extends Controller
 
     public function destroy(Request $request, int $student): JsonResponse
     {
-        Log::info($request->all());
+        Log::info($request->student);
         try {
             if (!$this->studentService->exists($student)) {
                 return $this->errorResponse('Student not found', null, 404);

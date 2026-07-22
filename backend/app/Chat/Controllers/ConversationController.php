@@ -26,7 +26,7 @@ class ConversationController extends Controller
         $user   = $request->user();
 
         $conversations = Conversation::with([
-            'participants.user:id,name,avatar',
+            'participants.user:id,name,avatar,acc_type',
             'messages' => fn($q) => $q->latest()->limit(1),
             'messages.sender:id,name',
         ])

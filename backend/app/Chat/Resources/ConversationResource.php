@@ -41,6 +41,7 @@ class ConversationResource extends JsonResource
                         'id'     => collect($this->participants)->firstWhere('user_id', '!=', $this->currentUserId ?? $request->user()?->id)->user->id,
                         'name'   => collect($this->participants)->firstWhere('user_id', '!=', $this->currentUserId ?? $request->user()?->id)->user->name,
                         'avatar' => collect($this->participants)->firstWhere('user_id', '!=', $this->currentUserId ?? $request->user()?->id)->user->avatar,
+                        'acc_type' => collect($this->participants)->firstWhere('user_id', '!=', $this->currentUserId ?? $request->user()?->id)->user->acc_type,
                     ] : null)
                 : null,
 

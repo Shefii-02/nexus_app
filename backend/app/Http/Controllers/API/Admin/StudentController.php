@@ -101,11 +101,11 @@ class StudentController extends Controller
 
             $user = $request->user();
 
-            if ($user->acc_type === 'admin') {
-                $this->studentService->forceDelete($student);
-            } else {
+            // if ($user->acc_type === 'admin') {
+            //     $this->studentService->forceDelete($student);
+            // } else {
                 $this->studentService->delete($student);
-            }
+            // }
             // $this->studentService->delete($student);
 
             return $this->successResponse(null, 'Student deleted successfully');

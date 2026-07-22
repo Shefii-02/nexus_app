@@ -83,7 +83,7 @@ class OtpService
                 ->first();
 
             if ($existing) {
-                $existing->update(['expires_at' => now()->addMinutes(15)]);
+                $existing->update(['expires_at' => now()->addMinutes(15), 'deviceId' => $deviceId]);
                 $otp = $existing->otp_code;
             } else {
                 OtpVerification::where('phone', $phone)

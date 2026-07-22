@@ -124,11 +124,11 @@ class TeacherController extends Controller
             }
             $user = $request->user();
 
-            if ($user->acc_type === 'admin') {
-                $this->teacherService->forceDelete($teacher);
-            } else {
+            // if ($user->acc_type === 'admin') {
+            //     $this->teacherService->forceDelete($teacher);
+            // } else {
                 $this->teacherService->delete($teacher);
-            }
+            // }
             // $this->teacherService->delete($teacher);
 
             return $this->successResponse(null, 'Teacher deleted successfully');

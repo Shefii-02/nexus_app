@@ -393,6 +393,33 @@ class AuthController extends Controller
         $phone    = $request->phone;     // e.g. 918086544828
         $deviceId = $request->device_id; // e.g. unique device fingerprint
 
+        /*
+    |--------------------------------------------------------------------------
+    | Find Soft Deleted User
+    |--------------------------------------------------------------------------
+    */
+
+        $user = User::withTrashed()
+            ->where('phone', $phone)
+            ->first();
+
+        /*
+    |--------------------------------------------------------------------------
+    | Restore Deleted User
+    |--------------------------------------------------------------------------
+    */
+
+        if ($user && $user->trashed()) {
+
+            $user->restore();
+
+            $user->update([
+                'acc_type' => null,
+                'email' => null,
+                'status' => 'active',
+            ]);
+        }
+
         $result = $this->otpService->sendOtp($phone, $deviceId);
 
         return response()->json($result, $result['success'] ? 200 : 500);

@@ -155,11 +155,11 @@ class StaffController extends Controller
             }
             $user = $request->user();
 
-            if ($user->acc_type === 'admin') {
-                $this->staffService->forceDelete($staff);
-            } else {
+            // if ($user->acc_type === 'admin') {
+            //     $this->staffService->forceDelete($staff);
+            // } else {
                 $this->staffService->delete($staff);
-            }
+            // }
             // $this->staffService->delete($staff);
 
             return $this->successResponse(null, 'Staff deleted successfully');

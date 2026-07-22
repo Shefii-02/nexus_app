@@ -10,7 +10,7 @@ class AnnouncementDTO
         public ?int $image,
         public string $title,
         public string $content,
-        public string $target_type,
+        public string $target_type = 'all_users',
         public array $user_ids = [],
         public array $role_ids = [],
         public array $batch_ids = [],

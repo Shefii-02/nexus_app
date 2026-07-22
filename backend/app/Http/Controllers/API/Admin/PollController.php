@@ -76,50 +76,184 @@ class PollController extends Controller
     }
 
     // ── Cast / change a vote ──────────────────────────────────────────────
+    // public function vote(Request $request, int $pollId)
+    // {
+    //     $poll = Poll::with('options')->findOrFail($pollId);
+    //     $user = $request->user();
+
+    //     $isMember = ConversationParticipant::where('conversation_id', $poll->conversation_id)
+    //         ->where('user_id', $user->id)
+    //         ->where('status', 'active')
+    //         ->exists();
+
+    //     if (!$isMember) {
+    //         return response()->json(['message' => 'Not a participant in this conversation.'], 403);
+    //     }
+
+    //     // Voting is allowed for everyone, same as reactions — no reply_permission check here
+    //     if ($poll->is_closed || ($poll->closes_at && $poll->closes_at->isPast())) {
+    //         return response()->json(['message' => 'This poll is closed.'], 422);
+    //     }
+
+    //     $validated = $request->validate([
+    //         'option_id' => 'required|integer|exists:poll_options,id',
+    //     ]);
+
+    //     $option = $poll->options->firstWhere('id', $validated['option_id']);
+    //     if (!$option) {
+    //         return response()->json(['message' => 'Option does not belong to this poll.'], 422);
+    //     }
+
+    //     DB::transaction(function () use ($poll, $option, $user) {
+    //         $existingVote = PollVote::where('poll_id', $poll->id)
+    //             ->where('poll_option_id', $option->id)
+    //             ->where('user_id', $user->id)
+    //             ->first();
+
+    //         if ($existingVote) {
+    //             // tapping the same option again removes the vote (toggle)
+    //             $existingVote->delete();
+    //             return;
+    //         }
+
+    //         if (!$poll->allow_multiple_votes) {
+    //             // single-choice poll — clear any other vote by this user first
+    //             PollVote::where('poll_id', $poll->id)->where('user_id', $user->id)->delete();
+    //         }
+
+    //         PollVote::create([
+    //             'poll_id'        => $poll->id,
+    //             'poll_option_id' => $option->id,
+    //             'user_id'        => $user->id,
+    //         ]);
+    //     });
+
+    //     // Only broadcast aggregate counts — never voter identities — since
+    //     // every participant (including students) shares this channel.
+    //     $tally = $this->aggregateTally($poll->fresh());
+
+    //     broadcast(new PollVoteCast($poll->conversation_id, $poll->id, $tally))->toOthers();
+
+    //     return response()->json(['tally' => $tally]);
+    // }
     public function vote(Request $request, int $pollId)
     {
         $poll = Poll::with('options')->findOrFail($pollId);
+
         $user = $request->user();
 
-        $isMember = ConversationParticipant::where('conversation_id', $poll->conversation_id)
+        /*
+    |--------------------------------------------------------------------------
+    | Check conversation membership
+    |--------------------------------------------------------------------------
+    */
+
+        $isMember = ConversationParticipant::query()
+            ->where('conversation_id', $poll->conversation_id)
             ->where('user_id', $user->id)
             ->where('status', 'active')
             ->exists();
 
         if (!$isMember) {
-            return response()->json(['message' => 'Not a participant in this conversation.'], 403);
+            return response()->json([
+                'message' => 'Not a participant in this conversation.',
+            ], 403);
         }
 
-        // Voting is allowed for everyone, same as reactions — no reply_permission check here
-        if ($poll->is_closed || ($poll->closes_at && $poll->closes_at->isPast())) {
-            return response()->json(['message' => 'This poll is closed.'], 422);
+        /*
+    |--------------------------------------------------------------------------
+    | Check poll status
+    |--------------------------------------------------------------------------
+    */
+
+        if (
+            $poll->is_closed ||
+            (
+                $poll->closes_at &&
+                $poll->closes_at->isPast()
+            )
+        ) {
+            return response()->json([
+                'message' => 'This poll is closed.',
+            ], 422);
         }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Validate option
+    |--------------------------------------------------------------------------
+    */
 
         $validated = $request->validate([
-            'option_id' => 'required|integer|exists:poll_options,id',
+            'option_id' => [
+                'required',
+                'integer',
+                'exists:poll_options,id',
+            ],
         ]);
 
-        $option = $poll->options->firstWhere('id', $validated['option_id']);
+        /*
+    |--------------------------------------------------------------------------
+    | Make sure option belongs to this poll
+    |--------------------------------------------------------------------------
+    */
+
+        $option = $poll->options
+            ->firstWhere('id', (int) $validated['option_id']);
+
         if (!$option) {
-            return response()->json(['message' => 'Option does not belong to this poll.'], 422);
+            return response()->json([
+                'message' => 'Option does not belong to this poll.',
+            ], 422);
         }
 
+        /*
+    |--------------------------------------------------------------------------
+    | Create / remove / change vote
+    |--------------------------------------------------------------------------
+    */
+
         DB::transaction(function () use ($poll, $option, $user) {
-            $existingVote = PollVote::where('poll_id', $poll->id)
+
+            /*
+        |--------------------------------------------------------------------------
+        | Same option clicked again = remove vote
+        |--------------------------------------------------------------------------
+        */
+
+            $existingVote = PollVote::query()
+                ->where('poll_id', $poll->id)
                 ->where('poll_option_id', $option->id)
                 ->where('user_id', $user->id)
                 ->first();
 
             if ($existingVote) {
-                // tapping the same option again removes the vote (toggle)
                 $existingVote->delete();
+
                 return;
             }
 
+            /*
+        |--------------------------------------------------------------------------
+        | Single-choice poll
+        |--------------------------------------------------------------------------
+        |
+        | Delete any previous vote by this user
+        |
+        */
+
             if (!$poll->allow_multiple_votes) {
-                // single-choice poll — clear any other vote by this user first
-                PollVote::where('poll_id', $poll->id)->where('user_id', $user->id)->delete();
+                PollVote::query()
+                    ->where('poll_id', $poll->id)
+                    ->where('user_id', $user->id)
+                    ->delete();
             }
+
+            /*
+        |--------------------------------------------------------------------------
+        | Create new vote
+        |--------------------------------------------------------------------------
+        */
 
             PollVote::create([
                 'poll_id'        => $poll->id,
@@ -128,13 +262,43 @@ class PollController extends Controller
             ]);
         });
 
-        // Only broadcast aggregate counts — never voter identities — since
-        // every participant (including students) shares this channel.
-        $tally = $this->aggregateTally($poll->fresh());
+        /*
+    |--------------------------------------------------------------------------
+    | Recalculate complete tally
+    |--------------------------------------------------------------------------
+    */
 
-        broadcast(new PollVoteCast($poll->conversation_id, $poll->id, $tally))->toOthers();
+        $tally = $this->aggregateTally(
+            $poll->fresh()
+        );
 
-        return response()->json(['tally' => $tally]);
+        /*
+    |--------------------------------------------------------------------------
+    | Broadcast to all OTHER users
+    |--------------------------------------------------------------------------
+    |
+    | The current user receives the API response.
+    | Other users receive poll.voted through Reverb.
+    |
+    */
+
+        broadcast(
+            new PollVoteCast(
+                conversationId: $poll->conversation_id,
+                pollId: $poll->id,
+                tally: $tally,
+            )
+        )->toOthers();
+
+        /*
+    |--------------------------------------------------------------------------
+    | Return current user's result
+    |--------------------------------------------------------------------------
+    */
+
+        return response()->json([
+            'tally' => $tally,
+        ]);
     }
 
     // ── Aggregate counts only — safe for every participant ─────────────────
@@ -187,19 +351,67 @@ class PollController extends Controller
         ]);
     }
 
+    // public function close(Request $request, int $pollId)
+    // {
+    //     $poll = Poll::findOrFail($pollId);
+    //     $user = $request->user();
+
+    //     if ($poll->created_by !== $user->id && !in_array($user->role, ['admin', 'staff'])) {
+    //         return response()->json(['message' => 'Not authorized to close this poll.'], 403);
+    //     }
+
+    //     $poll->update(['is_closed' => true]);
+    //     broadcast(new PollClosed($poll->conversation_id, $poll->id))->toOthers();
+
+    //     return response()->json(['status' => 'closed']);
+    // }
     public function close(Request $request, int $pollId)
     {
         $poll = Poll::findOrFail($pollId);
+
         $user = $request->user();
 
-        if ($poll->created_by !== $user->id && !in_array($user->role, ['admin', 'staff'])) {
-            return response()->json(['message' => 'Not authorized to close this poll.'], 403);
+        /*
+    |--------------------------------------------------------------------------
+    | Only poll creator, admin, or staff can close
+    |--------------------------------------------------------------------------
+    */
+
+        if (
+            $poll->created_by !== $user->id &&
+            !in_array($user->role, ['admin', 'staff'], true)
+        ) {
+            return response()->json([
+                'message' => 'Not authorized to close this poll.',
+            ], 403);
         }
 
-        $poll->update(['is_closed' => true]);
-        broadcast(new PollClosed($poll->conversation_id, $poll->id))->toOthers();
+        /*
+    |--------------------------------------------------------------------------
+    | Close poll
+    |--------------------------------------------------------------------------
+    */
 
-        return response()->json(['status' => 'closed']);
+        $poll->update([
+            'is_closed' => true,
+        ]);
+
+        /*
+    |--------------------------------------------------------------------------
+    | Broadcast immediately
+    |--------------------------------------------------------------------------
+    */
+
+        broadcast(
+            new PollClosed(
+                conversationId: $poll->conversation_id,
+                pollId: $poll->id,
+            )
+        )->toOthers();
+
+        return response()->json([
+            'status' => 'closed',
+        ]);
     }
 
     private function aggregateTally(Poll $poll): array

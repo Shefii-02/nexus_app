@@ -28,7 +28,7 @@ class AnnouncementController extends Controller
     public function store(AnnouncementRequest $request)
     {
 
-        Log::info($request->all());
+
 
         $data = $request->validated();
         if ($request->hasFile('thumbnail')) {

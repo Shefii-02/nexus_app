@@ -20,8 +20,8 @@ class AnnouncementRequest extends BaseRequest
 
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-
-            'target_type' => 'required|in:all_users, all_staffs,all_students, all_teachers, selected_users, roles, batches, specific',
+// in:all_users, all_staffs,all_students, all_teachers, selected_users, roles, batches, specific
+            'target_type' => 'required',
 
             'user_ids' => 'nullable|array',
             'role_ids' => 'nullable|array',

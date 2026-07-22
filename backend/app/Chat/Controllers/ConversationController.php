@@ -59,6 +59,8 @@ class ConversationController extends Controller
             return $conv;
         });
 
+        Log::info($conversations);
+
         return response()->json($conversations);
     }
 

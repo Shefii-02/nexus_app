@@ -21,7 +21,9 @@ class UserController extends Controller
     {
         $user = $request->user();
 
-        return $this->successResponse(UserResource::make($user), 'User profile retrieved successfully');
+        $userData = User::find($user->id);
+
+        return $this->successResponse(UserResource::make($userData), 'User profile retrieved successfully');
     }
 
 

@@ -266,28 +266,36 @@ class StaffController extends Controller
 
     private function syncPermissions(int $userId, array $permissions): void
     {
-        $permissions = collect($permissions)
-            ->only(UserAppPermission::KEYS);
+        // $permissions = $
+        // collect($permissions)
+            // ->only(UserAppPermission::KEYS);
 
         // Delete old permissions that are not included in the request
         UserAppPermission::where('user_id', $userId)
-            ->whereNotIn(
-                'permission_key',
-                $permissions->keys()->toArray()
-            )
+            // ->whereNotIn(
+            //     'permission_key',
+            //     $permissions->keys()->toArray()
+            // )
             ->delete();
 
         // Insert or update all submitted permissions
         foreach ($permissions as $key => $granted) {
-            UserAppPermission::updateOrCreate(
-                [
-                    'user_id' => $userId,
-                    'permission_key' => $key,
-                ],
-                [
-                    'granted' => (bool) $granted,
-                ]
-            );
+
+                    $new = new UserAppPermission();
+
+                    $new->user_id = $userId;
+                    $new->permission_key = $key;
+                    $new->granted = (bool) $granted;
+                    $new->save();
+            // UserAppPermission::updateOrCreate(
+            //     [
+            //         'user_id' => $userId,
+            //         'permission_key' => $key,
+            //     ],
+            //     [
+            //         'granted' => (bool) $granted,
+            //     ]
+            // );
         }
     }
 }

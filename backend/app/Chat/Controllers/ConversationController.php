@@ -49,12 +49,24 @@ class ConversationController extends Controller
             $conv->last_message  = $conv->messages->first();
             $conv->reply_permission_value = $conv->reply_permission;
             $conv->reply_permission = $conv->canUserSend($user) ?? 0;
+            $conv->total_members = $conv->participants->where('status', 'active')->count();
+            $conv->participants = $conv->participants->where('status', 'active')->map(fn($p) => [
+                'id'     => $p->user->id,
+                'name'   => $p->user->name,
+                'phone'  => $p->user->phone,
+                'avatar' => $p->user->avatar_url ?? null,
+                'role'   => $p->user->acc_type,
+                'is_creator' => $p->user->id === $conv->created_by,
+            ])->values();
+            $conv->created_by_user = $conv->participants->firstWhere('user_id', $conv->created_by)?->user;
+            $conv->module_id = $conv->module_id ?? null;
 
             // For single chats, expose the other user as the "title"
             if ($conv->type === 'single') {
                 $other = $conv->participants->firstWhere('user_id', '!=', $user->id);
                 $conv->other_user = $other?->user;
             }
+            $conv->type = $conv->type ?? 'single';
             unset($conv->messages);
             return $conv;
         });

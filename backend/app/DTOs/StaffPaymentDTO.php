@@ -48,7 +48,7 @@ class StaffPaymentDTO
             deduction_amount: $data['deduction_amount'] ?? 0,
             deduction_reason: $data['deduction_reason'],
 
-            final_amount: $data['final_amount'],
+            final_amount: $data['transfer_amount'],
 
             remarks: $data['remarks'] ?? null,
 

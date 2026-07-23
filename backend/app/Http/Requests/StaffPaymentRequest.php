@@ -40,7 +40,7 @@ extends BaseRequest
                 'numeric'
             ],
 
-            'final_amount' => [
+            'transfer_amount' => [
                 'required',
                 'numeric'
             ],

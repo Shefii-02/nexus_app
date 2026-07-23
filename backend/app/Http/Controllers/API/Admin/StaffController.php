@@ -172,6 +172,7 @@ class StaffController extends Controller
     public function permissionUpdate(Request $request, int $user)
     {
         Log::info($request->all());
+           Log::info($user);
         $validated = $request->validate([
             'permissions' => ['required', 'array'],
             'permissions.*' => ['boolean'],

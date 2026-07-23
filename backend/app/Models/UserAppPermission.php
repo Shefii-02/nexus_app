@@ -26,6 +26,12 @@ class UserAppPermission extends Model
         'teacher_manage',
         'staff_manage',
         'student_manage',
+        'teacher_payments',
+        'staff_payments',
+        'announcement_manage',
+        'notification_manage'
+
+
     ];
 
     public function user(): BelongsTo

@@ -17,6 +17,15 @@ class UserController extends Controller
 {
     use ApiResponse;
 
+    public function show(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        return $this->successResponse(UserResource::make($user), 'User profile retrieved successfully');
+    }
+
+
+
     public function allUsers(Request $request): JsonResponse
     {
         $filters = request()->query('filters', []);

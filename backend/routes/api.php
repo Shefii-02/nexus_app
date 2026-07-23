@@ -84,6 +84,11 @@ Route::middleware('auth:api')->group(function () {
 // Admin Routes - CRUD Operations
 Route::middleware(['auth:api'])->group(function () {
 
+
+
+    Route::get('/profile', [UserController::class, 'show']);
+
+
     Route::get('dashboard-status', [DashboardController::class, 'status']);
     Route::get('otp-usages', [DashboardController::class, 'otpUsages']);
 

@@ -168,7 +168,7 @@ class StaffController extends Controller
         }
     }
 
-    public function permissionUpdate(Request $request, $user)
+    public function permissionUpdate(Request $request, int $user)
     {
         $validated = $request->validate([
             'permissions' => ['required', 'array'],

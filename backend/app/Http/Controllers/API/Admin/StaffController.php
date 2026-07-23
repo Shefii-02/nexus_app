@@ -206,7 +206,7 @@ class StaffController extends Controller
 
             // DB::transaction(function () use ($validated, $userId) {
 
-                $permissions = collect($validated['permissions']);
+                $permissions = $validated['permissions'];
                     // ->only(UserAppPermission::KEYS);
 
                 /*

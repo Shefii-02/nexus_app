@@ -46,16 +46,16 @@ class StaffPaymentDTO
             bonus_amount: $data['bonus_amount'] ?? 0,
 
             deduction_amount: $data['deduction_amount'] ?? 0,
-            deduction_reason: $data['deduction_reason'],
+            deduction_reason: $data['deduction_reason'] ?? null,
 
-            final_amount: $data['transfer_amount'],
+            final_amount: $data['transfer_amount'] ?? 0,
 
             remarks: $data['remarks'] ?? null,
 
-            payment_method: $data['payment_method'],
-            payment_reference: $data['payment_reference'],
-            transaction_no: $data['transaction_no'],
-            payment_date: $data['payment_date'],
+            payment_method: $data['payment_method'] ?? null,
+            payment_reference: $data['payment_reference'] ?? null,
+            transaction_no: $data['transaction_no'] ?? null,
+            payment_date: $data['payment_date'] ?? null,
             status: $data['status'],
             created_by: auth()->id(),
             released_by : $data['status'] == 'released' ? auth()->id() : null,

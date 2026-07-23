@@ -8,9 +8,13 @@ use App\Http\Controllers\API\ApiResponse;
 use App\Http\Requests\StoreTeacherRequest;
 use App\Http\Requests\UpdateTeacherRequest;
 use App\Http\Resources\TeacherResource;
+use App\Models\Conversation;
+use App\Models\ConversationParticipant;
+use App\Models\User;
 use App\Services\Teacher\TeacherService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class TeacherController extends Controller
@@ -71,6 +75,58 @@ class TeacherController extends Controller
 
             $teacher = $this->teacherService->create($dto);
 
+
+            /* |--------------------------------------------------------------------------
+        | Create Direct Chat with First Super Admin
+        |--------------------------------------------------------------------------
+        */
+            $admin = User::where('acc_type', 'admin')
+                ->where('status', 1)
+                ->orderBy('id')
+                ->first();
+
+            if ($admin && $admin->id != $teacher->id) {
+
+                $conversation = Conversation::where('type', 'single')
+                    ->whereHas('participants', function ($q) use ($teacher) {
+                        $q->where('user_id', $teacher->id);
+                    })
+                    ->whereHas('participants', function ($q) use ($admin) {
+                        $q->where('user_id', $admin->id);
+                    })
+                    ->withCount('participants')
+                    ->having('participants_count', 2)
+                    ->first();
+
+                if (!$conversation) {
+
+                    DB::transaction(function () use ($admin, $teacher) {
+
+                        $conversation = Conversation::create([
+                            'type'       => 'single',
+                            'title'      => null,
+                            'created_by' => $admin->id,
+                            'status'     => "active",
+                        ]);
+
+                        ConversationParticipant::create([
+                            'conversation_id' => $conversation->id,
+                            'user_id'         => $admin->id,
+                            'created_by'      => $admin->id,
+                            'status'          => "active",
+                        ]);
+
+                        ConversationParticipant::create([
+                            'conversation_id' => $conversation->id,
+                            'user_id'         => $teacher->id,
+                            'created_by'      => $admin->id,
+                            'status'          => "active",
+                        ]);
+                    });
+                }
+            }
+
+
             return $this->successResponse(
                 TeacherResource::make($teacher->load('teacher')),
                 'Teacher created successfully',
@@ -127,7 +183,7 @@ class TeacherController extends Controller
             // if ($user->acc_type === 'admin') {
             //     $this->teacherService->forceDelete($teacher);
             // } else {
-                $this->teacherService->delete($teacher);
+            $this->teacherService->delete($teacher);
             // }
             // $this->teacherService->delete($teacher);
 

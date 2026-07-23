@@ -8,6 +8,8 @@ use App\Http\Controllers\API\ApiResponse;
 use App\Http\Requests\StoreStaffRequest;
 use App\Http\Requests\UpdateStaffRequest;
 use App\Http\Resources\StaffResource;
+use App\Models\Conversation;
+use App\Models\ConversationParticipant;
 use App\Models\User;
 use App\Models\UserAppPermission;
 use App\Services\Staff\StaffService;
@@ -75,6 +77,60 @@ class StaffController extends Controller
                     $validated['permissions']
                 );
             }
+
+
+
+            /* |--------------------------------------------------------------------------
+        | Create Direct Chat with First Super Admin
+        |--------------------------------------------------------------------------
+        */
+            $admin = User::where('acc_type', 'admin')
+                ->where('status', 1)
+                ->orderBy('id')
+                ->first();
+
+            if ($admin && $admin->id != $staff->id) {
+
+                $conversation = Conversation::where('type', 'single')
+                    ->whereHas('participants', function ($q) use ($staff) {
+                        $q->where('user_id', $staff->id);
+                    })
+                    ->whereHas('participants', function ($q) use ($admin) {
+                        $q->where('user_id', $admin->id);
+                    })
+                    ->withCount('participants')
+                    ->having('participants_count', 2)
+                    ->first();
+
+                if (!$conversation) {
+
+                    DB::transaction(function () use ($admin, $staff) {
+
+                        $conversation = Conversation::create([
+                            'type'       => 'single',
+                            'title'      => null,
+                            'created_by' => $admin->id,
+                            'status'     => "active",
+                        ]);
+
+                        ConversationParticipant::create([
+                            'conversation_id' => $conversation->id,
+                            'user_id'         => $admin->id,
+                            'created_by'      => $admin->id,
+                            'status'          => "active",
+                        ]);
+
+                        ConversationParticipant::create([
+                            'conversation_id' => $conversation->id,
+                            'user_id'         => $staff->id,
+                            'created_by'      => $admin->id,
+                            'status'          => "active",
+                        ]);
+                    });
+                }
+            }
+
+
 
             return $this->successResponse(
                 StaffResource::make(

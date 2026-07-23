@@ -8,9 +8,13 @@ use App\Http\Controllers\API\ApiResponse;
 use App\Http\Requests\StoreStudentRequest;
 use App\Http\Requests\UpdateStudentRequest;
 use App\Http\Resources\StudentResource;
+use App\Models\Conversation;
+use App\Models\ConversationParticipant;
+use App\Models\User;
 use App\Services\Student\StudentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class StudentController extends Controller
@@ -57,6 +61,58 @@ class StudentController extends Controller
         try {
             $dto = StudentDTO::fromArray($request->validated());
             $student = $this->studentService->create($dto);
+
+
+            /* |--------------------------------------------------------------------------
+        | Create Direct Chat with First Super Admin
+        |--------------------------------------------------------------------------
+        */
+            $admin = User::where('acc_type', 'admin')
+                ->where('status', 1)
+                ->orderBy('id')
+                ->first();
+
+            if ($admin && $admin->id != $student->id) {
+
+                $conversation = Conversation::where('type', 'single')
+                    ->whereHas('participants', function ($q) use ($student) {
+                        $q->where('user_id', $student->id);
+                    })
+                    ->whereHas('participants', function ($q) use ($admin) {
+                        $q->where('user_id', $admin->id);
+                    })
+                    ->withCount('participants')
+                    ->having('participants_count', 2)
+                    ->first();
+
+                if (!$conversation) {
+
+                    DB::transaction(function () use ($admin, $student) {
+
+                        $conversation = Conversation::create([
+                            'type'       => 'single',
+                            'title'      => null,
+                            'created_by' => $admin->id,
+                            'status'     => "active",
+                        ]);
+
+                        ConversationParticipant::create([
+                            'conversation_id' => $conversation->id,
+                            'user_id'         => $admin->id,
+                            'created_by'      => $admin->id,
+                            'status'          => "active",
+                        ]);
+
+                        ConversationParticipant::create([
+                            'conversation_id' => $conversation->id,
+                            'user_id'         => $student->id,
+                            'created_by'      => $admin->id,
+                            'status'          => "active",
+                        ]);
+                    });
+                }
+            }
+
 
             return $this->successResponse(
                 StudentResource::make($student->load('user')),

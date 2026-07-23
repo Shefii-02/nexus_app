@@ -14,6 +14,7 @@ use App\Services\Staff\StaffService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class StaffController extends Controller
 {
@@ -170,6 +171,7 @@ class StaffController extends Controller
 
     public function permissionUpdate(Request $request, int $user)
     {
+        Log::info($request->all());
         $validated = $request->validate([
             'permissions' => ['required', 'array'],
             'permissions.*' => ['boolean'],

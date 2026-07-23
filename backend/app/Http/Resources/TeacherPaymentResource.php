@@ -16,7 +16,7 @@ class TeacherPaymentResource extends JsonResource
                 'id'    => $this->teacher->id,
                 'name'  => $this->teacher->name,
                 'email' => $this->teacher->email,
-                'avatar'=>$this->staff->avatar_url,
+                'avatar'=>$this->teacher->avatar_url,
             ]),
             'period_start'      => date('Y-m-d', strtotime($this->period_start)),
             'period_end'        => date('Y-m-d', strtotime($this->period_end)),

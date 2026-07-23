@@ -137,9 +137,9 @@ class OtpService
             return ['success' => false, 'message' => 'OTP has expired. Please request a new one.'];
         }
 
-        if ($record->device_id !== $deviceId) {
-            return ['success' => false, 'message' => 'Device mismatch. Please request OTP again on this device.'];
-        }
+        // if ($record->device_id !== $deviceId) {
+        //     return ['success' => false, 'message' => 'Device mismatch. Please request OTP again on this device.'];
+        // }
 
         if ($record->otp_code !== $otp) {
             return ['success' => false, 'message' => 'Invalid OTP. Please try again.'];

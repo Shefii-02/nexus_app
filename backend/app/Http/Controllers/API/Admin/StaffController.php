@@ -50,101 +50,127 @@ class StaffController extends Controller
     public function store(StoreStaffRequest $request): JsonResponse
     {
         try {
-            $dto = StaffDTO::fromArray($request->validated());
+
+            $dto = StaffDTO::fromArray(
+                $request->validated()
+            );
+
             $staff = $this->staffService->create($dto);
+
+            /*
+        |--------------------------------------------------------------------------
+        | Sync Permissions
+        |--------------------------------------------------------------------------
+        */
 
             $validated = $request->validate([
                 'permissions' => ['nullable', 'array'],
                 'permissions.*' => ['boolean'],
             ]);
 
-            if (!empty($validated['permissions'])) {
-                // NOTE: confirm this matches your schema.
-                // permissionUpdate() below keys permissions to the User's id
-                // ($user->id), so this uses $staff->user_id to stay consistent
-                // (assumes $staffService->create() returns a Staff model with
-                // a user_id FK, per the $staff->load('user') call further down).
-                // If create() instead returns the User model directly, change
-                // this to $staff->id.
-                $rows = collect($validated['permissions'])
-                    ->only(UserAppPermission::KEYS)
-                    ->map(fn($granted, $key) => [
-                        'user_id' => $staff->user_id,
-                        'permission_key' => $key,
-                        'granted' => (bool) $granted,
-                        'updated_at' => now(),
-                        'created_at' => now(),
-                    ])
-                    ->values()
-                    ->all();
+            if (isset($validated['permissions'])) {
 
-                DB::transaction(function () use ($rows) {
-                    foreach ($rows as $row) {
-                        UserAppPermission::updateOrCreate(
-                            ['user_id' => $row['user_id'], 'permission_key' => $row['permission_key']],
-                            ['granted' => $row['granted']],
-                        );
-                    }
-                });
+                $this->syncPermissions(
+                    $staff->user_id,
+                    $validated['permissions']
+                );
             }
 
             return $this->successResponse(
-                StaffResource::make($staff->load('user')),
+                StaffResource::make(
+                    $staff->load('user')
+                ),
                 'Staff created successfully',
                 201
             );
-        } catch (\Exception $e) {
-            return $this->errorResponse('Failed to create staff', ['error' => $e->getMessage()], 500);
+        } catch (\Throwable $e) {
+
+            Log::error('Failed to create staff', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return $this->errorResponse(
+                'Failed to create staff',
+                [
+                    'error' => $e->getMessage(),
+                ],
+                500
+            );
         }
     }
-
-    public function update(UpdateStaffRequest $request, int $staff): JsonResponse
-    {
+    public function update(
+        UpdateStaffRequest $request,
+        int $staff
+    ): JsonResponse {
         try {
+
             if (!$this->staffService->exists($staff)) {
-                return $this->errorResponse('Staff member not found', null, 404);
+                return $this->errorResponse(
+                    'Staff member not found',
+                    null,
+                    404
+                );
             }
 
             $current = $this->staffService->find($staff);
-            $dto = StaffDTO::fromArray(array_merge(
-                $current->toArray(),
-                $request->validated()
-            ));
 
-            $this->staffService->update($staff, $dto);
-            $updated = $this->staffService->findWithRelations($staff, ['staff']);
+            $dto = StaffDTO::fromArray(
+                array_merge(
+                    $current->toArray(),
+                    $request->validated()
+                )
+            );
+
+            $this->staffService->update(
+                $staff,
+                $dto
+            );
+
+            /*
+        |--------------------------------------------------------------------------
+        | Sync Permissions
+        |--------------------------------------------------------------------------
+        */
 
             $validated = $request->validate([
                 'permissions' => ['nullable', 'array'],
                 'permissions.*' => ['boolean'],
             ]);
 
-            if (!empty($validated['permissions'])) {
-                $rows = collect($validated['permissions'])
-                    ->only(UserAppPermission::KEYS)
-                    ->map(fn($granted, $key) => [
-                        'user_id' => $staff, // here $staff is the int route param, so this is already correct
-                        'permission_key' => $key,
-                        'granted' => (bool) $granted,
-                        'updated_at' => now(),
-                        'created_at' => now(),
-                    ])
-                    ->values()
-                    ->all();
+            if (isset($validated['permissions'])) {
 
-                DB::transaction(function () use ($rows) {
-                    foreach ($rows as $row) {
-                        UserAppPermission::updateOrCreate(
-                            ['user_id' => $row['user_id'], 'permission_key' => $row['permission_key']],
-                            ['granted' => $row['granted']],
-                        );
-                    }
-                });
+                // Here $staff is the User ID based on your current code
+                $this->syncPermissions(
+                    $staff,
+                    $validated['permissions']
+                );
             }
 
-            return $this->successResponse(StaffResource::make($updated), 'Staff updated successfully');
-        } catch (\Exception $e) {
-            return $this->errorResponse('Failed to update staff', ['error' => $e->getMessage()], 500);
+            $updated = $this->staffService->findWithRelations(
+                $staff,
+                ['staff']
+            );
+
+            return $this->successResponse(
+                StaffResource::make($updated),
+                'Staff updated successfully'
+            );
+        } catch (\Throwable $e) {
+
+            Log::error('Failed to update staff', [
+                'staff_id' => $staff,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return $this->errorResponse(
+                'Failed to update staff',
+                [
+                    'error' => $e->getMessage(),
+                ],
+                500
+            );
         }
     }
 
@@ -159,7 +185,7 @@ class StaffController extends Controller
             // if ($user->acc_type === 'admin') {
             //     $this->staffService->forceDelete($staff);
             // } else {
-                $this->staffService->delete($staff);
+            $this->staffService->delete($staff);
             // }
             // $this->staffService->delete($staff);
 
@@ -169,42 +195,102 @@ class StaffController extends Controller
         }
     }
 
-    public function permissionUpdate(Request $request, int $user)
+    public function permissionUpdate(Request $request, int $userId): JsonResponse
     {
-        Log::info($request->all());
-           Log::info($user);
         $validated = $request->validate([
             'permissions' => ['required', 'array'],
             'permissions.*' => ['boolean'],
         ]);
 
-        $rows = collect($validated['permissions'])
-            ->only(UserAppPermission::KEYS)
-            ->map(fn($granted, $key) => [
-                'user_id' => $user,
-                'permission_key' => $key,
-                'granted' => (bool) $granted,
-                'updated_at' => now(),
-                'created_at' => now(),
-            ])
-            ->values()
-            ->all();
+        try {
 
-        DB::transaction(function () use ($rows) {
-            foreach ($rows as $row) {
-                UserAppPermission::updateOrCreate(
-                    ['user_id' => $row['user_id'], 'permission_key' => $row['permission_key']],
-                    ['granted' => $row['granted']],
-                );
-            }
-        });
+            DB::transaction(function () use ($validated, $userId) {
 
-        $user = User::where('id', $user)->first();
+                $permissions = collect($validated['permissions'])
+                    ->only(UserAppPermission::KEYS);
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Permissions updated successfully',
-            'data' => $user,
-        ]);
+                /*
+            |--------------------------------------------------------------------------
+            | Delete old permissions that are not in the request
+            |--------------------------------------------------------------------------
+            */
+
+                UserAppPermission::where('user_id', $userId)
+                    ->whereNotIn(
+                        'permission_key',
+                        $permissions->keys()->toArray()
+                    )
+                    ->delete();
+
+                /*
+            |--------------------------------------------------------------------------
+            | Insert / Update all submitted permissions
+            |--------------------------------------------------------------------------
+            */
+
+                foreach ($permissions as $key => $granted) {
+
+                    UserAppPermission::updateOrCreate(
+                        [
+                            'user_id' => $userId,
+                            'permission_key' => $key,
+                        ],
+                        [
+                            'granted' => (bool) $granted,
+                        ]
+                    );
+                }
+            });
+
+            $user = User::with('appPermissions')
+                ->findOrFail($userId);
+
+            return $this->successResponse(
+                $user,
+                'Permissions updated successfully'
+            );
+        } catch (\Throwable $e) {
+
+            Log::error('Permission update failed', [
+                'user_id' => $userId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return $this->errorResponse(
+                'Failed to update permissions',
+                [
+                    'error' => $e->getMessage(),
+                ],
+                500
+            );
+        }
+    }
+
+
+    private function syncPermissions(int $userId, array $permissions): void
+    {
+        $permissions = collect($permissions)
+            ->only(UserAppPermission::KEYS);
+
+        // Delete old permissions that are not included in the request
+        UserAppPermission::where('user_id', $userId)
+            ->whereNotIn(
+                'permission_key',
+                $permissions->keys()->toArray()
+            )
+            ->delete();
+
+        // Insert or update all submitted permissions
+        foreach ($permissions as $key => $granted) {
+            UserAppPermission::updateOrCreate(
+                [
+                    'user_id' => $userId,
+                    'permission_key' => $key,
+                ],
+                [
+                    'granted' => (bool) $granted,
+                ]
+            );
+        }
     }
 }

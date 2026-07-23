@@ -43,7 +43,7 @@ class TeacherPaymentDTO
             remarks:           $data['remarks']           ?? null,
             status:            $data['status']            ?? 'pending',
             created_by: auth()->id(),
-            released_by : $data['status'] == 'released' ? auth()->id() : '',
+            released_by : $data['status'] == 'released' ? auth()->id() : null,
         );
     }
 

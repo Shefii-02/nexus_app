@@ -21,7 +21,7 @@ extends BaseRequest
                 'exists:users,id'
             ],
 
-            'salary_month' => [
+            'payment_month' => [
                 'required'
             ],
 

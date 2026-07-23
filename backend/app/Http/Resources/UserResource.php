@@ -19,7 +19,8 @@ class UserResource extends JsonResource
             'parent_name' => $this->student?->parent_name,
             'role' => $this->acc_type,
             'roles' => $this->getRoleNames(),
-            'permissions' => $this->getAllPermissions()->pluck('name'),
+            // 'permissions' => $this->getAllPermissions()->pluck('name'),
+            'permissions' => $this->permissions_map,
             'profile_complete' => !empty($this->email),
             'app_permissions' => $this->permissions_map,
         ];

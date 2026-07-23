@@ -25,7 +25,7 @@ extends BaseRequest
                 'required'
             ],
 
-            'salary_amount' => [
+            'gross_amount' => [
                 'required',
                 'numeric'
             ],

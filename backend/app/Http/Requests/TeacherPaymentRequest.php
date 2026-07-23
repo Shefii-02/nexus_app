@@ -21,7 +21,7 @@ class TeacherPaymentRequest extends FormRequest
             'gross_amount'      => ['required', 'numeric', 'min:0'],
             'deduction_amount'  => ['nullable', 'numeric', 'min:0'],
             'deduction_reason'  => ['nullable', 'string', 'max:500'],
-            'amount'            => ['required', 'numeric', 'min:0'],
+            'transfer_amount'   => ['required', 'numeric', 'min:0'],
             'payment_method'    => ['nullable', 'string', 'in:bank_transfer,upi,cash,cheque'],
             'payment_reference' => ['nullable', 'string', 'max:255'],
             'transaction_no'    => ['nullable', 'string', 'max:255'],

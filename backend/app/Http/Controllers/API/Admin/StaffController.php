@@ -204,10 +204,10 @@ class StaffController extends Controller
 
         try {
 
-            DB::transaction(function () use ($validated, $userId) {
+            // DB::transaction(function () use ($validated, $userId) {
 
-                $permissions = collect($validated['permissions'])
-                    ->only(UserAppPermission::KEYS);
+                $permissions = collect($validated['permissions']);
+                    // ->only(UserAppPermission::KEYS);
 
                 /*
             |--------------------------------------------------------------------------
@@ -216,10 +216,10 @@ class StaffController extends Controller
             */
 
                 UserAppPermission::where('user_id', $userId)
-                    ->whereNotIn(
-                        'permission_key',
-                        $permissions->keys()->toArray()
-                    )
+                    // ->whereNotIn(
+                    //     'permission_key',
+                    //     $permissions->keys()->toArray()
+                    // )
                     ->delete();
 
                 /*
@@ -230,17 +230,14 @@ class StaffController extends Controller
 
                 foreach ($permissions as $key => $granted) {
 
-                    UserAppPermission::updateOrCreate(
-                        [
-                            'user_id' => $userId,
-                            'permission_key' => $key,
-                        ],
-                        [
-                            'granted' => (bool) $granted,
-                        ]
-                    );
+                    $new = new UserAppPermission();
+
+                    $new->user_id = $userId;
+                    $new->permission_key = $key;
+                    $new->granted = (bool) $granted;
+                    $new->save();
                 }
-            });
+            // });
 
             $user = User::with('appPermissions')
                 ->findOrFail($userId);

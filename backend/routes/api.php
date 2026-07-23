@@ -161,7 +161,7 @@ Route::middleware(['auth:api'])->group(function () {
 
     // Staff Management
 
-    Route::put('staff/{id}/permission-update', [StaffController::class, 'permissionUpdate']);
+    Route::put('staffs/{id}/permission-update', [StaffController::class, 'permissionUpdate']);
     Route::apiResource('staff', StaffController::class);
 
     Route::apiResource('roles', RoleController::class);

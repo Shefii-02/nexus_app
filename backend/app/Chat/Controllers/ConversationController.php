@@ -42,34 +42,82 @@ class ConversationController extends Controller
             ->paginate(30);
 
         $conversations->getCollection()->transform(function ($conv) use ($user) {
-            $participant = $conv->participants->firstWhere('user_id', $user->id);
-            $conv->unread_count  = $conv->getUnreadCountFor($user->id);
-            $conv->is_muted      = $participant?->is_muted ?? false;
-            $conv->is_pinned     = $participant?->is_pinned ?? false;
-            $conv->last_message  = $conv->messages->first();
+
+            // Keep Eloquent participant models before converting to arrays
+            $activeParticipants = $conv->participants
+                ->where('status', 'active');
+
+            $participant = $activeParticipants->firstWhere('user_id', $user->id);
+
+            $conv->unread_count = $conv->getUnreadCountFor($user->id);
+            $conv->is_muted = $participant?->is_muted ?? false;
+            $conv->is_pinned = $participant?->is_pinned ?? false;
+
+            $conv->last_message = $conv->messages->first();
+
             $conv->reply_permission_value = $conv->reply_permission;
             $conv->reply_permission = $conv->canUserSend($user) ?? 0;
-            $conv->total_members = $conv->participants->where('status', 'active')->count();
-            $conv->participants = $conv->participants->where('status', 'active')->map(fn($p) => [
-                'id'     => $p->user->id,
-                'name'   => $p->user->name,
-                'phone'  => $p->user->phone,
-                'avatar' => $p->user->avatar_url ?? null,
-                'role'   => $p->user->acc_type,
-                'is_creator' => $p->user->id === $conv->created_by,
-            ])->values();
-            // $conv->created_by_user = $conv->participants->firstWhere('user_id', $conv->created_by)?->user;
-            $conv->module_id = $conv->module_id ?? null;
 
-            // For single chats, expose the other user as the "title"
+            $conv->total_members = $activeParticipants->count();
+
+            // For single chats, get other user BEFORE converting participants to arrays
             if ($conv->type === 'single') {
-                $other = $conv->participants->firstWhere('user_id', '!=', $user->id);
-                $conv->other_user = $other?->user;
+
+                $otherParticipant = $activeParticipants
+                    ->first(fn($p) => $p->user_id != $user->id);
+
+                $conv->other_user = $otherParticipant?->user;
             }
+
+            // Convert participants to API response format
+            $conv->participants = $activeParticipants
+                ->map(fn($p) => [
+                    'id' => $p->user->id,
+                    'name' => $p->user->name,
+                    'phone' => $p->user->phone,
+                    'email' => $p->user->email,
+                    'avatar' => $p->user->avatar_url ?? null,
+                    'role' => $p->user->acc_type,
+                    'is_creator' => $p->user->id === $conv->created_by,
+                ])
+                ->values();
+
+            $conv->module_id = $conv->module_id ?? null;
             $conv->type = $conv->type ?? 'single';
+
             unset($conv->messages);
+
             return $conv;
         });
+        // $conversations->getCollection()->transform(function ($conv) use ($user) {
+        //     $participant = $conv->participants->firstWhere('user_id', $user->id);
+        //     $conv->unread_count  = $conv->getUnreadCountFor($user->id);
+        //     $conv->is_muted      = $participant?->is_muted ?? false;
+        //     $conv->is_pinned     = $participant?->is_pinned ?? false;
+        //     $conv->last_message  = $conv->messages->first();
+        //     $conv->reply_permission_value = $conv->reply_permission;
+        //     $conv->reply_permission = $conv->canUserSend($user) ?? 0;
+        //     $conv->total_members = $conv->participants->where('status', 'active')->count();
+        //     $conv->participants = $conv->participants->where('status', 'active')->map(fn($p) => [
+        //         'id'     => $p->user->id,
+        //         'name'   => $p->user->name,
+        //         'phone'  => $p->user->phone,
+        //         'avatar' => $p->user->avatar_url ?? null,
+        //         'role'   => $p->user->acc_type,
+        //         'is_creator' => $p->user->id === $conv->created_by,
+        //     ])->values();
+        //     // $conv->created_by_user = $conv->participants->firstWhere('user_id', $conv->created_by)?->user;
+        //     $conv->module_id = $conv->module_id ?? null;
+
+        //     // For single chats, expose the other user as the "title"
+        //     if ($conv->type === 'single') {
+        //         $other = $conv->participants->firstWhere('user_id', '!=', $user->id);
+        //         $conv->other_user = $other?->user;
+        //     }
+        //     $conv->type = $conv->type ?? 'single';
+        //     unset($conv->messages);
+        //     return $conv;
+        // });
 
 
 

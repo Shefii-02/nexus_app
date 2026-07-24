@@ -58,7 +58,7 @@ class ConversationController extends Controller
                 'role'   => $p->user->acc_type,
                 'is_creator' => $p->user->id === $conv->created_by,
             ])->values();
-            $conv->created_by_user = $conv->participants->firstWhere('user_id', $conv->created_by)?->user;
+            // $conv->created_by_user = $conv->participants->firstWhere('user_id', $conv->created_by)?->user;
             $conv->module_id = $conv->module_id ?? null;
 
             // For single chats, expose the other user as the "title"

@@ -112,20 +112,21 @@ class StaffController extends Controller
                             'created_by' => $admin->id,
                             'status'     => "active",
                         ]);
+                        if ($conversation) {
+                            ConversationParticipant::create([
+                                'conversation_id' => $conversation->id,
+                                'user_id'         => $admin->id,
+                                'created_by'      => $admin->id,
+                                'status'          => "active",
+                            ]);
 
-                        ConversationParticipant::create([
-                            'conversation_id' => $conversation->id,
-                            'user_id'         => $admin->id,
-                            'created_by'      => $admin->id,
-                            'status'          => "active",
-                        ]);
-
-                        ConversationParticipant::create([
-                            'conversation_id' => $conversation->id,
-                            'user_id'         => $staff->id,
-                            'created_by'      => $admin->id,
-                            'status'          => "active",
-                        ]);
+                            ConversationParticipant::create([
+                                'conversation_id' => $conversation->id,
+                                'user_id'         => $staff->id,
+                                'created_by'      => $admin->id,
+                                'status'          => "active",
+                            ]);
+                        }
                     });
                 }
             }

@@ -68,9 +68,9 @@ class ConversationController extends Controller
 
                 $conv->other_user = $otherParticipant?->user;
 
-                Log::info('Other user for single chat: ' . ($conv->other_user?->name ?? 'None'));
-                Log::info('Participants: ' . $activeParticipants->pluck('user_id')->implode(', '));
-                Log::info($activeParticipants);
+                // Log::info('Other user for single chat: ' . ($conv->other_user?->name ?? 'None'));
+                // Log::info('Participants: ' . $activeParticipants->pluck('user_id')->implode(', '));
+                // Log::info($activeParticipants);
             }
 
             // Convert participants to API response format

@@ -5,13 +5,13 @@ namespace App\DTOs;
 class StaffDTO
 {
     public function __construct(
-        public string $department,
-        public string $designation,
-        public string $name,
-        public string $email,
-        public string $password,
-        public string $phone,
-        public string $address,
+        public string $department = '',
+        public string $designation = '',
+        public string $name = '',
+        public string $email = '',
+        public string $password = '',
+        public string $phone = '',
+        public string $address = '',
         public string $acc_type = 'staff',
         public string $status = 'active',
     ) {}
@@ -24,23 +24,28 @@ class StaffDTO
             name: $data['name'] ?? '',
             email: $data['email'] ?? '',
             password: $data['password'] ?? '',
-            // phone: $data['phone'] ?? '',
             phone: self::formatPhone($data['phone'] ?? ''),
             address: $data['address'] ?? '',
             acc_type: $data['acc_type'] ?? 'staff',
             status: $data['status'] ?? 'active',
         );
     }
+
     public function toUserArray(): array
     {
-        return [
+        $data = [
             'name' => $this->name,
             'email' => $this->email,
-            'password' => bcrypt($this->password),
             'phone' => $this->phone,
             'acc_type' => $this->acc_type,
             'status' => $this->status,
         ];
+
+        if (!empty($this->password)) {
+            $data['password'] = bcrypt($this->password);
+        }
+
+        return $data;
     }
 
     public function toStaffArray(int $userId): array
@@ -51,13 +56,11 @@ class StaffDTO
             'designation' => $this->designation,
             'name' => $this->name,
             'email' => $this->email,
-            'password' => $this->password,
             'phone' => $this->phone,
             'address' => $this->address,
             'status' => $this->status,
         ];
     }
-
 
     private static function formatPhone(?string $phone): string
     {
@@ -65,18 +68,14 @@ class StaffDTO
             return '';
         }
 
-        // Remove all non-numeric characters except +
         $phone = preg_replace('/[^0-9+]/', '', trim($phone));
 
-        // Remove leading +
         $phone = ltrim($phone, '+');
 
-        // Remove country code 91 if present
         if (str_starts_with($phone, '91')) {
             $phone = substr($phone, 2);
         }
 
-        // Keep only last 10 digits
         $phone = substr($phone, -10);
 
         return '+91 ' . $phone;

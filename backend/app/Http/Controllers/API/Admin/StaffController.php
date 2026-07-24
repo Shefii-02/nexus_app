@@ -84,53 +84,97 @@ class StaffController extends Controller
         | Create Direct Chat with First Super Admin
         |--------------------------------------------------------------------------
         */
-            $admin = User::where('acc_type', 'admin')
-                ->where('status', 1)
-                ->orderBy('id')
-                ->first();
+            // $admin = User::where('acc_type', 'admin')
+            //     ->where('status', 1)
+            //     ->orderBy('id')
+            //     ->first();
 
-            if ($admin && $admin->id != $staff->id) {
+            // if ($admin && $admin->id != $staff->id) {
 
-                $conversation = Conversation::where('type', 'single')
-                    ->whereHas('participants', function ($q) use ($staff) {
-                        $q->where('user_id', $staff->id);
-                    })
-                    ->whereHas('participants', function ($q) use ($admin) {
-                        $q->where('user_id', $admin->id);
-                    })
-                    ->withCount('participants')
-                    ->having('participants_count', 2)
-                    ->first();
+            //     $conversation = Conversation::where('type', 'single')
+            //         ->whereHas('participants', function ($q) use ($staff) {
+            //             $q->where('user_id', $staff->id);
+            //         })
+            //         ->whereHas('participants', function ($q) use ($admin) {
+            //             $q->where('user_id', $admin->id);
+            //         })
+            //         ->withCount('participants')
+            //         ->having('participants_count', 2)
+            //         ->first();
 
-                if (!$conversation) {
+            //     if (!$conversation) {
 
-                    DB::transaction(function () use ($admin, $staff) {
+            //         DB::transaction(function () use ($admin, $staff) {
 
-                        $conversation = Conversation::create([
-                            'type'       => 'single',
-                            'title'      => null,
-                            'created_by' => $admin->id,
-                            'status'     => "active",
-                        ]);
-                        if ($conversation) {
-                            ConversationParticipant::create([
-                                'conversation_id' => $conversation->id,
-                                'user_id'         => $admin->id,
-                                'created_by'      => $admin->id,
-                                'status'          => "active",
-                            ]);
+            //             $conversation = Conversation::create([
+            //                 'type'       => 'single',
+            //                 'title'      => null,
+            //                 'created_by' => $admin->id,
+            //                 'status'     => "active",
+            //             ]);
+            //             if ($conversation) {
+            //                 ConversationParticipant::create([
+            //                     'conversation_id' => $conversation->id,
+            //                     'user_id'         => $admin->id,
+            //                     'created_by'      => $admin->id,
+            //                     'status'          => "active",
+            //                 ]);
 
-                            ConversationParticipant::create([
-                                'conversation_id' => $conversation->id,
-                                'user_id'         => $staff->id,
-                                'created_by'      => $admin->id,
-                                'status'          => "active",
-                            ]);
-                        }
-                    });
-                }
-            }
+            //                 ConversationParticipant::create([
+            //                     'conversation_id' => $conversation->id,
+            //                     'user_id'         => $staff->id,
+            //                     'created_by'      => $admin->id,
+            //                     'status'          => "active",
+            //                 ]);
+            //             }
+            //         });
+            //     }
+            // }
+$admin = User::where('acc_type', 'admin')
+    ->where('status', 1)
+    ->orderBy('id')
+    ->first();
 
+if ($admin && $admin->id != $staff->user_id) {
+
+    $conversation = Conversation::where('type', 'single')
+        ->whereHas('participants', function ($q) use ($staff) {
+            $q->where('user_id', $staff->user_id);
+        })
+        ->whereHas('participants', function ($q) use ($admin) {
+            $q->where('user_id', $admin->id);
+        })
+        ->withCount('participants')
+        ->having('participants_count', 2)
+        ->first();
+
+    if (!$conversation) {
+
+        DB::transaction(function () use ($admin, $staff) {
+
+            $conversation = Conversation::create([
+                'type'       => 'single',
+                'title'      => null,
+                'created_by' => $admin->id,
+                'status'     => 'active',
+            ]);
+
+            ConversationParticipant::create([
+                'conversation_id' => $conversation->id,
+                'user_id'         => $admin->id,
+                'created_by'      => $admin->id,
+                'status'           => 'active',
+            ]);
+
+            ConversationParticipant::create([
+                'conversation_id' => $conversation->id,
+                'user_id'         => $staff->user_id,
+                'created_by'      => $admin->id,
+                'status'           => 'active',
+            ]);
+        });
+    }
+}
 
 
             return $this->successResponse(

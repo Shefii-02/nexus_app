@@ -135,7 +135,7 @@ class StaffController extends Controller
 
             return $this->successResponse(
                 StaffResource::make(
-                    $staff->load('user')
+                    $staff->load('staff')
                 ),
                 'Staff created successfully',
                 201

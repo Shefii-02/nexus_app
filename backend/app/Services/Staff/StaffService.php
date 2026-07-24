@@ -31,7 +31,7 @@ class StaffService extends BaseService
                 $dto->toStaffArray($user->id)
             );
 
-            return $staff;
+            return $user;
         });
     }
 

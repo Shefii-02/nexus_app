@@ -39,7 +39,7 @@ class UpdateStaffRequest extends BaseRequest
             'designation' => 'nullable|string|max:255',
             // 'phone' => 'nullable|string|max:20|unique:users,phone,' . $this->route('staff'),
             'address' => 'nullable|string|max:500',
-            'status' => 'nullable|in:active,inactive,suspended',
+            'status' => 'nullable',
         ];
     }
 

@@ -67,6 +67,8 @@ class ConversationController extends Controller
                     ->first(fn($p) => $p->user_id != $user->id);
 
                 $conv->other_user = $otherParticipant?->user;
+
+                Log
             }
 
             // Convert participants to API response format

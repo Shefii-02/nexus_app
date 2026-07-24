@@ -10,7 +10,6 @@ use App\Http\Requests\UpdateStaffRequest;
 use App\Http\Resources\StaffResource;
 use App\Models\Conversation;
 use App\Models\ConversationParticipant;
-use App\Models\Staff;
 use App\Models\User;
 use App\Models\UserAppPermission;
 use App\Services\Staff\StaffService;
@@ -50,71 +49,112 @@ class StaffController extends Controller
         return $this->successResponse(StaffResource::make($staffData), 'Staff retrieved successfully');
     }
 
-    public function store(StaffDTO $dto): object
+    public function store(StoreStaffRequest $request): JsonResponse
     {
-        return DB::transaction(function () use ($dto) {
+        try {
 
-            $user = User::withTrashed()
-                ->where('phone', $dto->phone)
-                ->first();
+            $dto = StaffDTO::fromArray(
+                $request->validated()
+            );
+
+            $staff = $this->staffService->create($dto);
 
             /*
         |--------------------------------------------------------------------------
-        | Existing User
+        | Sync Permissions
         |--------------------------------------------------------------------------
         */
 
-            if ($user) {
+            $validated = $request->validate([
+                'permissions' => ['nullable', 'array'],
+                'permissions.*' => ['boolean'],
+            ]);
 
-                // Restore soft-deleted user
-                if ($user->trashed()) {
-                    $user->restore();
-                }
+            if (isset($validated['permissions'])) {
 
-                // Update user data
-                $user->update(
-                    $dto->toUserArray()
-                );
-
-                // Ensure staff role
-                if (!$user->hasRole('staff')) {
-                    $user->assignRole('staff');
-                }
-
-                // Find existing staff record
-                $staff = Staff::where('user_id', $user->id)->first();
-
-                if ($staff) {
-
-                    $staff->update(
-                        $dto->toStaffArray($user->id)
-                    );
-
-                    return $staff->fresh();
-                }
-
-                // User exists but staff record doesn't exist
-                return Staff::create(
-                    $dto->toStaffArray($user->id)
+                $this->syncPermissions(
+                    $staff->user_id,
+                    $validated['permissions']
                 );
             }
 
-            /*
-        |--------------------------------------------------------------------------
-        | New User
+
+
+            /* |--------------------------------------------------------------------------
+        | Create Direct Chat with First Super Admin
         |--------------------------------------------------------------------------
         */
+            $admin = User::where('acc_type', 'admin')
+                ->where('status', 1)
+                ->orderBy('id')
+                ->first();
 
-            $user = User::create(
-                $dto->toUserArray()
+            if ($admin && $admin->id != $staff->id) {
+
+                $conversation = Conversation::where('type', 'single')
+                    ->whereHas('participants', function ($q) use ($staff) {
+                        $q->where('user_id', $staff->id);
+                    })
+                    ->whereHas('participants', function ($q) use ($admin) {
+                        $q->where('user_id', $admin->id);
+                    })
+                    ->withCount('participants')
+                    ->having('participants_count', 2)
+                    ->first();
+
+                if (!$conversation) {
+
+                    DB::transaction(function () use ($admin, $staff) {
+
+                        $conversation = Conversation::create([
+                            'type'       => 'single',
+                            'title'      => null,
+                            'created_by' => $admin->id,
+                            'status'     => "active",
+                        ]);
+                        if ($conversation) {
+                            ConversationParticipant::create([
+                                'conversation_id' => $conversation->id,
+                                'user_id'         => $admin->id,
+                                'created_by'      => $admin->id,
+                                'status'          => "active",
+                            ]);
+
+                            ConversationParticipant::create([
+                                'conversation_id' => $conversation->id,
+                                'user_id'         => $staff->id,
+                                'created_by'      => $admin->id,
+                                'status'          => "active",
+                            ]);
+                        }
+                    });
+                }
+            }
+
+
+
+            return $this->successResponse(
+                StaffResource::make(
+                    $staff->load('staff')
+                ),
+                'Staff created successfully',
+                201
             );
+        } catch (\Throwable $e) {
 
-            $user->assignRole('staff');
+            Log::error('Failed to create staff', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
 
-            return Staff::create(
-                $dto->toStaffArray($user->id)
+            return $this->errorResponse(
+                'Failed to create staff',
+                [
+                    'error' => $e->getMessage(),
+                ],
+                500
             );
-        });
+        }
     }
 
     public function update(

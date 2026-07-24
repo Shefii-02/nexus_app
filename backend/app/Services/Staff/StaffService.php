@@ -16,24 +16,72 @@ class StaffService extends BaseService
         parent::__construct($repository);
     }
 
-    public function create(StaffDTO $dto): object
-    {
-        return DB::transaction(function () use ($dto) {
+   public function create(StaffDTO $dto): object
+{
+    return DB::transaction(function () use ($dto) {
 
-            // ✅ 1. Create User
-            $user = User::create($dto->toUserArray());
+        $user = User::withTrashed()
+            ->where('phone', $dto->phone)
+            ->first();
 
-            // ✅ 2. Assign Role (if using spatie)
-            $user->assignRole('staff');
+        /*
+        |--------------------------------------------------------------------------
+        | Existing User
+        |--------------------------------------------------------------------------
+        */
 
-            // ✅ 3. Create Staff
-            $staff = Staff::create(
-                $dto->toStaffArray($user->id)
+        if ($user) {
+
+            // Restore soft-deleted user
+            if ($user->trashed()) {
+                $user->restore();
+            }
+
+            // Update user data
+            $user->update(
+                $dto->toUserArray()
             );
 
-            return $user;
-        });
-    }
+            // Ensure staff role
+            if (!$user->hasRole('staff')) {
+                $user->assignRole('staff');
+            }
+
+            // Find existing staff record
+            $staff = Staff::where('user_id', $user->id)->first();
+
+            if ($staff) {
+
+                $staff->update(
+                    $dto->toStaffArray($user->id)
+                );
+
+                return $staff->fresh();
+            }
+
+            // User exists but staff record doesn't exist
+            return Staff::create(
+                $dto->toStaffArray($user->id)
+            );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | New User
+        |--------------------------------------------------------------------------
+        */
+
+        $user = User::create(
+            $dto->toUserArray()
+        );
+
+        $user->assignRole('staff');
+
+        return Staff::create(
+            $dto->toStaffArray($user->id)
+        );
+    });
+}
 
     public function update(int $id, StaffDTO $dto): object
     {

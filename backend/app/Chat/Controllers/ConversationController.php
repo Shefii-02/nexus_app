@@ -70,17 +70,17 @@ class ConversationController extends Controller
             }
 
             // Convert participants to API response format
-            $conv->participants = $activeParticipants
-                ->map(fn($p) => [
-                    'id' => $p->user->id,
-                    'name' => $p->user->name,
-                    'phone' => $p->user->phone,
-                    'email' => $p->user->email,
-                    'avatar' => $p->user->avatar_url ?? null,
-                    'role' => $p->user->acc_type,
-                    'is_creator' => $p->user->id === $conv->created_by,
-                ])
-                ->values();
+            // $conv->participants = $activeParticipants
+            //     ->map(fn($p) => [
+            //         'id' => $p->user->id,
+            //         'name' => $p->user->name,
+            //         'phone' => $p->user->phone,
+            //         'email' => $p->user->email,
+            //         'avatar' => $p->user->avatar_url ?? null,
+            //         'role' => $p->user->acc_type,
+            //         'is_creator' => $p->user->id === $conv->created_by,
+            //     ])
+            //     ->values();
 
             $conv->module_id = $conv->module_id ?? null;
             $conv->type = $conv->type ?? 'single';

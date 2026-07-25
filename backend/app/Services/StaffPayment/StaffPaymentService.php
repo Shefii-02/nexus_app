@@ -90,57 +90,57 @@ class StaffPaymentService
 
                 $payment =
                     $this->repository
-                        ->find($id);
+                    ->find($id);
 
                 $payment->update([
 
                     'status' =>
-                        'released',
+                    'released',
 
                     'payment_method' =>
-                        $paymentMethod,
+                    $paymentMethod,
 
                     'transaction_no' =>
-                        $transactionNo,
+                    $transactionNo,
 
                     'payment_date' =>
-                        now(),
+                    now(),
 
                     'released_by' =>
-                        auth()->id(),
+                    auth()->id(),
                 ]);
 
                 Transaction::create([
 
                     'type' =>
-                        'expense',
+                    'expense',
 
                     'category' =>
-                        'staff_payment',
+                    'staff_payment',
 
                     'reference_type' =>
-                        'staff_payment',
+                    'staff_payment',
 
                     'reference_id' =>
-                        $payment->id,
+                    $payment->id,
 
                     'amount' =>
-                        $payment->final_amount,
+                    $payment->final_amount,
 
                     'payment_method' =>
-                        $paymentMethod,
+                    $paymentMethod,
 
                     'transaction_no' =>
-                        $transactionNo,
+                    $transactionNo,
 
                     'transaction_date' =>
-                        now(),
+                    now(),
 
                     'description' =>
-                        'Staff salary released',
+                    'Staff salary released',
 
                     'created_by' =>
-                        auth()->id(),
+                    auth()->id(),
                 ]);
 
                 return $payment->fresh();
@@ -150,20 +150,19 @@ class StaffPaymentService
 
     public function delete(
         int $id
-    )
-    {
+    ) {
         $payment =
             $this->repository
-                ->find($id);
+            ->find($id);
 
-        if (
-            $payment->status ===
-            'released'
-        ) {
-            throw new \Exception(
-                'Released payment cannot be deleted'
-            );
-        }
+        // if (
+        //     $payment->status ===
+        //     'released'
+        // ) {
+        //     throw new \Exception(
+        //         'Released payment cannot be deleted'
+        //     );
+        // }
 
         return $payment->delete();
     }

@@ -30,6 +30,7 @@ extends JsonResource
             floatval($this->bonus_amount),
 
             'deduction_amount' =>  floatval($this->deduction_amount),
+            'deduction_reason' =>  $this->deduction_reason,
 
             'final_amount' =>  floatval($this->final_amount),
 

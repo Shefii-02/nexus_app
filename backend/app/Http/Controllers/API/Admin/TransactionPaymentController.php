@@ -39,7 +39,7 @@ class TransactionPaymentController extends Controller
         // $request->validate(['payment_id' => ['required', 'integer']]);
 
         $payment = AdmissionPayment::with(['student:id,name', 'course:id,name'])
-            ->where('student_id', $request->user()->id)
+            // ->where('student_id', $request->user()->id)
             ->find($paymentId);
 
         if (! $payment) {

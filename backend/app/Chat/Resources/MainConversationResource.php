@@ -107,9 +107,10 @@ class MainConversationResource extends JsonResource
     private function resolveAvatar(): ?string
     {
         if ($this->type === 'group') {
-            if ($this->relationLoaded('media') && $this->media) {
-                return asset('storage/' . $this->media->file_path);
-            }
+            // if ($this->relationLoaded('media') && $this->media) {
+
+                // return asset('storage/' . $this->media->file_path);
+            // }
 
             return $this->media_url; // uses Conversation::getMediaUrlAttribute()
 

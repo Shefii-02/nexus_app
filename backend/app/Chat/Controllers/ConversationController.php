@@ -569,7 +569,9 @@ class ConversationController extends Controller
     // 1 — Full detail: permission + member list with role/phone/avatar
     public function detail(Request $request, int $id)
     {
-        $conv = Conversation::with(['participants.user:id,name,phone,avatar,acc_type'])->findOrFail($id);
+        $conv = Conversation::with(['participants.user:id,name,phone,avatar,acc_type'])
+            ->findOrFail($id);
+
         $user = $request->user();
 
         abort_unless(
@@ -579,26 +581,41 @@ class ConversationController extends Controller
         );
 
         return response()->json([
-            'conversation' => [
-                'id'               => $conv->id,
-                'title'            => $conv->title,
-                'avatar'           => $conv->avatar,
-                'type'             => $conv->type,
-                'status'           => $conv->status,
-                'reply_permission' => $conv->reply_permission,
-                'created_by'       => $conv->created_by,
-                'total_members'    => $conv->participants->where('status', 'active')->count(),
-                'participants'     => $conv->participants->where('status', 'active')->map(fn($p) => [
-                    'id'     => $p->user->id,
-                    'name'   => $p->user->name,
-                    'phone'  => $p->user->phone,
-                    'avatar' => $p->user->avatar_url ?? null,
-                    'role'   => $p->user->acc_type,
-                    'is_creator' => $p->user->id === $conv->created_by,
-                ])->values(),
-            ],
+            'conversation' => new ConversationDetailResource($conv),
         ]);
     }
+    // public function detail(Request $request, int $id)
+    // {
+    //     $conv = Conversation::with(['participants.user:id,name,phone,avatar,acc_type'])->findOrFail($id);
+    //     $user = $request->user();
+
+    //     abort_unless(
+    //         $conv->participants->contains('user_id', $user->id),
+    //         403,
+    //         'Not a participant.'
+    //     );
+
+    //     return response()->json([
+    //         'conversation' => [
+    //             'id'               => $conv->id,
+    //             'title'            => $conv->title,
+    //             'avatar'           => $conv->avatar,
+    //             'type'             => $conv->type,
+    //             'status'           => $conv->status,
+    //             'reply_permission' => $conv->reply_permission,
+    //             'created_by'       => $conv->created_by,
+    //             'total_members'    => $conv->participants->where('status', 'active')->count(),
+    //             'participants'     => $conv->participants->where('status', 'active')->map(fn($p) => [
+    //                 'id'     => $p->user->id,
+    //                 'name'   => $p->user->name,
+    //                 'phone'  => $p->user->phone,
+    //                 'avatar' => $p->user->avatar_url ?? null,
+    //                 'role'   => $p->user->acc_type,
+    //                 'is_creator' => $p->user->id === $conv->created_by,
+    //             ])->values(),
+    //         ],
+    //     ]);
+    // }
 
     // 2 — Update reply permission only (admin/staff)
     public function updateReplyPermission(Request $request, int $id)

@@ -83,25 +83,41 @@ class MainConversationResource extends JsonResource
      * Group chats use the conversation's own uploaded avatar (media relation).
      * Single chats fall back to the other participant's user avatar.
      */
+    // private function resolveAvatar(): ?string
+    // {
+    //     if ($this->type === 'group') {
+    //         // Adjust relation/column name to match your schema —
+    //         // assumes Conversation::media() is a hasOne/morphOne to a
+    //         // media row storing the uploaded group photo.
+    //         if ($this->relationLoaded('media') && $this->media) {
+    //             return asset('storage/' . $this->media->file_path);
+    //         }
+
+    //         // Fallback if you store it directly as a column instead
+    //         if ($this->group_avatar) {
+    //             return asset('storage/' . $this->group_avatar);
+    //         }
+
+    //         return null;
+    //     }
+
+    //     // Single chat -> other user's avatar
+    //     return $this->other_user?->avatar_url;
+    // }
     private function resolveAvatar(): ?string
     {
         if ($this->type === 'group') {
-            // Adjust relation/column name to match your schema —
-            // assumes Conversation::media() is a hasOne/morphOne to a
-            // media row storing the uploaded group photo.
             if ($this->relationLoaded('media') && $this->media) {
                 return asset('storage/' . $this->media->file_path);
             }
 
-            // Fallback if you store it directly as a column instead
-            if ($this->group_avatar) {
+            if ($this->group_avatar) {   // ← doesn't exist, always null
                 return asset('storage/' . $this->group_avatar);
             }
 
             return null;
         }
 
-        // Single chat -> other user's avatar
         return $this->other_user?->avatar_url;
     }
 }

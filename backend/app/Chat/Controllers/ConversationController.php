@@ -4,6 +4,7 @@ namespace App\Chat\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Chat\Models\Conversation;
+use App\Chat\Resources\ConversationDetailResource;
 use App\Chat\Resources\MainConversationResource;
 use App\Models\ConversationParticipant;
 use App\Models\User;

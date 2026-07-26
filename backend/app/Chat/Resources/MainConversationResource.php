@@ -26,9 +26,6 @@ class MainConversationResource extends JsonResource
             'avatar' => $this->type === 'group'
                 ? $this->resolveAvatar()
                 : $this->other_user?->avatar_url ?? '',
-            'avatar2' => $this->type === 'group'
-                ? $this->resolveAvatar()
-                : $this->other_user?->avatar_url ?? '',
 
             // ── Computed per-request fields (set on the model in the
             //    controller before wrapping, since these need the

@@ -111,6 +111,9 @@ class MainConversationResource extends JsonResource
                 return asset('storage/' . $this->media->file_path);
             }
 
+            return $this->media_url; // uses Conversation::getMediaUrlAttribute()
+
+
             if ($this->group_avatar) {   // ← doesn't exist, always null
                 return asset('storage/' . $this->group_avatar);
             }

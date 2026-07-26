@@ -262,7 +262,9 @@ class ConversationController extends Controller
         ]);
 
         $authId = config('adminId', 1) ?? $request->user()->id;
-        $userIds = array_unique(array_merge([$authId], $request->user_ids));
+        $ownUser = $request->user();
+
+        $userIds = array_unique(array_merge([$authId,$ownUser->id], $request->user_ids));
 
         DB::beginTransaction();
         try {
@@ -286,7 +288,7 @@ class ConversationController extends Controller
             $conversation = Conversation::create([
                 'type'       => 'group',
                 'title'      => $request->title,
-                'created_by' => $authId,
+                'created_by' => $ownUser->id,
                 'avatar'     => $mediaId,
                 'module_id'  => $request->module_id,
             ]);

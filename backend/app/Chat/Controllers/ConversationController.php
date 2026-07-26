@@ -7,6 +7,7 @@ use App\Chat\Models\Conversation;
 use App\Chat\Resources\ConversationDetailResource;
 use App\Chat\Resources\MainConversationResource;
 use App\Models\ConversationParticipant;
+use App\Models\MediaFile;
 use App\Models\User;
 use App\Services\Notification\FcmNotificationService;
 use Illuminate\Http\Request;
@@ -256,7 +257,7 @@ class ConversationController extends Controller
             'title'       => 'required|string|max:255',
             'user_ids'    => 'required|array|min:2',
             'user_ids.*'  => 'exists:users,id',
-            'avatar'      => 'nullable|string',
+            'avatar'      => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120', // 5MB
             'module_id'   => 'nullable|integer',
         ]);
 
@@ -265,11 +266,28 @@ class ConversationController extends Controller
 
         DB::beginTransaction();
         try {
+            // ── Handle avatar upload (optional) ──────────────────────────
+            $mediaId = null;
+            if ($request->hasFile('avatar')) {
+                $file = $request->file('avatar');
+                $path = $file->store('chat/group_avatars', 'public');
+
+                $media = MediaFile::create([
+                    'user_id'   => $authId,
+                    'file_name' => $file->getClientOriginalName(),
+                    'file_path' => $path,
+                    'file_type' => $file->getClientMimeType(),
+                    'file_size' => $file->getSize(),
+                ]);
+
+                $mediaId = $media->id;
+            }
+
             $conversation = Conversation::create([
                 'type'       => 'group',
                 'title'      => $request->title,
                 'created_by' => $authId,
-                'avatar'     => $request->avatar,
+                'avatar'     => $mediaId,
                 'module_id'  => $request->module_id,
             ]);
 
@@ -284,19 +302,81 @@ class ConversationController extends Controller
                     'conversation_id'   => $conversation->id,
                     'sender_name'       => $request->user()->name,
                     'preview'           => Str::limit("New Conversation Created..", 80),
-                    'conversation_name' => $conv?->title ?? $request->user()->name,
+                    'conversation_name' => $conversation->title ?? $request->user()->name,
                 ]);
             }
 
             DB::commit();
+
+            $conversation->load(['participants.user:id,name,avatar', 'media']);
+
             return response()->json([
-                'conversation' => $conversation->load('participants.user:id,name,avatar')
+                'conversation' => [
+                    'id'         => $conversation->id,
+                    'title'      => $conversation->title,
+                    'type'       => $conversation->type,
+                    'avatar'     => $conversation->media_url,
+                    'created_by' => $conversation->created_by,
+                    'module_id'  => $conversation->module_id,
+                    'participants' => $conversation->participants->map(fn($p) => [
+                        'id'     => $p->user->id,
+                        'name'   => $p->user->name,
+                        'avatar' => $p->user->avatar_url ?? null,
+                    ])->values(),
+                ],
             ], 201);
         } catch (\Throwable $e) {
             DB::rollBack();
             return response()->json(['message' => 'Failed to create group.'], 500);
         }
     }
+    // public function createGroup(Request $request): JsonResponse
+    // {
+    //     $request->validate([
+    //         'title'       => 'required|string|max:255',
+    //         'user_ids'    => 'required|array|min:2',
+    //         'user_ids.*'  => 'exists:users,id',
+    //         'avatar'      => 'nullable|string',
+    //         'module_id'   => 'nullable|integer',
+    //     ]);
+
+    //     $authId = config('adminId', 1) ?? $request->user()->id;
+    //     $userIds = array_unique(array_merge([$authId], $request->user_ids));
+
+    //     DB::beginTransaction();
+    //     try {
+    //         $conversation = Conversation::create([
+    //             'type'       => 'group',
+    //             'title'      => $request->title,
+    //             'created_by' => $authId,
+    //             'avatar'     => $request->avatar,
+    //             'module_id'  => $request->module_id,
+    //         ]);
+
+    //         foreach ($userIds as $uid) {
+    //             ConversationParticipant::create([
+    //                 'conversation_id' => $conversation->id,
+    //                 'user_id'         => $uid,
+    //                 'created_by'      => $authId,
+    //             ]);
+
+    //             (new FcmNotificationService())->sendNewMessage($uid, [
+    //                 'conversation_id'   => $conversation->id,
+    //                 'sender_name'       => $request->user()->name,
+    //                 'preview'           => Str::limit("New Conversation Created..", 80),
+    //                 'conversation_name' => $conv?->title ?? $request->user()->name,
+    //             ]);
+    //         }
+
+    //         DB::commit();
+    //         return response()->json([
+    //             'conversation' => $conversation->load('participants.user:id,name,avatar')
+    //         ], 201);
+    //     } catch (\Throwable $e) {
+    //         DB::rollBack();
+    //         return response()->json(['message' => 'Failed to create group.'], 500);
+    //     }
+    // }
 
     /**
      * Get a single conversation with participants.
@@ -728,6 +808,70 @@ class ConversationController extends Controller
         $conv->delete(); // add cascading deletes for messages/participants at DB level if not already set
 
         return response()->json(['status' => true, 'message' => 'Group removed.']);
+    }
+
+
+    public function updateInfo(Request $request, int $id)
+    {
+        $conv = Conversation::findOrFail($id);
+        $user = $request->user();
+
+        if (!in_array($user->acc_type, ['admin', 'staff'])) {
+            return response()->json(['status' => false, 'message' => 'Not authorized.'], 403);
+        }
+
+        $validated = $request->validate([
+            'title'  => 'required|string|max:255',
+            'status' => 'required|in:active,suspended,expired,declined',
+            'avatar' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120', // 5MB
+        ]);
+
+        $conv->title = $validated['title'];
+        $conv->status = $validated['status'];
+
+        // ── Avatar upload (optional — only replace if a new file was sent) ──
+        if ($request->hasFile('avatar')) {
+            $file = $request->file('avatar');
+            $path = $file->store('chat/group_avatars', 'public');
+
+            $media = MediaFile::create([
+                'user_id'   => $user->id,
+                'file_name' => $file->getClientOriginalName(),
+                'file_path' => $path,
+                'file_type' => $file->getClientMimeType(),
+                'file_size' => $file->getSize(),
+            ]);
+
+            // Delete the old avatar file from disk if one existed, to avoid
+            // orphaned files piling up in storage every time the group photo changes.
+            if ($conv->avatar) {
+                $oldMedia = MediaFile::find($conv->avatar);
+                if ($oldMedia && Storage::disk('public')->exists($oldMedia->file_path)) {
+                    Storage::disk('public')->delete($oldMedia->file_path);
+                }
+            }
+
+            $conv->avatar = $media->id;
+        }
+
+        $conv->save();
+        $conv->load('media');
+
+        // broadcast(new \App\Events\ConversationUpdated($conv->id, [
+        //     'title'  => $conv->title,
+        //     'status' => $conv->status,
+        //     'avatar' => $conv->media_url,
+        // ]))->toOthers();
+
+        return response()->json([
+            'status' => true,
+            'conversation' => [
+                'id'     => $conv->id,
+                'title'  => $conv->title,
+                'status' => $conv->status,
+                'avatar' => $conv->media_url,
+            ],
+        ]);
     }
 
 

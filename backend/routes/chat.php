@@ -31,6 +31,7 @@ Route::middleware(['auth:api'])->prefix('chat')->group(function () {
     Route::get('conversations/{id}/detail',              [ConversationController::class, 'detail']);
     Route::post('conversations/{id}/reply-permission',   [ConversationController::class, 'updateReplyPermission']);
     Route::post('conversations/{id}/participants/sync',  [ConversationController::class, 'syncParticipants']);
+    Route::post('conversations/{id}/info',              [ConversationController::class, 'updateInfo']);
     Route::post('conversations/{id}/status',              [ConversationController::class, 'updateStatus']);
     Route::delete('conversations/{id}',                   [ConversationController::class, 'destroy']);
 

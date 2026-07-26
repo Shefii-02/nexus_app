@@ -16,6 +16,7 @@ use App\Http\Controllers\API\Admin\PaymentController;
 use App\Http\Controllers\API\Admin\AnnouncementController;
 use App\Http\Controllers\API\Admin\AppAnnouncementController;
 use App\Http\Controllers\API\Admin\AppNotificationController;
+use App\Http\Controllers\API\Admin\AppPaymentController;
 use App\Http\Controllers\API\Admin\BroadcastCallController;
 use App\Http\Controllers\API\Admin\CallController;
 use App\Http\Controllers\API\Admin\ConversationController;
@@ -35,7 +36,6 @@ use App\Http\Controllers\API\Admin\TeacherPaymentItemController;
 use App\Http\Controllers\API\Admin\ReportController;
 use App\Http\Controllers\API\Admin\MyCourseController;
 use App\Http\Controllers\API\Admin\TransactionPaymentController;
-use App\Http\Controllers\API\Admin\AppPaymentController;
 
 // routes/api.php
 use Illuminate\Support\Facades\Broadcast;

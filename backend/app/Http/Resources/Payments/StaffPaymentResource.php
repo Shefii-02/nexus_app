@@ -22,7 +22,7 @@ class StaffPaymentResource extends JsonResource
             'paid_at'          => $this->paid_at?->toIso8601String(true),
             'payment_method'   => $this->payment_method,
             'transaction_no'   => $this->transaction_no,
-            'payment_date'     => $this->payment_date?->toDateString(),
+            'payment_date'     => $this->payment_date,
             'remarks'          => $this->remarks,
             'released_by_name' => $this->whenLoaded('releasedBy', fn() => $this->releasedBy?->name),
         ];

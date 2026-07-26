@@ -41,9 +41,7 @@ class ConversationDetailResource extends JsonResource
     private function resolveAvatar($user, $activeParticipants): ?string
     {
         if ($this->type === 'group') {
-            return $this->avatar
-                ? asset('storage/' . $this->avatar)
-                : null;
+            return $this->media_url;
         }
 
         $other = $activeParticipants->first(fn ($p) => $p->user_id !== $user->id);

@@ -229,7 +229,7 @@ class AppPaymentController extends Controller
         }
 
         $payment->update([
-            'status'         => 'paid',
+            'status'         => $request->status ?? 'released',
             'released_by'    => Auth::id(),
             'paid_at'        => now(),
             'payment_method' => $request->payment_method ?? 'bank_transfer',

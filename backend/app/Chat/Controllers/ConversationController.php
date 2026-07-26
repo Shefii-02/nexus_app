@@ -831,6 +831,10 @@ class ConversationController extends Controller
 
         // ── Avatar upload (optional — only replace if a new file was sent) ──
         if ($request->hasFile('avatar')) {
+            // Capture the old media row BEFORE we overwrite conv->avatar,
+            // so we can clean up both the file on disk and the DB row.
+            $oldMedia = $conv->avatar ? MediaFile::find($conv->avatar) : null;
+
             $file = $request->file('avatar');
             $path = $file->store('chat/group_avatars', 'public');
 
@@ -842,16 +846,17 @@ class ConversationController extends Controller
                 'file_size' => $file->getSize(),
             ]);
 
-            // Delete the old avatar file from disk if one existed, to avoid
-            // orphaned files piling up in storage every time the group photo changes.
-            if ($conv->avatar) {
-                $oldMedia = MediaFile::find($conv->avatar);
-                if ($oldMedia && Storage::disk('public')->exists($oldMedia->file_path)) {
+            $conv->avatar = $media->id;
+
+            // Delete old file from disk + its DB row now that the new one
+            // is safely created and linked — avoids leaving orphaned rows
+            // or orphaned files if anything above had failed first.
+            if ($oldMedia) {
+                if (Storage::disk('public')->exists($oldMedia->file_path)) {
                     Storage::disk('public')->delete($oldMedia->file_path);
                 }
+                $oldMedia->delete();
             }
-
-            $conv->avatar = $media->id;
         }
 
         $conv->save();

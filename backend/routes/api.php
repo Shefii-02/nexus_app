@@ -665,7 +665,7 @@ Route::middleware(['auth:api'])->group(function () {
         //     ->name('payments.receipt');
 
         // ── Admin release actions ─────────────────────────────────────────────────
-        Route::middleware('role:admin,staff')->group(function () {
+        // Route::middleware('role:admin,staff')->group(function () {
             // POST /api/payments/teacher/{id}/release
             Route::post('teacher/{id}/release', [AppPaymentController::class, 'releaseTeacherPayment'])
                 ->name('payments.teacher.release');
@@ -673,7 +673,7 @@ Route::middleware(['auth:api'])->group(function () {
             // POST /api/payments/staff/{id}/release
             Route::post('staff/{id}/release', [AppPaymentController::class, 'releaseStaffPayment'])
                 ->name('payments.staff.release');
-        });
+        // });
     });
 
 

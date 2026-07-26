@@ -14,8 +14,9 @@ class MainConversationResource extends JsonResource
         return [
             'id'          => $this->id,
             'type'        => $this->type ?? 'single',
+            'title'       => $this->title,
             'module_id'   => $this->module_id ?? null,
-            'name'        => $this->name,
+
             'status'      => $this->status,
             'created_by'  => $this->created_by,
 

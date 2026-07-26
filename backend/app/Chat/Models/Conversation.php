@@ -2,6 +2,7 @@
 
 namespace App\Chat\Models;
 
+use App\Models\MediaFile;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -124,5 +125,16 @@ class Conversation extends Model
                 $q->where('created_at', '>', $participant->last_read_at)
             )
             ->count();
+    }
+
+
+     public function media()
+    {
+        return $this->belongsTo(MediaFile::class, 'avatar');
+    }
+
+    public function getMediaUrlAttribute()
+    {
+        return $this->media  ? asset('storage/' . $this->media->file_path) : 'https://ui-avatars.com/api/?name=' . urlencode($this->title);
     }
 }

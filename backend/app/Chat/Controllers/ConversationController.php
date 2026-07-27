@@ -211,7 +211,9 @@ class ConversationController extends Controller
         // Find existing conversation (scoped to module to avoid duplicates)
         $existing = Conversation::findIndividual($authId, $targetId, $moduleId);
         if ($existing) {
-            return response()->json(['conversation' => $existing->load('participants.user:id,name,avatar')]);
+            return response()->json(['conversation' => new MainConversationResource($existing->load('participants.user:id,name,avatar,acc_type'))]);
+            // $existing->load('participants.user:id,name,avatar')
+            // ]);
         }
 
         DB::beginTransaction();

@@ -88,6 +88,9 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::get('/profile', [UserController::class, 'show']);
 
+    Route::post('/settings/account/delete', [UserController::class, 'deleteUserData']);
+
+
 
     Route::get('dashboard-status', [DashboardController::class, 'status']);
     Route::get('otp-usages', [DashboardController::class, 'otpUsages']);
@@ -666,13 +669,13 @@ Route::middleware(['auth:api'])->group(function () {
 
         // ── Admin release actions ─────────────────────────────────────────────────
         // Route::middleware('role:admin,staff')->group(function () {
-            // POST /api/payments/teacher/{id}/release
-            Route::post('teacher/{id}/release', [AppPaymentController::class, 'releaseTeacherPayment'])
-                ->name('payments.teacher.release');
+        // POST /api/payments/teacher/{id}/release
+        Route::post('teacher/{id}/release', [AppPaymentController::class, 'releaseTeacherPayment'])
+            ->name('payments.teacher.release');
 
-            // POST /api/payments/staff/{id}/release
-            Route::post('staff/{id}/release', [AppPaymentController::class, 'releaseStaffPayment'])
-                ->name('payments.staff.release');
+        // POST /api/payments/staff/{id}/release
+        Route::post('staff/{id}/release', [AppPaymentController::class, 'releaseStaffPayment'])
+            ->name('payments.staff.release');
         // });
     });
 

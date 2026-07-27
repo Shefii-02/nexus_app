@@ -11,7 +11,10 @@ use App\Models\User;
 use App\Models\UserPlatform;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class UserController extends Controller
 {
@@ -195,5 +198,99 @@ class UserController extends Controller
         return response()->json([
             'data' => UserResource::collection($users)
         ]);
+    }
+
+
+
+    public function destroyAccount(Request $request)
+    {
+        $user = $request->user();
+
+        DB::beginTransaction();
+        try {
+            $this->deleteUserData($user);
+
+            $userId = $user->id;
+            $user->forceDelete(); // ← permanent delete, bypasses SoftDeletes
+
+            DB::commit();
+
+            Log::info("Account permanently deleted", ['user_id' => $userId]);
+
+            return response()->json(['message' => 'Account deleted successfully']);
+        } catch (Throwable $e) {
+            DB::rollBack();
+            Log::error('Account deletion failed', [
+                'user_id' => $user->id,
+                'error'   => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'message' => 'Failed to delete account',
+            ], 500);
+        }
+    }
+
+    private function deleteUserData(User $user): void
+    {
+        DB::table('activity_logs')->where('user_id', $user->id)->delete();
+        DB::table('announcement_user')->where('user_id', $user->id)->delete();
+        DB::table('app_notifications')->where('user_id', $user->id)->delete();
+        DB::table('calls')->where('teacher_id', $user->id)->delete();
+        DB::table('calls')->where('student_id', $user->id)->delete();
+        DB::table('call_recipients')->where('student_id', $user->id)->delete();
+        DB::table('conversation_participants')->where('user_id', $user->id)->delete();
+
+        // ── Messages: must clean up dependents BEFORE deleting the messages ──
+        $messageIds = DB::table('messages')->where('sender_id', $user->id)->pluck('id');
+
+        if ($messageIds->isNotEmpty()) {
+            DB::table('message_reactions')->whereIn('message_id', $messageIds)->delete();
+            DB::table('message_reads')->whereIn('message_id', $messageIds)->delete();
+
+            // Polls attached to this user's messages
+            $pollIds = DB::table('polls')->whereIn('message_id', $messageIds)->pluck('id');
+            if ($pollIds->isNotEmpty()) {
+                DB::table('poll_votes')->whereIn('poll_id', $pollIds)->delete();
+                DB::table('poll_options')->whereIn('poll_id', $pollIds)->delete();
+                DB::table('polls')->whereIn('id', $pollIds)->delete();
+            }
+
+            // Other messages replying to this user's messages — don't cascade-delete
+            // those messages, just detach the reply link.
+            DB::table('messages')->whereIn('reply_to', $messageIds)->update(['reply_to' => null]);
+        }
+
+        DB::table('messages')->where('sender_id', $user->id)->delete();
+        DB::table('message_reactions')->where('user_id', $user->id)->delete(); // reactions THIS user made elsewhere
+        DB::table('message_reads')->where('user_id', $user->id)->delete();
+        DB::table('poll_votes')->where('user_id', $user->id)->delete(); // votes THIS user cast elsewhere
+
+        DB::table('refresh_tokens')->where('user_id', $user->id)->delete();
+        DB::table('staff')->where('user_id', $user->id)->delete();
+        DB::table('staff_payments')->where('staff_id', $user->id)->delete();
+        DB::table('students')->where('user_id', $user->id)->delete();
+        DB::table('teachers')->where('user_id', $user->id)->delete();
+        DB::table('teachers_courses')->where('teacher_id', $user->id)->delete();
+        DB::table('teacher_payments')->where('teacher_id', $user->id)->delete();
+        DB::table('teacher_payment_items')->where('teacher_id', $user->id)->delete();
+        DB::table('user_app_permissions')->where('user_id', $user->id)->delete();
+        DB::table('user_devices')->where('user_id', $user->id)->delete();
+        DB::table('user_platforms')->where('user_id', $user->id)->delete();
+
+        // ── Courses / conversations this user "owns" — DECIDE how to handle ──
+        // (see explanation above — reassign, block, or cascade; nulling shown
+        // here only works if these columns are nullable in your schema)
+        DB::table('courses')->where('teacher_id', $user->id)->update(['teacher_id' => null]);
+        DB::table('conversations')->where('created_by', $user->id)->update(['created_by' => null]);
+
+        // ── Media files: delete storage files AND their DB rows ──────────────
+        $mediaFiles = DB::table('media_files')->where('user_id', $user->id)->get();
+        foreach ($mediaFiles as $mediaFile) {
+            if ($mediaFile->file_path && Storage::exists($mediaFile->file_path)) {
+                Storage::delete($mediaFile->file_path);
+            }
+        }
+        DB::table('media_files')->where('user_id', $user->id)->delete();
     }
 }

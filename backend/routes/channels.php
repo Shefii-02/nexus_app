@@ -13,10 +13,10 @@ use Illuminate\Support\Facades\Log;
 
 
 Broadcast::channel('conversation.{conversationId}', function ($user, $conversationId) {
-    Log::info('Channel auth', [
-        'user_id'         => $user->id,
-        'conversation_id' => $conversationId,
-    ]);
+    // Log::info('Channel auth', [
+    //     'user_id'         => $user->id,
+    //     'conversation_id' => $conversationId,
+    // ]);
 
     $isMember = ConversationParticipant::where('conversation_id', $conversationId)
         ->where('user_id', $user->id)

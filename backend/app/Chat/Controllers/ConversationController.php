@@ -240,7 +240,8 @@ class ConversationController extends Controller
 
             DB::commit();
             return response()->json([
-                'conversation' => $conversation->load('participants.user:id,name,avatar')
+                'conversation' => new MainConversationResource($conversation->load('participants.user:id,name,avatar,acc_type'))
+                // $conversation->load('participants.user:id,name,avatar')
             ], 201);
         } catch (\Throwable $e) {
             DB::rollBack();

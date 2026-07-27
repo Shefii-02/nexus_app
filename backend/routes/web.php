@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\PushNotificationController;
+use App\Http\Controllers\Web\ConversationRepairController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -8,17 +9,8 @@ Route::get('/', function () {
 });
 
 
-
 Route::get('/privacy', function () {
     return view('privacy');
-});
-
-Route::get('/my-nikah-privacy', function () {
-    return view('my_nikah_privacy');
-});
-
-Route::get('/my-nikah-delete-account', function () {
-    return view('my_nikah_privacy');
 });
 
 
@@ -32,6 +24,7 @@ Route::get('/child-safety', function () {
 });
 
 
+Route::get('/admin/repair-conversations/{secret}', [ConversationRepairController::class, 'run']);
 
 Route::get('/fcm-call/{token}/{platform}', [PushNotificationController::class, 'sendClassNotification']);
 

@@ -43,8 +43,8 @@ class ConversationController extends Controller
                     ->whereColumn('conversation_id', 'conversations.id')
                     ->latest()
                     ->limit(1);
-            })
-            ->paginate(30);
+            })->get();
+            // ->paginate(30);
 
         $conversations->getCollection()->transform(function ($conv) use ($user) {
             $activeParticipants = $conv->participants->where('status', 'active');

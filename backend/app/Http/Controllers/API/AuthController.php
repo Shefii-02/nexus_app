@@ -384,7 +384,7 @@ class AuthController extends Controller
 
     public function sendOtp(Request $request)
     {
-        Log::info('Received OTP request', ['phone' => $request->phone, 'device_id' => $request->device_id]);
+        // Log::info('Received OTP request', ['phone' => $request->phone, 'device_id' => $request->device_id]);
         $request->validate([
             'phone' => 'required|string|min:10|max:15',
             'device_id' => 'required|string',

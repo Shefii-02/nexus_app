@@ -452,7 +452,7 @@ class StaffController extends Controller
         // (see explanation above — reassign, block, or cascade; nulling shown
         // here only works if these columns are nullable in your schema)
         DB::table('courses')->where('teacher_id', $user->id)->update(['teacher_id' => null]);
-        DB::table('conversations')->where('created_by', $user->id)->update(['created_by' => null]);
+        DB::table('conversations')->where('created_by', $user->id)->update(['created_by' => 1]);
 
         // ── Media files: delete storage files AND their DB rows ──────────────
         $mediaFiles = DB::table('media_files')->where('user_id', $user->id)->get();

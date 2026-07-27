@@ -36,7 +36,7 @@ class MessageReadEvent implements ShouldBroadcast
         $data = [
             'message' => $this->conversationId
         ];
-        Log::info('MessageRead Broadcast', $data);
+        // Log::info('MessageRead Broadcast', $data);
         return [
             'conversation_id' => $this->conversationId,
             'user_id'         => $this->userId,

@@ -34,7 +34,7 @@ class MessageUpdated implements ShouldBroadcast
             'message' => $this->message->fresh(['reactions'])
         ];
 
-        Log::info('MessageUpdated Broadcast', $data);
+        // Log::info('MessageUpdated Broadcast', $data);
 
         return ['message' => $data];
     }

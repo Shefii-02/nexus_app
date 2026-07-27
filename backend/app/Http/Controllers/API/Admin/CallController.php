@@ -17,7 +17,7 @@ class CallController extends Controller
 
     public function store(Request $request, Course $course)
     {
-        Log::info($request->all());
+        // Log::info($request->all());
         $data = $request->validate([
             'teacher_id'      => ['required', 'exists:users,id'],
             'type'            => ['sometimes', Rule::in(['audio', 'video'])],

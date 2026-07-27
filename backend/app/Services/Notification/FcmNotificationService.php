@@ -281,10 +281,10 @@ class FcmNotificationService
                 ]
             );
 
-            Log::info('FcmNotificationService: sent', [
-                'type'   => $data['type'] ?? '?',
-                'status' => $response->getStatusCode(),
-            ]);
+            // Log::info('FcmNotificationService: sent', [
+            //     'type'   => $data['type'] ?? '?',
+            //     'status' => $response->getStatusCode(),
+            // ]);
         } catch (RequestException $e) {
             if ($this->isInvalidTokenError($e)) {
                 $platform->fcm_token = null;

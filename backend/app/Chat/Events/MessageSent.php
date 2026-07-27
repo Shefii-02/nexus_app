@@ -36,7 +36,7 @@ class MessageSent implements ShouldBroadcast
             'message' => $this->message->message
         ];
 
-        Log::info('message sending  Broadcast',  $data);
+        // Log::info('message sending  Broadcast',  $data);
 
         $this->message->load(['sender:id,name,avatar', 'replyTo:id,message,sender_id', 'reactions', 'media']);
         return [

@@ -141,8 +141,8 @@ class LoginController extends Controller
 
   public function AppleLoginCheck(Request $request)
   {
-    Log::info($request->all());
-    Log::info('Apple Details');
+    // Log::info($request->all());
+    // Log::info('Apple Details');
     try {
       $authUser = $request->user(); // may be null
       $idToken  = $request->input('idToken');

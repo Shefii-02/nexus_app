@@ -34,7 +34,7 @@ class MediaService
         // 🔥 delete file from storage
         if ($media->file_path && Storage::disk('public')->exists($media->file_path)) {
             Storage::disk('public')->delete($media->file_path);
-            Log::info('File Deleted');
+            // Log::info('File Deleted');
         }
 
         // 🔥 delete DB record

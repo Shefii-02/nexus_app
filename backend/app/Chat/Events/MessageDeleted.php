@@ -31,7 +31,7 @@ class MessageDeleted implements ShouldBroadcast
          $data = [
             'message' => $this->messageId
         ];
-            Log::info('MessageDelete Broadcast', $data);
+            // Log::info('MessageDelete Broadcast', $data);
         return ['message_id' => $this->messageId, 'conversation_id' => $this->conversationId];
     }
 }

@@ -43,7 +43,7 @@ class ReactionAdded implements ShouldBroadcast
                 'user_id' => $r->user_id,
                 'user'    => $r->user,
             ]))->toArray();
-        Log::info('message reactinh  Broadcast',  $reactions);
+        // Log::info('message reactinh  Broadcast',  $reactions);
         return [
             'message_id' => $this->messageId,
             'reactions'  => $reactions,

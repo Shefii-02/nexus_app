@@ -95,8 +95,8 @@ class CourseCallController extends Controller
             'student_ids.*'   => 'integer|exists:users,id',
         ]);
 
-        Log::info($request->all());
-        Log::alert($id);
+        // Log::info($request->all());
+        // Log::alert($id);
 
         // $students = User::whereIn('id', $request->student_ids)
         //     ->whereNotNull('fcm_token')
@@ -134,8 +134,8 @@ class CourseCallController extends Controller
         ]);
 
 
-        Log::info($request->all());
-        Log::alert($id);
+        // Log::info($request->all());
+        // Log::alert($id);
 
         $studentCount = count($request->student_ids);
 

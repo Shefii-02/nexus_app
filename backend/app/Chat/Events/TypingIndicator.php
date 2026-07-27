@@ -40,7 +40,7 @@ class TypingIndicator implements ShouldBroadcast
             'isTyping' => $this->isTyping,
         ];
 
-        Log::info('message typing  Broadcast', $data);
+        // Log::info('message typing  Broadcast', $data);
 
         return [
             'user_id'   => $this->userId,

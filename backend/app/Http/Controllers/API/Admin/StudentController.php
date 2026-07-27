@@ -166,8 +166,11 @@ class StudentController extends Controller
             // }
             // $this->studentService->delete($student);
 
-            $this->deleteUserData($user);
-            $user->forceDelete(); // ← permanent delete, bypasses SoftDeletes
+
+            $studentUser =  User::findOrFail($student);
+            $this->deleteUserData($studentUser);
+
+            // $user->forceDelete(); // ← permanent delete, bypasses SoftDeletes
 
 
             return $this->successResponse(null, 'Student deleted successfully');

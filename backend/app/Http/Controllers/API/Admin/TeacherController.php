@@ -181,8 +181,12 @@ class TeacherController extends Controller
             }
             $user = $request->user();
 
-            $this->deleteUserData($user);
-            $user->forceDelete(); // ← permanent delete, bypasses SoftDeletes
+
+            $teacherUser =  User::findOrFail($teacher);
+            $this->deleteUserData($teacherUser);
+
+            // $this->deleteUserData($user);
+            // $user->forceDelete(); // ← permanent delete, bypasses SoftDeletes
 
 
             // if ($user->acc_type === 'admin') {

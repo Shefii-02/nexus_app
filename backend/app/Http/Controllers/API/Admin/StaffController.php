@@ -285,15 +285,19 @@ class StaffController extends Controller
             }
             $user = $request->user();
 
+
             // if ($user->acc_type === 'admin') {
-            //     $this->staffService->forceDelete($staff);
+            // $this->staffService->forceDelete($staff);
             // } else {
             // $this->staffService->delete($staff);
             // }
             // $this->staffService->delete($staff);
 
-            $this->deleteUserData($user);
-            $user->forceDelete(); // ← permanent delete, bypasses SoftDeletes
+            $staffUser =  User::findOrFail($staff);
+            $this->deleteUserData($staffUser);
+            // $user->forceDelete(); // ← permanent delete, bypasses SoftDeletes
+
+            User::findOrFail($staff)->forceDelete();
 
 
             return $this->successResponse(null, 'Staff deleted successfully');

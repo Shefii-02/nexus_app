@@ -163,7 +163,7 @@ class UserController extends Controller
     {
         $filters = request()->query('filters', []);
         $users = User::get();
-        $q = $request->q;
+        $q = $request->q ?? $request->search;
 
         $users = User::query()
             ->where('acc_type', 'teacher')
@@ -183,7 +183,7 @@ class UserController extends Controller
     {
         $filters = request()->query('filters', []);
         $users = User::get();
-        $q = $request->q;
+        $q = $request->q ?? $request->search;
 
         $users = User::query()
             ->where('acc_type', 'staff')

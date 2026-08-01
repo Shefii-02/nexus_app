@@ -88,7 +88,7 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::get('/profile', [UserController::class, 'show']);
 
-    Route::post('/settings/account/delete', [UserController::class, 'deleteUserData']);
+    Route::post('/settings/account/delete', [UserController::class, 'destroyAccount']);
 
 
 

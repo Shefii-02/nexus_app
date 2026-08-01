@@ -165,6 +165,10 @@ class UserController extends Controller
         $users = User::get();
         $q = $request->q ?? $request->search;
 
+        if($q && strlen($q) < 1) {
+            return response()->json(['data' => []]);
+        }
+
         $users = User::query()
             ->where('acc_type', 'teacher')
             ->when($q, function ($query) use ($q) {
@@ -184,6 +188,11 @@ class UserController extends Controller
         $filters = request()->query('filters', []);
         $users = User::get();
         $q = $request->q ?? $request->search;
+
+         if($q && strlen($q) < 1) {
+            return response()->json(['data' => []]);
+        }
+
 
         $users = User::query()
             ->where('acc_type', 'staff')

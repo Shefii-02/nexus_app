@@ -42,12 +42,24 @@ class ConversationController extends Controller
                     ->where('cp.status', 'active');
             })
             ->select('conversations.*')
+            // ->selectSub(function ($q) use ($userId) {
+            //     $q->from('messages')
+            //         ->selectRaw('COUNT(*)')
+            //         ->whereColumn('messages.conversation_id', 'conversations.id')
+            //         ->where('messages.sender_id', '!=', $userId)
+            //         ->whereNull('messages.read_at'); // Adjust according to your schema
+            // }, 'unread_count')
             ->selectSub(function ($q) use ($userId) {
                 $q->from('messages')
                     ->selectRaw('COUNT(*)')
                     ->whereColumn('messages.conversation_id', 'conversations.id')
                     ->where('messages.sender_id', '!=', $userId)
-                    ->whereNull('messages.read_at'); // Adjust according to your schema
+                    ->whereNotExists(function ($sub) use ($userId) {
+                        $sub->selectRaw(1)
+                            ->from('message_reads')
+                            ->whereColumn('message_reads.message_id', 'messages.id')
+                            ->where('message_reads.user_id', $userId);
+                    });
             }, 'unread_count')
             ->orderByDesc('cp.is_pinned')
             ->orderByDesc('unread_count')

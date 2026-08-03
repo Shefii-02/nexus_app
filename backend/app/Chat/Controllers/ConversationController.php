@@ -38,13 +38,21 @@ class ConversationController extends Controller
             ->where('conversations.status', '!=', 'archived')
             ->leftJoin('conversation_participants as cp', function ($join) use ($userId) {
                 $join->on('cp.conversation_id', '=', 'conversations.id')
-                    ->where('cp.user_id', '=', $userId)
-                    ->where('cp.status', '=', 'active');
+                    ->where('cp.user_id', $userId)
+                    ->where('cp.status', 'active');
             })
             ->select('conversations.*')
+            ->selectSub(function ($q) use ($userId) {
+                $q->from('messages')
+                    ->selectRaw('COUNT(*)')
+                    ->whereColumn('messages.conversation_id', 'conversations.id')
+                    ->where('messages.sender_id', '!=', $userId)
+                    ->whereNull('messages.read_at'); // Adjust according to your schema
+            }, 'unread_count')
             ->orderByDesc('cp.is_pinned')
-            ->orderByDesc(function ($query) {
-                $query->select('created_at')
+            ->orderByDesc('unread_count')
+            ->orderByDesc(function ($q) {
+                $q->select('created_at')
                     ->from('messages')
                     ->whereColumn('messages.conversation_id', 'conversations.id')
                     ->latest()

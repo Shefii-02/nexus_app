@@ -28,23 +28,45 @@ class ConversationController extends Controller
     {
         $user   = $request->user();
         $userId = $user->id;
-
         $conversations = Conversation::with([
             'participants.user:id,name,avatar,acc_type,phone,email',
             'messages' => fn($q) => $q->latest()->limit(1),
             'messages.sender:id,name',
-            'media', // ← group avatar relation; remove if you don't have this
+            'media',
         ])
             ->forUser($userId)
             ->where('status', '!=', 'archived')
+            ->leftJoin('conversation_participants as cp', function ($join) use ($userId) {
+                $join->on('cp.conversation_id', '=', 'conversations.id')
+                    ->where('cp.user_id', '=', $userId)
+                    ->where('cp.status', '=', 'active');
+            })
+            ->select('conversations.*')
+            ->orderByDesc('cp.is_pinned')
             ->orderByDesc(function ($query) {
                 $query->select('created_at')
                     ->from('messages')
-                    ->whereColumn('conversation_id', 'conversations.id')
+                    ->whereColumn('messages.conversation_id', 'conversations.id')
                     ->latest()
                     ->limit(1);
             })
             ->paginate(1000);
+        // $conversations = Conversation::with([
+        //     'participants.user:id,name,avatar,acc_type,phone,email',
+        //     'messages' => fn($q) => $q->latest()->limit(1),
+        //     'messages.sender:id,name',
+        //     'media', // ← group avatar relation; remove if you don't have this
+        // ])
+        //     ->forUser($userId)
+        //     ->where('status', '!=', 'archived')
+        //     ->orderByDesc(function ($query) {
+        //         $query->select('created_at')
+        //             ->from('messages')
+        //             ->whereColumn('conversation_id', 'conversations.id')
+        //             ->latest()
+        //             ->limit(1);
+        //     })
+        //     ->paginate(1000);
 
         $conversations->getCollection()->transform(function ($conv) use ($user) {
             $activeParticipants = $conv->participants->where('status', 'active');
@@ -267,7 +289,7 @@ class ConversationController extends Controller
         $authId = config('adminId', 1) ?? $request->user()->id;
         $ownUser = $request->user();
 
-        $userIds = array_unique(array_merge([$authId,$ownUser->id], $request->user_ids));
+        $userIds = array_unique(array_merge([$authId, $ownUser->id], $request->user_ids));
 
         DB::beginTransaction();
         try {

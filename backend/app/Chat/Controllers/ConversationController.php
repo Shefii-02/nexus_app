@@ -35,7 +35,7 @@ class ConversationController extends Controller
             'media',
         ])
             ->forUser($userId)
-            ->where('status', '!=', 'archived')
+            ->where('conversations.status', '!=', 'archived')
             ->leftJoin('conversation_participants as cp', function ($join) use ($userId) {
                 $join->on('cp.conversation_id', '=', 'conversations.id')
                     ->where('cp.user_id', '=', $userId)

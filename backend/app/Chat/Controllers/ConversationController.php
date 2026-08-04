@@ -54,12 +54,12 @@ class ConversationController extends Controller
                     ->selectRaw('COUNT(*)')
                     ->whereColumn('messages.conversation_id', 'conversations.id')
                     ->where('messages.sender_id', '!=', $userId)
-                    ->whereNotExists(function ($sub) use ($userId) {
-                        $sub->selectRaw(1)
-                            ->from('message_reads')
-                            ->whereColumn('message_reads.message_id', 'messages.id')
-                            ->where('message_reads.user_id', $userId);
-                    });
+                    // ->whereNotExists(function ($sub) use ($userId) {
+                    //     $sub->selectRaw(1)
+                    //         ->from('message_reads')
+                    //         ->whereColumn('message_reads.message_id', 'messages.id')
+                    //         ->where('message_reads.user_id', $userId);
+                    // });
             }, 'unread_count')
             ->orderByDesc('cp.is_pinned')
             ->orderByDesc('unread_count')

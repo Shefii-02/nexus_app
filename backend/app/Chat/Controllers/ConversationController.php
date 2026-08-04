@@ -28,51 +28,51 @@ class ConversationController extends Controller
     {
         $user   = $request->user();
         $userId = $user->id;
-        $conversations = Conversation::with([
-            'participants.user:id,name,avatar,acc_type,phone,email',
-            'messages' => fn($q) => $q->latest()->limit(1),
-            'messages.sender:id,name',
-            'media',
-        ])
-            ->forUser($userId)
-            ->where('conversations.status', '!=', 'archived')
-            ->leftJoin('conversation_participants as cp', function ($join) use ($userId) {
-                $join->on('cp.conversation_id', '=', 'conversations.id')
-                    ->where('cp.user_id', $userId)
-                    ->where('cp.status', 'active');
-            })
-            ->select('conversations.*')
-            // ->selectSub(function ($q) use ($userId) {
-            //     $q->from('messages')
-            //         ->selectRaw('COUNT(*)')
-            //         ->whereColumn('messages.conversation_id', 'conversations.id')
-            //         ->where('messages.sender_id', '!=', $userId)
-            //         ->whereNull('messages.read_at'); // Adjust according to your schema
-            // }, 'unread_count')
-            ->selectSub(function ($q) use ($userId) {
-                $q->from('messages')
-                    ->selectRaw('COUNT(*)')
-                    ->whereColumn('messages.conversation_id', 'conversations.id')
-                    ->where('messages.sender_id', '!=', $userId)
-                    // ->whereNotExists(function ($sub) use ($userId) {
-                    //     $sub->selectRaw(1)
-                    //         ->from('message_reads')
-                    //         ->whereColumn('message_reads.message_id', 'messages.id')
-                    //         ->where('message_reads.user_id', $userId);
-                    // });
-            }, 'unread_count')
-            ->orderByDesc('cp.is_pinned')
-            ->orderByDesc('unread_count')
-            ->orderByDesc(function ($q) {
-                $q->select('created_at')
-                    ->from('messages')
-                    ->whereColumn('messages.conversation_id', 'conversations.id')
-                    ->latest()
-                    ->limit(1);
-            })
-            ->paginate(1000);
         // $conversations = Conversation::with([
         //     'participants.user:id,name,avatar,acc_type,phone,email',
+        //     'messages' => fn($q) => $q->latest()->limit(1),
+        //     'messages.sender:id,name',
+        //     'media',
+        // ])
+        //     ->forUser($userId)
+        //     ->where('conversations.status', '!=', 'archived')
+        //     ->leftJoin('conversation_participants as cp', function ($join) use ($userId) {
+        //         $join->on('cp.conversation_id', '=', 'conversations.id')
+        //             ->where('cp.user_id', $userId)
+        //             ->where('cp.status', 'active');
+        //     })
+        //     ->select('conversations.*')
+        //     // ->selectSub(function ($q) use ($userId) {
+        //     //     $q->from('messages')
+        //     //         ->selectRaw('COUNT(*)')
+        //     //         ->whereColumn('messages.conversation_id', 'conversations.id')
+        //     //         ->where('messages.sender_id', '!=', $userId)
+        //     //         ->whereNull('messages.read_at'); // Adjust according to your schema
+        //     // }, 'unread_count')
+        //     ->selectSub(function ($q) use ($userId) {
+        //         $q->from('messages')
+        //             ->selectRaw('COUNT(*)')
+        //             ->whereColumn('messages.conversation_id', 'conversations.id')
+        //             ->where('messages.sender_id', '!=', $userId)
+        //             ->whereNotExists(function ($sub) use ($userId) {
+        //                 $sub->selectRaw(1)
+        //                     ->from('message_reads')
+        //                     ->whereColumn('message_reads.message_id', 'messages.id')
+        //                     ->where('message_reads.user_id', $userId);
+        //             });
+        //     }, 'unread_count')
+        //     ->orderByDesc('cp.is_pinned')
+        //     ->orderByDesc('unread_count')
+        //     ->orderByDesc(function ($q) {
+        //         $q->select('created_at')
+        //             ->from('messages')
+        //             ->whereColumn('messages.conversation_id', 'conversations.id')
+        //             ->latest()
+        //             ->limit(1);
+        //     })
+        //     ->paginate(1000);
+        // // $conversations = Conversation::with([
+        // //     'participants.user:id,name,avatar,acc_type,phone,email',
         //     'messages' => fn($q) => $q->latest()->limit(1),
         //     'messages.sender:id,name',
         //     'media', // ← group avatar relation; remove if you don't have this
@@ -88,30 +88,73 @@ class ConversationController extends Controller
         //     })
         //     ->paginate(1000);
 
+        // $conversations->getCollection()->transform(function ($conv) use ($user) {
+        //     $activeParticipants = $conv->participants->where('status', 'active');
+        //     $participant = $activeParticipants->firstWhere('user_id', $user->id);
+
+        //     $conv->unread_count = $conv->getUnreadCountFor($user->id);
+        //     $conv->is_muted = $participant?->is_muted ?? false;
+        //     $conv->is_pinned = $participant?->is_pinned ?? false;
+
+        //     $conv->reply_permission_value = $conv->reply_permission;
+        //     $conv->reply_permission = $conv->canUserSend($user) ?? 0;
+
+        //     $conv->total_members = $activeParticipants->count();
+
+        //     if ($conv->type === 'single') {
+        //         $otherParticipant = $activeParticipants
+        //             ->first(fn($p) => $p->user_id != $user->id);
+        //         $conv->other_user = $otherParticipant?->user;
+        //     }
+
+        //     $conv->module_id = $conv->module_id ?? null;
+        //     $conv->type = $conv->type ?? 'single';
+
+        //     return $conv;
+        // });
+
+        $conversations = Conversation::with([
+            'participants.user:id,name,avatar,acc_type,phone,email',
+            'messages' => fn($q) => $q->latest()->limit(1),
+            'messages.sender:id,name',
+            'media',
+        ])
+            ->forUser($userId)
+            ->where('status', '!=', 'archived')
+            ->leftJoin('conversation_participants as cp', function ($join) use ($userId) {
+                $join->on('cp.conversation_id', '=', 'conversations.id')
+                    ->where('cp.user_id', '=', $userId)
+                    ->where('cp.status', '=', 'active');
+            })
+            ->select('conversations.*')
+            ->orderByDesc('cp.is_pinned')
+            ->orderByDesc(function ($query) {
+                $query->select('created_at')
+                    ->from('messages')
+                    ->whereColumn('messages.conversation_id', 'conversations.id')
+                    ->latest()
+                    ->limit(1);
+            })
+            ->paginate(1000);
+
         $conversations->getCollection()->transform(function ($conv) use ($user) {
             $activeParticipants = $conv->participants->where('status', 'active');
             $participant = $activeParticipants->firstWhere('user_id', $user->id);
-
             $conv->unread_count = $conv->getUnreadCountFor($user->id);
             $conv->is_muted = $participant?->is_muted ?? false;
             $conv->is_pinned = $participant?->is_pinned ?? false;
-
             $conv->reply_permission_value = $conv->reply_permission;
             $conv->reply_permission = $conv->canUserSend($user) ?? 0;
-
             $conv->total_members = $activeParticipants->count();
-
             if ($conv->type === 'single') {
-                $otherParticipant = $activeParticipants
-                    ->first(fn($p) => $p->user_id != $user->id);
+                $otherParticipant = $activeParticipants->first(fn($p) => $p->user_id != $user->id);
                 $conv->other_user = $otherParticipant?->user;
             }
-
             $conv->module_id = $conv->module_id ?? null;
             $conv->type = $conv->type ?? 'single';
-
             return $conv;
         });
+        return response()->json(['data' => MainConversationResource::collection($conversations->getCollection()), 'meta' => ['current_page' => $conversations->currentPage(), 'last_page' => $conversations->lastPage(), 'per_page' => $conversations->perPage(), 'total' => $conversations->total(),],]);
 
         return response()->json([
             'data' => MainConversationResource::collection($conversations->getCollection()),

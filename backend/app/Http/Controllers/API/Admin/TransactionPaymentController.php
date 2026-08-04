@@ -34,7 +34,7 @@ class TransactionPaymentController extends Controller
     /**
      * Download/share link for a PAID admission receipt (student's own).
      */
-    public function studentReceipt(Request $request,$paymentId): JsonResponse
+    public function studentReceipt(Request $request, $paymentId): JsonResponse
     {
         // $request->validate(['payment_id' => ['required', 'integer']]);
 
@@ -110,7 +110,7 @@ class TransactionPaymentController extends Controller
     /**
      * Download/share link for a RELEASED teacher payment receipt (own).
      */
-    public function teacherReceipt(Request $request,$paymentId): JsonResponse
+    public function teacherReceipt(Request $request, $paymentId): JsonResponse
     {
         // $request->validate(['payment_id' => ['required', 'integer']]);
 
@@ -141,7 +141,7 @@ class TransactionPaymentController extends Controller
     /**
      * Download link for a PENDING teacher payment invoice (own).
      */
-    public function teacherPendingInvoice(Request $request,$paymentId): JsonResponse
+    public function teacherPendingInvoice(Request $request, $paymentId): JsonResponse
     {
         // $request->validate(['payment_id' => ['required', 'integer']]);
 
@@ -188,7 +188,7 @@ class TransactionPaymentController extends Controller
     /**
      * Download/share link for a RELEASED staff salary receipt (own).
      */
-    public function staffReceipt(Request $request,$paymentId): JsonResponse
+    public function staffReceipt(Request $request, $paymentId): JsonResponse
     {
         // $request->validate(['payment_id' => ['required', 'integer']]);
 
@@ -218,7 +218,7 @@ class TransactionPaymentController extends Controller
     /**
      * Download link for a PENDING staff salary invoice (own).
      */
-    public function staffPendingInvoice(Request $request,$paymentId): JsonResponse
+    public function staffPendingInvoice(Request $request, $paymentId): JsonResponse
     {
         // $request->validate(['payment_id' => ['required', 'integer']]);
 
@@ -408,12 +408,11 @@ class TransactionPaymentController extends Controller
      */
     private function getAdmissionPayments(?int $studentId = null): Collection
     {
-        return AdmissionPayment::with([
-            'student:id,name',
-            'course:id,name',
-            'admission:id',
-        ])
-            ->when($studentId, fn ($query) => $query->where('student_id', $studentId))
+        return AdmissionPayment::whereHas('student', function ($query) use ($studentId) {
+            $query->when($studentId, fn($q) => $q->where('id', $studentId));
+        })->whereHas('admission', function ($query) {
+            $query->where('status', 'paid');
+        })->when($studentId, fn($query) => $query->where('student_id', $studentId))
             ->orderByDesc('paid_at')
             ->get()
             ->map(function ($payment) {
@@ -447,7 +446,7 @@ class TransactionPaymentController extends Controller
             'admission:id',
         ])
             ->where('status', 'pending')
-            ->when($studentId, fn ($query) => $query->where('student_id', $studentId))
+            ->when($studentId, fn($query) => $query->where('student_id', $studentId))
             ->latest()
             ->get()
             ->map(function ($renewal) {
@@ -485,7 +484,7 @@ class TransactionPaymentController extends Controller
             'items.course:id,name',
         ])
             ->where('status', $status)
-            ->when($teacherId, fn ($q) => $q->where('teacher_id', $teacherId));
+            ->when($teacherId, fn($q) => $q->where('teacher_id', $teacherId));
 
         $query = $status === 'released'
             ? $query->latest('payment_date')
@@ -549,7 +548,7 @@ class TransactionPaymentController extends Controller
             'releasedBy:id,name',
         ])
             ->where('status', $status)
-            ->when($staffId, fn ($q) => $q->where('staff_id', $staffId));
+            ->when($staffId, fn($q) => $q->where('staff_id', $staffId));
 
         $query = $status === 'released'
             ? $query->latest('payment_date')

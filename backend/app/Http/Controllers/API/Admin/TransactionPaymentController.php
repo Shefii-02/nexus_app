@@ -408,10 +408,12 @@ class TransactionPaymentController extends Controller
      */
     private function getAdmissionPayments(?int $studentId = null): Collection
     {
-        return AdmissionPayment::whereHas('student', function ($query) use ($studentId) {
+        return AdmissionPayment::
+        whereHas('student', function ($query) use ($studentId) {
             $query->when($studentId, fn($q) => $q->where('id', $studentId));
-        })->whereHas('admission', function ($query) {
-            $query->where('status', 'paid');
+        })->
+        whereHas('admission', function ($query) {
+            $query->where('status', 'active');
         })->when($studentId, fn($query) => $query->where('student_id', $studentId))
             ->orderByDesc('paid_at')
             ->get()

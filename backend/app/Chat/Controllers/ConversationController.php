@@ -696,6 +696,15 @@ class ConversationController extends Controller
                 ]);
             }
 
+            if ($type === 'audio' || $type === 'voice') {
+
+                return array_merge($base, [
+                    'media_url' => $fileUrl,
+                    'thumb_url' => $fileUrl,
+                ]);
+            }
+
+
             if ($type === 'links') {
 
                 $url = $row->message;

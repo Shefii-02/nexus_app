@@ -313,6 +313,9 @@ class PollController extends Controller
     {
         // $poll = Poll::with(['options.votes.user:id,name,avatar,phone,options.votes.user.media'])->findOrFail($pollId);
         $poll = Poll::with([
+            'options.votes' => function ($q) {
+                $q->orderBy('created_at', 'asc'); // ✅ oldest voter first
+            },
             'options.votes.user:id,name,phone,avatar',   // ✅ id + phone + avatar FK column
             'options.votes.user.media',                   // ✅ separate entry — nested relation
         ])->findOrFail($pollId);

@@ -635,8 +635,12 @@ class ConversationController extends Controller
                 $query->whereIn('messages.type', [
                     'image',
                     'video',
+                ]);
+                break;
+            case 'audio':
+                 $query->whereIn('messages.type', [
                     'audio',
-                    'voice'
+                    'voice',
                 ]);
                 break;
 

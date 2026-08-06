@@ -638,12 +638,17 @@ class ConversationController extends Controller
                 ]);
                 break;
             case 'audio':
-                 $query->whereIn('messages.type', [
+                $query->whereIn('messages.type', [
                     'audio',
                     'voice',
                 ]);
                 break;
-
+            case 'voice':
+                $query->whereIn('messages.type', [
+                    'audio',
+                    'voice',
+                ]);
+                break;
             case 'links':
                 $query->where('messages.type', 'link');
                 break;

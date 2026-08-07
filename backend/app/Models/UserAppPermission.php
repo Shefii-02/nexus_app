@@ -29,7 +29,8 @@ class UserAppPermission extends Model
         'teacher_payments',
         'staff_payments',
         'announcement_manage',
-        'notification_manage'
+        'notification_manage',
+        'payment_manage'
 
 
     ];

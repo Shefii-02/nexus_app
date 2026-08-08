@@ -96,7 +96,7 @@ class TransactionPaymentController extends Controller
      */
     public function teacher(Request $request): JsonResponse
     {
-        $user = $request->user()->id;
+        $user = $request->user();
         $userID = $user->id;
         $userType = $user->acc_type;
 

@@ -103,8 +103,8 @@ class TransactionPaymentController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
-                'pending_release' => $userType == 'Teacher' ? $this->getTeacherPayments('pending', $userID) :  $this->getStaffPayments('pending', $userID),
-                'released'        => $userType == 'Teacher' ? $this->getTeacherPayments('released', $userID) :  $this->getStaffPayments('released', $userID),
+                'pending_release' => $userType == 'teacher' ? $this->getTeacherPayments('pending', $userID) :  $this->getStaffPayments('pending', $userID),
+                'released'        => $userType == 'teacher' ? $this->getTeacherPayments('released', $userID) :  $this->getStaffPayments('released', $userID),
             ],
         ]);
     }

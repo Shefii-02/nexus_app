@@ -99,7 +99,7 @@ class TransactionPaymentController extends Controller
     {
         $user = $request->user();
         $userID = $request->user()->id;
-        $userType = $user->acc_type;
+        $userType = $user->acc_type == 'teacher' ? 'teacher' : 'staff';
 
         Log::info('teacher() hit', ['user' => $request->user(), 'acc_type' => $request->user()?->acc_type]);
 

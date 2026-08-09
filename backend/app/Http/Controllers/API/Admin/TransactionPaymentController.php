@@ -11,6 +11,7 @@ use App\Services\ReceiptPdfService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class TransactionPaymentController extends Controller
@@ -99,6 +100,8 @@ class TransactionPaymentController extends Controller
         $user = $request->user();
         $userID = $request->user()->id;
         $userType = $user->acc_type;
+
+        Log::info('teacher() hit', ['user' => $request->user(), 'acc_type' => $request->user()?->acc_type]);
 
         return response()->json([
             'success' => true,

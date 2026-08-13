@@ -101,8 +101,6 @@ class TransactionPaymentController extends Controller
         $userID = $request->user()->id;
         $userType = $user->acc_type == 'teacher' ? 'teacher' : 'staff';
 
-        Log::info('teacher() hit', ['user' => $request->user(), 'acc_type' => $request->user()?->acc_type]);
-
         return response()->json([
             'success' => true,
             'data' => [

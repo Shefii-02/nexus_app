@@ -4,11 +4,14 @@ namespace App\Http\Controllers\API\Admin;
 
 use App\Chat\Events\PollClosed;
 use App\Chat\Events\PollVoteCast;
+use App\Chat\Events\UserNewMessage;
 use App\Chat\Models\Message;
 use App\Http\Controllers\Controller;
 use App\Models\{Conversation, ConversationParticipant, Poll, PollOption, PollVote};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Services\Notification\FcmNotificationService;
+use Illuminate\Support\Str;
 
 class PollController extends Controller
 {
@@ -71,6 +74,44 @@ class PollController extends Controller
         });
 
         broadcast(new \App\Chat\Events\MessageSent($result))->toOthers();
+
+         $participants = ConversationParticipant::where('conversation_id', $conversationId)
+            ->where('user_id', '!=', $user->id)
+            ->where('status', 'active')->get();
+        // ->pluck('user_id');
+
+        foreach ($participants as $recipient) {
+            $recipientId = $recipient->user_id;
+            $unread = Message::where('conversation_id', $conversationId)
+                ->where('sender_id', '!=', $recipientId)
+                ->whereDoesntHave('reads', fn($q) => $q->where('user_id', $recipientId))
+                ->count();
+
+            broadcast(new UserNewMessage(
+                $recipientId,
+                $conversationId,
+                $request->user()->name,
+                $poll->question ?? '📎 Media',
+                $unread
+            ));
+
+            // New chat message
+            // FCM push — only if participant hasn't muted this conversation
+            $isMuted = $recipient->is_muted;
+            // ConversationParticipant::where('conversation_id', $conversationId)
+            // ->where('user_id', $recipientId)
+            // ->value('is_muted');
+
+            if (!$isMuted) {
+                (new FcmNotificationService())->sendNewMessage($recipientId, [
+                    'conversation_id'   => $conversationId,
+                    'sender_name'       => $request->user()->name,
+                    'preview'           => Str::limit($message->message ?? '📎 Media', 80),
+                    'conversation_name' => $conv?->title ?? $request->user()->name,
+                ]);
+            }
+        }
+
 
         return response()->json(['message' => $result], 201);
     }

@@ -365,13 +365,13 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('teacher', [TransactionPaymentController::class, 'teacher']);
         Route::get('staff',   [TransactionPaymentController::class, 'staff']);
         Route::get('admin',   [TransactionPaymentController::class, 'admin']);
-        Route::get('admin',   [TransactionPaymentController::class, 'admin']);
+        // Route::get('admin',   [TransactionPaymentController::class, 'admin']);
         Route::get('receipt/{id}', [TransactionPaymentController::class, 'studentReceipt']);
         // Student
         Route::get('/student/receipt/{$id}', [TransactionPaymentController::class, 'studentReceipt']);          // ?payment_id=
         Route::get('/student/pending-invoice', [TransactionPaymentController::class, 'studentPendingInvoice']); // ?renewal_id=
 
-        // Teacher
+        // TeacherU
         Route::get('/teacher/receipt', [TransactionPaymentController::class, 'teacherReceipt']);          // ?payment_id=
         Route::get('/teacher/pending-invoice', [TransactionPaymentController::class, 'teacherPendingInvoice']); // ?payment_id=
 

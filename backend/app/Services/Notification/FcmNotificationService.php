@@ -337,7 +337,7 @@ class FcmNotificationService
             'incoming_call'                => 'call_channel',
             'class_started', 'class_reminder' => 'class_alert_channel',
             'announcement'                 => 'announcement_channel',
-            'material_uploaded',
+            'material_uploaded'               => 'material_channel',
             'recorded_class'               => 'material_channel',
             'admission'                    => 'admission_channel',
             // default                        => 'general_channel',

@@ -269,6 +269,9 @@ class FcmNotificationService
             ],
         ];
 
+
+        Log::alert($payload);
+
         try {
             $response = $this->client->post(
                 'https://fcm.googleapis.com/v1/projects/' . $this->projectId() . '/messages:send',

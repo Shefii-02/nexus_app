@@ -36,17 +36,30 @@ class MessageResource extends JsonResource
                 ]
             ),
 
+
             'message' =>
             $this->is_deleted
                 ? null
-                : $this->message,
+                : (in_array($this->type, ['poll', 'voice', 'image'])
+                    ? ($this->type == 'poll' ? $this->poll?->question : null)
+                    : $this->message),
+
+            // 'message' =>
+            // $this->is_deleted
+            //     ? null
+            //     : ($this->type == 'poll' ? $this->poll?->question : $this->message),
+
+            // 'message' =>
+            // $this->is_deleted
+            //     ? null
+            //     : $this->message,
 
             'type' =>
             $this->is_deleted
                 ? 'deleted'
                 : $this->type,
 
-            'media_url' => $this->media?->file_path ?  asset('storage/'.$this->media->file_path) : "",
+            'media_url' => $this->media?->file_path ?  asset('storage/' . $this->media->file_path) : "",
 
             // 'media_url' => $this->whenLoaded(
             //     'media',

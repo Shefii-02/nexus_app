@@ -290,11 +290,11 @@ class FcmNotificationService
                 $platform->fcm_token = null;
                 $platform->save();
 
-                Log::warning('FcmNotificationService: invalid token cleared', [
-                    'user_id'  => $platform->user_id,
-                    'platform' => $platform->platform,
-                    'type'     => $data['type'] ?? 'unknown',
-                ]);
+                // Log::warning('FcmNotificationService: invalid token cleared', [
+                //     'user_id'  => $platform->user_id,
+                //     'platform' => $platform->platform,
+                //     'type'     => $data['type'] ?? 'unknown',
+                // ]);
                 return;
             }
 
@@ -332,14 +332,16 @@ class FcmNotificationService
     private function channelForType(string $type): string
     {
         return match ($type) {
-            'new_message'                  => 'chat_channel',
+            // 'new_message'                  => 'chat_channel',
+            'new_message'                  => 'chat_channel_v2',
             'incoming_call'                => 'call_channel',
             'class_started', 'class_reminder' => 'class_alert_channel',
             'announcement'                 => 'announcement_channel',
             'material_uploaded',
             'recorded_class'               => 'material_channel',
             'admission'                    => 'admission_channel',
-            default                        => 'general_channel',
+            // default                        => 'general_channel',
+            default                        => 'general_channel_v2'
         };
     }
 

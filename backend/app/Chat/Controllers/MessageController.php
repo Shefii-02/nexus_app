@@ -479,9 +479,15 @@ class MessageController extends Controller
             'updated_at' => $now,
         ])->toArray();
 
+        // if (!empty($reads)) {
+        //     MessageRead::insert($reads);
+        //     broadcast(new MessageReadEvent($conversationId, $userId, $now->toISOString()))->toOthers();
+        // }
         if (!empty($reads)) {
-            MessageRead::insert($reads);
-            broadcast(new MessageReadEvent($conversationId, $userId, $now->toISOString()))->toOthers();
+            $inserted = MessageRead::insertOrIgnore($reads);
+            if ($inserted > 0) {
+                broadcast(new MessageReadEvent($conversationId, $userId, $now->toISOString()))->toOthers();
+            }
         }
     }
 }

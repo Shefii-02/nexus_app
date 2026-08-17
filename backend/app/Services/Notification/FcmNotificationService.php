@@ -250,7 +250,8 @@ class FcmNotificationService
                     'ttl'          => '60s',
                     'notification' => [
                         'channel_id' => $this->channelForType($data['type'] ?? ''),
-                        'sound'      => 'default',
+                        // 'sound'      => 'default',
+                        'sound' => $data['type'] == 'new_message' ||  $data['type'] == 'general' ? 'notification_tone.caf' : 'default',
                     ],
                 ],
                 'apns' => [
@@ -261,7 +262,7 @@ class FcmNotificationService
                                 'title' => $notification['title'],
                                 'body'  => $notification['body'],
                             ],
-                            'sound' => 'default',
+                            'sound' => $data['type'] == 'new_message' ||  $data['type'] == 'general' ? 'notification_tone.caf' : 'default',
                             'badge' => 1,
                         ],
                     ],

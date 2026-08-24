@@ -38,7 +38,7 @@ class CourseController extends Controller
     public function index(): JsonResponse
     {
         $page = request()->query('page', 1);
-        $perPage = request()->query('per_page', 15);
+        $perPage = request()->query('per_page', 1000);
 
 
         $filters = [

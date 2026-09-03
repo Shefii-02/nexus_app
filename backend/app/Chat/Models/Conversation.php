@@ -39,7 +39,7 @@ class Conversation extends Model
         $userRank = self::ROLE_RANK[$user->acc_type] ?? 0;
         $requiredRank = self::ROLE_RANK[$this->reply_permission] ?? 0;
 // Log::info("User rank: $userRank, Required rank: $requiredRank", ['user_id' => $user->id, 'conversation_id' => $this->id, 'reply_permission' => $this->reply_permission]);
-Log::alert($userRank >= $requiredRank ? true : false);
+// Log::alert($userRank >= $requiredRank ? true : false);
         return $userRank >= $requiredRank ? true : false;
     }
 

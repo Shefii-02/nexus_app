@@ -35,7 +35,7 @@ class MainConversationResource extends JsonResource
             'is_muted'              => $this->is_muted ?? false,
             'is_pinned'             => $this->is_pinned ?? false,
             // 'reply_permission'      =>  $this->reply_permission ?? 0,
-            'reply_permission'        => $this->canUserSend($user) ?? 0,
+            'reply_permission'        => $this->can_reply ?? false,
             'reply_permission_value' => $this->reply_permission_value,
             'total_members'         => $this->total_members ?? 0,
 

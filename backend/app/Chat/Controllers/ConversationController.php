@@ -145,10 +145,8 @@ class ConversationController extends Controller
             $conv->is_muted = $participant?->is_muted ?? false;
             $conv->is_pinned = $participant?->is_pinned ?? false;
             $conv->reply_permission_value = $conv->reply_permission;
-            $conv->reply_permission = $conv->canUserSend($user) ?? 0;
-            Log::info("Processing conversation ID: {$conv->id} for user ID: {$user->id}");
-            Log::info($conv->canUserSend($user));
-            Log::alert($conv->reply_permission);
+            $conv->can_reply = $conv->canUserSend($user);
+
             $conv->total_members = $activeParticipants->count();
             if ($conv->type === 'single') {
                 $otherParticipant = $activeParticipants->first(fn($p) => $p->user_id != $user->id);

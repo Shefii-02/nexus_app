@@ -138,6 +138,8 @@ class ConversationController extends Controller
             ->paginate(1000);
 
         $conversations->getCollection()->transform(function ($conv) use ($user) {
+            Log::info("Processing conversation ID: {$conv->id} for user ID: {$user->id}");
+            Log::info($conv->canUserSend($user));
             $activeParticipants = $conv->participants->where('status', 'active');
             $participant = $activeParticipants->firstWhere('user_id', $user->id);
             $conv->unread_count = $conv->getUnreadCountFor($user->id);

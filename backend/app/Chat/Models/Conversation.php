@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Log;
 
 class Conversation extends Model
 {
@@ -37,7 +38,7 @@ class Conversation extends Model
     {
         $userRank = self::ROLE_RANK[$user->acc_type] ?? 0;
         $requiredRank = self::ROLE_RANK[$this->reply_permission] ?? 0;
-
+Log::info("User rank: $userRank, Required rank: $requiredRank");
         return $userRank >= $requiredRank;
     }
 
